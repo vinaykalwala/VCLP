@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head><title>Mark Attendance</title></head>
+<body>
+<h2>Mark Attendance</h2>
+<form method="post">
+    {% csrf_token %}
+    <label>Date:</label>
+    <input type="date" name="date" required><br><br>
+
+    <table border="1">
+        <tr>
+            <th>Intern ID</th>
+            <th>Name</th>
+            <th>Status</th>
+        </tr>
+        {% for intern in interns %}
+        <tr>
+            <td>{{ intern.unique_id }}</td>
+            <td>{{ intern.user.username }}</td>
+            <td>
+                <select name="status_{{ intern.id }}">
+                    <option value="">--</option>
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                </select>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <button type="submit">Submit</button>
+</form>
+<a href="{% url 'dashboard' %}">Back</a>
+</body>
+</html>

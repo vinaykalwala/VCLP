@@ -1,4 +1,181 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
+from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile
 
 def home(request):
-    return render(request, 'home.html')  # Template we will create
+    return render(request, 'home.html') 
+
+# =====================
+# Signup
+# =====================
+def signup_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        role = request.POST.get('role')
+
+        # validations
+        if not username or not first_name or not last_name or not email or not phone or not password1 or not password2 or not role:
+            messages.error(request, "All fields are required.")
+            return render(request, 'signup.html')
+
+        if password1 != password2:
+            messages.error(request, "Passwords do not match.")
+            return render(request, 'signup.html')
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Invalid email address.")
+            return render(request, 'signup.html')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken.")
+            return render(request, 'signup.html')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already associated with an account.")
+            return render(request, 'signup.html')
+
+        if User.objects.filter(phone=phone).exists():
+            messages.error(request, "Phone number already associated with an account.")
+            return render(request, 'signup.html')
+
+        # create user
+        user = User(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            password=make_password(password1),
+            plain_password=password1,
+            role=role
+        )
+        if role == "superuser":
+            user.is_staff = True
+            user.is_superuser = True
+        user.save()
+
+        # create profile based on role
+        if role == "intern":
+            last_intern = InternProfile.objects.order_by("-id").first()
+            if last_intern and last_intern.unique_id:
+                last_number = int(last_intern.unique_id.replace("VCPL", ""))
+                new_id = f"VCPL{last_number + 1:03d}"
+            else:
+                new_id = "VCPL001"
+            InternProfile.objects.create(user=user, unique_id=new_id)
+
+        elif role == "trainer":
+            TrainerProfile.objects.create(user=user)
+
+        elif role == "admin":
+            AdminProfile.objects.create(user=user)
+
+        elif role == "superuser":
+            SuperUserProfile.objects.create(user=user)
+
+        messages.success(request, "Account created successfully! Please log in.")
+        return redirect('login')
+
+    return render(request, 'signup.html', {'role_choices': User.ROLE_CHOICES})
+
+
+# =====================
+# Login / Logout
+# =====================
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Invalid credentials.")
+    return render(request, 'login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+# =====================
+# Dashboards
+# =====================
+@login_required
+def dashboard_view(request):
+    if request.user.role == "superuser":
+        return render(request, "dashboards/superuserdashboard.html")
+    elif request.user.role == "admin":
+        return render(request, "dashboards/administratordashboard.html")
+    elif request.user.role == "trainer":
+        return render(request, "dashboards/trainerdashboard.html")
+    elif request.user.role == "intern":
+        return render(request, "dashboards/interndashboard.html")
+    else:
+        return render(request, "dashboards/defaultdashboard.html")
+
+
+# =====================
+# Attendance (Trainer)
+# =====================
+@login_required
+def mark_attendance(request):
+    if request.user.role != "trainer":
+        return redirect('dashboard')
+
+    trainer = request.user.trainer_profile
+    interns = InternProfile.objects.all()
+
+    if request.method == "POST":
+        for intern in interns:
+            status = request.POST.get(f"status_{intern.id}")
+            if status:
+                Attendance.objects.update_or_create(
+                    intern=intern, date=request.POST.get("date"), defaults={"trainer": trainer, "status": status}
+                )
+        messages.success(request, "Attendance updated successfully.")
+        return redirect("mark_attendance")
+
+    return render(request, "attendance/mark_attendance.html", {"interns": interns})
+
+
+# =====================
+# File Upload / View
+# =====================
+@login_required
+def upload_lesson(request):
+    if request.user.role != "trainer":
+        return redirect('dashboard')
+
+    if request.method == "POST" and request.FILES.get("file"):
+        trainer = request.user.trainer_profile
+        title = request.POST.get("title")
+        file = request.FILES["file"]
+        LessonFile.objects.create(trainer=trainer, title=title, file=file)
+        messages.success(request, "File uploaded successfully.")
+        return redirect("upload_lesson")
+
+    return render(request, "files/upload.html")
+
+
+@login_required
+def view_lessons(request):
+    lessons = LessonFile.objects.all()
+    return render(request, "files/view.html", {"lessons": lessons})
+

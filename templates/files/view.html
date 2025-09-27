@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Lessons</title></head>
+<body>
+<h2>Available Lessons</h2>
+<ul>
+{% for lesson in lessons %}
+    <li>
+        <b>{{ lesson.title }}</b> (Uploaded: {{ lesson.uploaded_at }})<br>
+        <!-- Embed PDF view-only -->
+        <iframe src="{{ lesson.file.url }}" width="600" height="400"></iframe>
+    </li>
+{% empty %}
+    <li>No lessons available.</li>
+{% endfor %}
+</ul>
+<a href="{% url 'dashboard' %}">Back</a>
+</body>
+</html>
