@@ -294,11 +294,12 @@ from xhtml2pdf import pisa
 # ==================================
 # Helper Function for PDF Generation
 # ==================================
+
 def generate_pdf_for_intern(intern):
     """
     Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
     """
-    
+
     context = {'intern': intern}
     html_string = render_to_string('certificates/certificate_template.html', context)
 
@@ -316,6 +317,7 @@ def generate_pdf_for_intern(intern):
     pdf_bytes = result.getvalue()
     result.close()
     return pdf_bytes
+
 # ================================
 # Certificate Management View (Admin)
 # ================================
