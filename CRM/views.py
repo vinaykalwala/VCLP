@@ -5,8 +5,13 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
 
-from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile
+
+
+from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile,Batch
 
 def home(request):
     return render(request, 'home.html') 
@@ -72,7 +77,7 @@ def signup_view(request):
         if role == "intern":
             last_intern = InternProfile.objects.order_by("-id").first()
             if last_intern and last_intern.unique_id:
-                last_number = int(last_intern.unique_id.replace("VCPL", ""))
+                last_number = int(last_intern.unique_id.replace("VCLPI", ""))
                 new_id = f"VCLPI{last_number + 1:03d}"
             else:
                 new_id = "VCLPI001"
@@ -203,4 +208,73 @@ def upload_lesson(request):
 def view_lessons(request):
     lessons = LessonFile.objects.all()
     return render(request, "files/view.html", {"lessons": lessons})
+
+
+# -------------------------
+# Helper function to generate PDF
+# -------------------------
+def generate_pdf(html_content):
+    response = HttpResponse(content_type='application/pdf')
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF")
+    return response
+
+
+# -------------------------
+# Single intern PDF
+# -------------------------
+def generate_single_intern_pdf(request, intern_id):
+    intern = get_object_or_404(
+        InternProfile,
+        id=intern_id,
+        internship_status="Ongoing",
+        undertaking_generated=False
+    )
+    
+    html_content = render_to_string("undertaking_letter.html", {"intern": intern})
+    intern.undertaking_generated = True
+    intern.save()
+    return generate_pdf(html_content)
+
+# -------------------------
+# Multiple interns PDF
+# `intern_ids` is a list of IDs received via POST
+# -------------------------
+def generate_multiple_interns_pdf(request):
+    intern_ids = request.POST.getlist("intern_ids")
+    interns = InternProfile.objects.filter(
+        id__in=intern_ids,
+        internship_status="Ongoing",
+        undertaking_generated=False
+    )
+
+    html_content = ""
+    for intern in interns:
+        html_content += render_to_string("undertaking_letter.html", {"intern": intern})
+        intern.undertaking_generated = True
+        intern.save()
+    
+    return generate_pdf(html_content)
+
+# -------------------------
+# Batch PDF
+# -------------------------
+def generate_batch_pdf(request, batch_id):
+    batch = get_object_or_404(Batch, id=batch_id)
+    interns = batch.interns.filter(
+        internship_status="Ongoing",
+        undertaking_generated=False
+    )
+
+    html_content = ""
+    for intern in interns:
+        html_content += render_to_string("undertaking_letter.html", {"intern": intern})
+        intern.undertaking_generated = True
+        intern.save()
+    
+    return generate_pdf(html_content)
+
+
+
 
