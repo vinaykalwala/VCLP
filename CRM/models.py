@@ -170,3 +170,133 @@ class LessonFile(models.Model):
         return self.title
 
 
+class DailySessionUpdate(models.Model):
+    trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="daily_updates")
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="daily_updates")
+    date = models.DateField(auto_now_add=True)
+    topic_covered = models.TextField()
+    summary = models.TextField(blank=True, null=True)
+    challenges = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('trainer', 'batch', 'date')
+
+    def __str__(self):
+        return f"{self.batch.name} - {self.date}"
+
+
+class Doubt(models.Model):
+    intern = models.ForeignKey(InternProfile, on_delete=models.CASCADE, related_name="doubts")
+    trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="received_doubts")
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="doubts")
+    question = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Doubt by {self.intern.unique_id} - {self.trainer.user.username}"
+
+
+class DoubtResolution(models.Model):
+    doubt = models.OneToOneField(Doubt, on_delete=models.CASCADE, related_name="resolution")
+    answer = models.TextField()
+    resolved_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Resolution for {self.doubt.id}"
+
+
+class RecordedSession(models.Model):
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="recorded_sessions")
+    trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="recorded_sessions")
+    title = models.CharField(max_length=255)
+    video = models.FileField(upload_to="recorded_sessions/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.batch.name}"
+
+
+class Assignment(models.Model):
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="assignments")
+    trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="created_assignments")
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to="assignments/", null=True, blank=True)
+    deadline = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name="submissions")
+    intern = models.ForeignKey(InternProfile, on_delete=models.CASCADE, related_name="assignment_submissions")
+    file = models.FileField(upload_to="assignment_submissions/")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    graded = models.BooleanField(default=False)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    feedback = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('assignment', 'intern')
+
+    def __str__(self):
+        return f"{self.intern.unique_id} - {self.assignment.title}"
+
+
+class Assessment(models.Model):
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="assessments")
+    trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="assessments")
+    title = models.CharField(max_length=255)
+    question_file = models.FileField(upload_to="assessments/questions/")
+    created_at = models.DateTimeField(auto_now_add=True)
+    total_marks = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.title} - {self.batch.name}"
+
+
+class AssessmentMCQ(models.Model):
+    assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, related_name="mcqs")
+    question_text = models.TextField()
+    option_1 = models.CharField(max_length=255)
+    option_2 = models.CharField(max_length=255)
+    option_3 = models.CharField(max_length=255, blank=True, null=True)
+    option_4 = models.CharField(max_length=255, blank=True, null=True)
+    correct_option = models.IntegerField(choices=((1, "Option 1"), (2, "Option 2"), (3, "Option 3"), (4, "Option 4")))
+
+    def __str__(self):
+        return self.question_text
+
+
+class AssessmentSubmission(models.Model):
+    assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, related_name="submissions")
+    intern = models.ForeignKey(InternProfile, on_delete=models.CASCADE, related_name="assessment_submissions")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Store answers in JSON: {mcq_id: selected_option}
+    answers = models.JSONField()
+
+    class Meta:
+        unique_together = ('assessment', 'intern')
+
+    def __str__(self):
+        return f"{self.intern.unique_id} - {self.assessment.title}"
+
+
+class Curriculum(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="curriculums")
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="curriculums/")
+    description = models.TextField(blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(TrainerProfile, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.course.name}"
