@@ -73,9 +73,9 @@ def signup_view(request):
             last_intern = InternProfile.objects.order_by("-id").first()
             if last_intern and last_intern.unique_id:
                 last_number = int(last_intern.unique_id.replace("VCPL", ""))
-                new_id = f"VCPL{last_number + 1:03d}"
+                new_id = f"VCLPI{last_number + 1:03d}"
             else:
-                new_id = "VCPL001"
+                new_id = "VCLPI001"
             InternProfile.objects.create(user=user, unique_id=new_id)
 
         elif role == "trainer":
@@ -134,26 +134,51 @@ def dashboard_view(request):
 # =====================
 # Attendance (Trainer)
 # =====================
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import TrainerProfile, Batch, InternProfile, Attendance
+
 @login_required
 def mark_attendance(request):
-    if request.user.role != "trainer":
-        return redirect('dashboard')
+    # Ensure only trainers can access
+    if not hasattr(request.user, "trainer_profile"):
+        messages.error(request, "Only trainers can mark attendance.")
+        return redirect("dashboard")
 
     trainer = request.user.trainer_profile
-    interns = InternProfile.objects.all()
+    # ✅ Only batches assigned to this trainer
+    batches = Batch.objects.filter(trainer=trainer)  
+    interns = None
+    selected_batch = None
 
     if request.method == "POST":
-        for intern in interns:
-            status = request.POST.get(f"status_{intern.id}")
-            if status:
-                Attendance.objects.update_or_create(
-                    intern=intern, date=request.POST.get("date"), defaults={"trainer": trainer, "status": status}
-                )
-        messages.success(request, "Attendance updated successfully.")
-        return redirect("mark_attendance")
+        selected_batch_id = request.POST.get("batch")
+        date = request.POST.get("date")
 
-    return render(request, "attendance/mark_attendance.html", {"interns": interns})
+        if selected_batch_id:
+            # ✅ Ensure trainer only accesses their own batch
+            selected_batch = get_object_or_404(Batch, id=selected_batch_id, trainer=trainer)
+            interns = selected_batch.interns.all()
 
+            # Save attendance
+            if "save_attendance" in request.POST:
+                for intern in interns:
+                    status = request.POST.get(f"status_{intern.id}")
+                    if status:
+                        Attendance.objects.update_or_create(
+                            intern=intern,
+                            date=date,
+                            defaults={"trainer": trainer, "batch": selected_batch, "status": status},
+                        )
+                messages.success(request, f"Attendance saved for {selected_batch.name} on {date}.")
+                return redirect("mark_attendance")
+
+    return render(request, "attendance/mark_attendance.html", {
+        "batches": batches,
+        "interns": interns,
+        "selected_batch": selected_batch,
+    })
 
 # =====================
 # File Upload / View

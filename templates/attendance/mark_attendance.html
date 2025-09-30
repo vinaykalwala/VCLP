@@ -5,31 +5,45 @@
 <h2>Mark Attendance</h2>
 <form method="post">
     {% csrf_token %}
-    <label>Date:</label>
-    <input type="date" name="date" required><br><br>
 
-    <table border="1">
-        <tr>
-            <th>Intern ID</th>
-            <th>Name</th>
-            <th>Status</th>
-        </tr>
-        {% for intern in interns %}
-        <tr>
-            <td>{{ intern.unique_id }}</td>
-            <td>{{ intern.user.username }}</td>
-            <td>
-                <select name="status_{{ intern.id }}">
-                    <option value="">--</option>
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
-                </select>
-            </td>
-        </tr>
+    <label>Select Batch:</label>
+    <select name="batch" onchange="this.form.submit()">
+        <option value="">--Select--</option>
+        {% for batch in batches %}
+            <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
+                {{ batch.name }} ({{ batch.course.name }})
+            </option>
         {% endfor %}
-    </table>
+    </select>
 
-    <button type="submit">Submit</button>
+    {% if selected_batch %}
+        <br><br>
+        <label>Date:</label>
+        <input type="date" name="date" required><br><br>
+
+        <table border="1">
+            <tr>
+                <th>Intern ID</th>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+            {% for intern in interns %}
+            <tr>
+                <td>{{ intern.unique_id }}</td>
+                <td>{{ intern.user.username }}</td>
+                <td>
+                    <select name="status_{{ intern.id }}">
+                        <option value="">--</option>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <button type="submit" name="save_attendance">Save Attendance</button>
+    {% endif %}
 </form>
 <a href="{% url 'dashboard' %}">Back</a>
 </body>
