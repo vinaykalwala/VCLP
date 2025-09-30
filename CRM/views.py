@@ -284,25 +284,37 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
 import io
 import zipfile
 from .models import InternProfile
 from django.db.models import Q
 from .forms import InternFilterForm
+from xhtml2pdf import pisa
 
 # ==================================
 # Helper Function for PDF Generation
 # ==================================
 def generate_pdf_for_intern(intern):
     """
-    Renders an HTML template for a single intern's certificate and returns it as PDF bytes.
+    Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
     """
     context = {'intern': intern}
     html_string = render_to_string('certificates/certificate_template.html', context)
-    pdf_bytes = HTML(string=html_string).write_pdf()
-    return pdf_bytes
 
+    # Create a BytesIO buffer to hold PDF
+    result = io.BytesIO()
+
+    # Convert HTML to PDF
+    pisa_status = pisa.CreatePDF(io.StringIO(html_string), dest=result)
+
+    # Check for errors
+    if pisa_status.err:
+        raise Exception('Error generating PDF')
+
+    # Get PDF bytes
+    pdf_bytes = result.getvalue()
+    result.close()
+    return pdf_bytes
 # ================================
 # Certificate Management View (Admin)
 # ================================
@@ -415,3 +427,72 @@ def download_certificate_view(request, intern_id):
     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Batch
+from .forms import BatchForm
+
+# Function-based views approach
+@login_required
+def batch_list(request):
+    batches = Batch.objects.all().select_related('course', 'trainer__user')
+    return render(request, 'batches/batch_list.html', {'batches': batches})
+
+@login_required
+def batch_detail(request, pk):
+    batch = get_object_or_404(Batch.objects.select_related('course', 'trainer__user'), pk=pk)
+    return render(request, 'batches/batch_detail.html', {'batch': batch})
+
+@login_required
+def batch_create(request):
+    if request.method == 'POST':
+        form = BatchForm(request.POST)
+        if form.is_valid():
+            batch = form.save()
+            messages.success(request, f'Batch "{batch.name}" created successfully!')
+            return redirect('batch_detail', pk=batch.pk)
+    else:
+        form = BatchForm()
+    
+    return render(request, 'batches/batch_form.html', {
+        'form': form,
+        'title': 'Create New Batch'
+    })
+
+@login_required
+def batch_update(request, pk):
+    batch = get_object_or_404(Batch, pk=pk)
+    
+    if request.method == 'POST':
+        form = BatchForm(request.POST, instance=batch)
+        if form.is_valid():
+            batch = form.save()
+            messages.success(request, f'Batch "{batch.name}" updated successfully!')
+            return redirect('batch_detail', pk=batch.pk)
+    else:
+        form = BatchForm(instance=batch)
+    
+    return render(request, 'batches/batch_form.html', {
+        'form': form,
+        'title': f'Update Batch: {batch.name}',
+        'batch': batch
+    })
+
+@login_required
+def batch_delete(request, pk):
+    batch = get_object_or_404(Batch, pk=pk)
+    
+    if request.method == 'POST':
+        batch_name = batch.name
+        batch.delete()
+        messages.success(request, f'Batch "{batch_name}" deleted successfully!')
+        return redirect('batch_list')
+    
+    return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
