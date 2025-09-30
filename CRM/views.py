@@ -298,6 +298,7 @@ def generate_pdf_for_intern(intern):
     """
     Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
     """
+    
     context = {'intern': intern}
     html_string = render_to_string('certificates/certificate_template.html', context)
 
