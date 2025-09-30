@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Batch</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --danger: #e63946;
+            --danger-dark: #c1121f;
+            --danger-gradient: linear-gradient(135deg, #e63946 0%, #c1121f 100%);
+            --warning-gradient: linear-gradient(135deg, #ff9e00 0%, #ff6b00 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            --hover-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            --success: #4caf50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .delete-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .delete-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transform: translateY(0);
+            transition: all 0.4s ease;
+        }
+        
+        .delete-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-5px);
+        }
+        
+        .delete-card-header {
+            background: var(--danger-gradient);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .delete-card-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255,255,255,0.15);
+            transform: rotate(30deg);
+            animation: shimmer 8s infinite linear;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(30deg) translateX(-100px); }
+            100% { transform: rotate(30deg) translateX(100px); }
+        }
+        
+        .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        
+        .delete-title {
+            font-weight: 800;
+            margin-bottom: 0;
+            font-size: 2rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.5px;
+        }
+        
+        .delete-subtitle {
+            font-weight: 500;
+            margin-top: 10px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .delete-card-body {
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .batch-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--danger);
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(230, 57, 70, 0.05);
+            border-radius: 12px;
+            border-left: 5px solid var(--danger);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .batch-name::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%);
+        }
+        
+        .batch-name:hover::after {
+            animation: shine 1.5s;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .warning-text {
+            color: #6c757d;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .danger-alert {
+            background: rgba(230, 57, 70, 0.08);
+            border: 1px solid rgba(230, 57, 70, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .danger-alert:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(230, 57, 70, 0.15);
+        }
+        
+        .danger-alert i {
+            color: var(--danger);
+            font-size: 1.5rem;
+            margin-right: 12px;
+        }
+        
+        .danger-alert p {
+            margin: 0;
+            color: var(--danger-dark);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .batch-details {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        
+        .detail-item:hover {
+            background: rgba(255,255,255,0.5);
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 8px;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 35px;
+        }
+        
+        .btn-delete {
+            background: var(--danger-gradient);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 16px 35px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-delete::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.5);
+            color: white;
+        }
+        
+        .btn-delete:hover::before {
+            left: 100%;
+        }
+        
+        .btn-delete:active {
+            transform: translateY(0);
+        }
+        
+        .btn-delete i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-cancel {
+            background: white;
+            border: 2px solid #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            padding: 16px 35px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .btn-cancel:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .btn-cancel i {
+            margin-right: 10px;
+        }
+        
+        .consequences-list {
+            text-align: left;
+            margin: 25px 0;
+            padding: 0;
+        }
+        
+        .consequences-list li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .consequences-list li:before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 1.2rem;
+        }
+        
+        .consequences-title {
+            font-weight: 700;
+            color: var(--danger-dark);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .consequences-title i {
+            margin-right: 10px;
+            color: var(--danger);
+        }
+        
+        .progress-container {
+            margin: 25px 0;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--danger-gradient);
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        @media (max-width: 576px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-delete, .btn-cancel {
+                width: 100%;
+            }
+            
+            body {
+                padding: 15px;
+                align-items: flex-start;
+            }
+            
+            .delete-card-body {
+                padding: 30px 25px;
+            }
+            
+            .delete-card-header {
+                padding: 25px 20px;
+            }
+            
+            .delete-title {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="delete-container">
+            <div class="delete-card">
+                <div class="delete-card-header">
+                    <i class="fas fa-exclamation-triangle warning-icon"></i>
+                    <h1 class="delete-title">Delete Batch</h1>
+                    <p class="delete-subtitle">Irreversible Action Required</p>
+                </div>
+                <div class="delete-card-body">
+                    <p class="warning-text">
+                        You are about to permanently delete the following batch:
+                    </p>
+                    
+                    <div class="batch-name">
+                        "{{ batch.name }}"
+                    </div>
+                    
+                    <!-- Batch Details -->
+                    <div class="batch-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Course:</span>
+                            <span class="detail-value">{{ batch.course.name }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Trainer:</span>
+                            <span class="detail-value">{{ batch.trainer.user.get_full_name|default:batch.trainer.user.username }}</span>
+                        </div>
+                        {% if batch.start_date %}
+                        <div class="detail-item">
+                            <span class="detail-label">Start Date:</span>
+                            <span class="detail-value">{{ batch.start_date }}</span>
+                        </div>
+                        {% endif %}
+                        {% if batch.end_date %}
+                        <div class="detail-item">
+                            <span class="detail-label">End Date:</span>
+                            <span class="detail-value">{{ batch.end_date }}</span>
+                        </div>
+                        {% endif %}
+                        {% if batch.interns.count %}
+                        <div class="detail-item">
+                            <span class="detail-label">Interns:</span>
+                            <span class="detail-value">{{ batch.interns.count }} enrolled</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="danger-alert">
+                        <i class="fas fa-radiation-alt"></i>
+                        <p>This action cannot be undone!</p>
+                    </div>
+                    
+                    <!-- Consequences Warning -->
+                    {% if batch.interns.count %}
+                    <div class="consequences-list">
+                        <div class="consequences-title">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>This will also:</span>
+                        </div>
+                        <ul>
+                            <li>Remove {{ batch.interns.count }} intern(s) from this batch</li>
+                            <li>Delete all attendance records associated with this batch</li>
+                            <li>Affect reporting and analytics for this batch</li>
+                            <li>Remove all batch-related data from the system</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Progress indicator (hidden by default) -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-text">Deleting batch...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                    
+                    <form method="post" id="deleteForm">
+                        {% csrf_token %}
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-delete" id="deleteButton">
+                                <i class="fas fa-trash-alt"></i> Yes, Delete Permanently
+                            </button>
+                            <a href="{% url 'batch_detail' batch.pk %}" class="btn btn-cancel">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteBtn = document.getElementById('deleteButton');
+            const deleteForm = document.getElementById('deleteForm');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            
+            deleteBtn.addEventListener('click', function(e) {
+                // Double confirmation for extra safety
+                if (!confirm('Are you absolutely sure? This action cannot be reversed!')) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                // Show progress indicator
+                progressContainer.style.display = 'block';
+                
+                // Simulate progress animation
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressFill.style.width = progress + '%';
+                    
+                    if (progress >= 90) {
+                        clearInterval(interval);
+                    }
+                }, 100);
+            });
+            
+            // Add subtle animation to the card
+            const card = document.querySelector('.delete-card');
+            card.style.transform = 'translateY(0)';
+            
+            // Add hover effect to batch name
+            const batchName = document.querySelector('.batch-name');
+            batchName.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            batchName.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

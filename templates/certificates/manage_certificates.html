@@ -1,0 +1,173 @@
+
+{% block title %}Manage Certificates{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Certificates</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles can be minimal when using Tailwind effectively */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-select, .form-input {
+            @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            
+            <div class="p-6 bg-gray-800 text-white">
+                <div class="flex items-center">
+                    <i class="fas fa-award text-3xl text-yellow-400"></i>
+                    <h2 class="text-3xl font-bold ml-4">Manage Completion Certificates</h2>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-b border-gray-200">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    
+                    <div class="lg:col-span-3">
+                        <form method="get" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="{{ filter_form.course.id_for_label }}" class="block text-sm font-medium text-gray-700">Course</label>
+                                {{ filter_form.course }}
+                            </div>
+                            <div>
+                                <label for="{{ filter_form.batch.id_for_label }}" class="block text-sm font-medium text-gray-700">Batch</label>
+                                {{ filter_form.batch }}
+                            </div>
+                            <div class="self-end">
+                                <button type="submit" class="w-full flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform hover:scale-105">
+                                    <i class="fas fa-filter mr-2"></i> Filter
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2">
+                        <form method="get" class="flex items-end gap-2">
+                            <div class="flex-grow">
+                                <label for="{{ filter_form.q.id_for_label }}" class="block text-sm font-medium text-gray-700">Search by Name or ID</label>
+                                {{ filter_form.q }}
+                            </div>
+                            <button type="submit" class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform hover:scale-105">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if selected_batch %}
+                        <input type="hidden" name="batch_id" value="{{ selected_batch.id }}">
+                    {% endif %}
+
+                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                        <button type="submit" name="action" value="download_selected" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 transition-transform hover:-translate-y-0.5">
+                            <i class="fas fa-download mr-2"></i> Download for Selected
+                        </button>
+                        {% if selected_batch %}
+                            <button type="submit" name="action" value="download_batch" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 transition-transform hover:-translate-y-0.5">
+                                <i class="fas fa-file-archive mr-2"></i> Download for Batch
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <input type="checkbox" id="select-all" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Intern</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        {% for intern in interns %}
+        <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <input type="checkbox" class="intern-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded" name="intern_ids" value="{{ intern.id }}">
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">{{ intern.user.get_full_name }}</div>
+                <div class="text-sm text-gray-500">{{ intern.unique_id }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ intern.batch.course.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ intern.batch.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    {% if intern.internship_status == 'Completed' %}bg-green-100 text-green-800
+                    {% elif intern.internship_status == 'Ongoing' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-red-100 text-red-800{% endif %}">
+                    {{ intern.internship_status }}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                {% if intern.internship_status == 'Completed' %}
+                    <a href="{% url 'download_certificate' intern.id %}" class="text-indigo-600 hover:text-indigo-900 transition-colors">
+                        <i class="fas fa-file-pdf mr-1"></i> Download
+                    </a>
+                {% else %}
+                    <span class="text-gray-400 italic">Not Completed</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-10 text-gray-500">
+                <i class="fas fa-search fa-2x mb-2"></i>
+                <p>No interns found matching your criteria.</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('select-all').addEventListener('click', function(event) {
+            const checkboxes = document.querySelectorAll('.intern-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = event.target.checked;
+            });
+        });
+
+        // This script adds the necessary Tailwind classes to the form fields Django renders.
+        document.addEventListener('DOMContentLoaded', function() {
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.classList.add('form-select');
+            });
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.classList.add('form-input');
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

@@ -18,6 +18,15 @@ urlpatterns = [
     path("undertaking/single/<int:identifier>/", views.generate_intern_pdf, {"mode": "single"}, name="undertaking_single"),
     path("undertaking/multiple/", views.generate_intern_pdf, {"mode": "multiple"}, name="undertaking_multiple"),
     path("undertaking/batch/<int:identifier>/", views.generate_intern_pdf, {"mode": "batch"}, name="undertaking_batch"),
+
+    path('managecertificates/', views.manage_certificates_view, name='manage_certificates'),
+    path('certificate/download/<int:intern_id>/', views.download_certificate_view, name='download_certificate'),
+    
+    path('batches/', views.batch_list, name='batch_list'),
+    path('batches/create/', views.batch_create, name='batch_create'),
+    path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
+    path('batches/<int:pk>/update/', views.batch_update, name='batch_update'),
+    path('batches/<int:pk>/delete/', views.batch_delete, name='batch_delete'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

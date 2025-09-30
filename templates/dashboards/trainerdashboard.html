@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head><title>Trainer Dashboard</title></head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}Trainer Dashboard{% endblock %}
+{% block content %}
+{% load static %}
+<div class="main-content">
 <h2>Welcome Trainer: {{ request.user.username }}</h2>
-<ul>
-    <li><a href="{% url 'mark_attendance' %}">Mark Attendance</a></li>
-    <li><a href="{% url 'upload_lesson' %}">Upload Lesson</a></li>
-    <li><a href="{% url 'view_lessons' %}">View Lessons</a></li>
-</ul>
-<a href="{% url 'logout' %}">Logout</a>
-</body>
-</html>
+
+</div>
+{% endblock %}
+

@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head><title>SuperUser Dashboard</title></head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}SuperUser Dashboard{% endblock %}
+{% block content %}
+{% load static %}
+<div class="main-content">
 <h2>Welcome SuperUser: {{ request.user.username }}</h2>
-<a href="{% url 'logout' %}">Logout</a>
-</body>
-</html>
+</div>
+{% endblock %}
