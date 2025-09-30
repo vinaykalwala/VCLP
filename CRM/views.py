@@ -288,8 +288,8 @@ from weasyprint import HTML
 import io
 import zipfile
 from .models import InternProfile
-from .forms import BatchFilterForm
 from django.db.models import Q
+from .forms import InternFilterForm
 
 # ==================================
 # Helper Function for PDF Generation

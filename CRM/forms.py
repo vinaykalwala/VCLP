@@ -1,14 +1,11 @@
 from django import forms
-from .models import Course
+from .models import Course, Batch
 
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name", "description"]
 
-
-from django import forms
-from .models import Course, Batch
 
 class InternFilterForm(forms.Form):
     course = forms.ModelChoiceField(
@@ -19,7 +16,8 @@ class InternFilterForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     batch = forms.ModelChoiceField(
-        queryset=Batch.objects.none(),  # We will populate this dynamically in the view
+        # The queryset will be dynamically set in __init__
+        queryset=Batch.objects.all(),
         required=False,
         empty_label="--- All Batches ---",
         label="Filter by Batch",
@@ -33,11 +31,17 @@ class InternFilterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'course' in self.data:
+        
+        # Get the selected course from the submitted form data (if any)
+        selected_course = self.data.get('course')
+
+        if selected_course:
             try:
-                course_id = int(self.data.get('course'))
-                self.fields['batch'].queryset = Batch.objects.filter(course_id=course_id).order_by('name')
+                # If a course is selected, filter the batch queryset
+                self.fields['batch'].queryset = Batch.objects.filter(course_id=int(selected_course)).order_by('name')
             except (ValueError, TypeError):
-                pass  # invalid input from browser; ignore and fallback to empty queryset
-        elif 'batch' in self.initial:
-             self.fields['batch'].queryset = Batch.objects.filter(pk=self.initial['batch'].pk)
+                # If the course value is invalid, show no batches
+                self.fields['batch'].queryset = Batch.objects.none()
+        else:
+            # If no course is selected (initial page load), ensure all batches are shown
+            self.fields['batch'].queryset = Batch.objects.all().order_by('name')
