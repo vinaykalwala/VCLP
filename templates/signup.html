@@ -1,56 +1,269 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signup</title>
-</head>
-<body>
-<h2>Signup</h2>
+{% extends 'login_base.html' %}
+{% block title %}Signup{% endblock %}
+{% block content %}
+{% load static %}
 
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li 
-        {% if message.tags %} class="{{ message.tags }}" {% endif %}
-      >
-        {{ message }}
-      </li>
-    {% endfor %}
-  </ul>
-{% endif %}
+<style>
+/* ---------- Signup Page Styles ---------- */
+.signup-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg), #0f1c2d);
+  color: var(--text-light);
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 20px;
+}
 
-<form method="POST">
-  {% csrf_token %}
-  <label>Username:</label>
-  <input type="text" name="username" required><br>
+.signup-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 50px;
+  padding-right: 30px;
+}
+.signup-left h1 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.signup-left h1 span {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.signup-left p {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+.signup-left img {
+  max-width: 120%;   /* allow it to grow larger than the container */
+  width: 500px;      /* optional fixed width for consistency */
+  margin-top: 10px;  /* add spacing from text */
+  border-radius: 12px;
+ 
+}
 
-  <label>First Name:</label>
-  <input type="text" name="first_name" required><br>
 
-  <label>Last Name:</label>
-  <input type="text" name="last_name" required><br>
+/* Right section */
+.signup-right {
+  flex: 2; /* make right side slightly bigger */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.signup-box {
+  background: var(--bg-light);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 600px; /* wider form */
+}
 
-  <label>Email:</label>
-  <input type="email" name="email" required><br>
+/* Form */
+.signup-box form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.signup-field {
+  display: flex;
+  flex-direction: column;
+}
+.signup-field.full {
+  grid-column: span 2;
+}
+.signup-field label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.signup-field input,
+.signup-field select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2f4d6f;
+  background: #0f1c2d;
+  color: var(--text-light);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+.signup-field input:focus,
+.signup-field select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 195, 255, 0.2);
+}
 
-  <label>Phone:</label>
-  <input type="text" name="phone" required><br>
+/* Button */
+.signup-btn {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.signup-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
 
-  <label>Password:</label>
-  <input type="password" name="password1" required><br>
+/* Link */
+.signup-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+.signup-footer a {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.signup-footer a:hover {
+  text-decoration: underline;
+}
 
-  <label>Confirm Password:</label>
-  <input type="password" name="password2" required><br>
+/* Responsive */
+@media (max-width: 992px) {
+  .signup-container {
+    flex-direction: column;
+    padding: 20px;
+  }
+  .signup-left {
+    padding: 20px;
+    text-align: center;
+  }
+  .signup-left p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .signup-right {
+    padding: 2px;
+  }
+  .signup-box {
+    max-width: 100%;
+  }
+  .signup-box form {
+    grid-template-columns: 1fr;
+  }
+  .signup-field.full,
+  .signup-btn {
+    grid-column: span 1;
+  }
+}
+@media (max-width: 992px) {
+  .signup-left {
+    padding: 20px;
+    text-align: center;        /* center text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;       /* center everything horizontally */
+    justify-content: center;   /* optional: center vertically if needed */
+  }
 
-  <label>Role:</label>
-  <select name="role" required>
-    {% for value, label in role_choices %}
-      <option value="{{ value }}">{{ label }}</option>
-    {% endfor %}
-  </select><br>
+  .signup-left p {
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-  <button type="submit">Sign Up</button>
-</form>
+  .signup-left img {
+    margin: 20px auto;         /* centers the image */
+    max-width: 80%;            /* optional: make image smaller for mobile */
+    width: auto;
+  }
+}
 
-<a href="{% url 'login' %}">Already have an account? Login</a>
-</body>
-</html>
+</style>
+
+<div class="main-content">
+<div class="signup-container">
+  <!-- Left Section -->
+ <div class="signup-left">
+  <h1>Create Accounts for <span>Users</span></h1>
+  <p>
+    This page is for <strong>user registrations</strong>.  
+    Admins and Superusers should create accounts for their team members directly through the admin dashboard.
+  </p>
+  <img src="{% static 'images/signup.webp' %}" alt="Join us">
+</div>
+
+
+  <!-- Right Section -->
+  <div class="signup-right">
+    <div class="signup-box">
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="signup-field">
+          <label>Username</label>
+          <input type="text" name="username" required>
+        </div>
+
+        <div class="signup-field">
+          <label>First Name</label>
+          <input type="text" name="first_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Last Name</label>
+          <input type="text" name="last_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Phone</label>
+          <input type="text" name="phone" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Password</label>
+          <input type="password" name="password1" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Confirm Password</label>
+          <input type="password" name="password2" required>
+        </div>
+
+        <div class="signup-field full">
+          <label>Role</label>
+          <select name="role" required>
+            {% for value, label in role_choices %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="signup-btn">Create Account</button>
+      </form>
+
+      <div class="signup-footer">
+        Already have an account? <a href="{% url 'login' %}">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
