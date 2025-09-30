@@ -45,3 +45,26 @@ class InternFilterForm(forms.Form):
         else:
             # If no course is selected (initial page load), ensure all batches are shown
             self.fields['batch'].queryset = Batch.objects.all().order_by('name')
+            
+            
+
+from django import forms
+from .models import Batch, Course, TrainerProfile
+
+class BatchForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ['name', 'course', 'description', 'trainer', 'start_date', 'end_date']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'course': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'trainer': forms.Select(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only show trainers in the trainer dropdown
+        self.fields['trainer'].queryset = TrainerProfile.objects.all()
