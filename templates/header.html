@@ -1,0 +1,116 @@
+{% load static %}
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" 
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfN1dqklQmQCWmvMRGsiE09z1FMvx6bMpiKFF9volG/Gp1pc5xJj3Bg==" 
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<nav class="navbar navbar-expand-lg dark-navbar fixed-top">
+  <div class="container-fluid px-3 px-md-3">
+
+    <!-- Logo + Brand -->
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'home' %}">
+      <span class="brand-text full-name ms-2">Vindus Career Launch Program</span>
+      <span class="brand-text short-name ms-2">VCLP</span>
+    </a>
+
+    <!-- Toggler -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="fas fa-bars" style="color:#fff;"></i>
+    </button>
+
+    <!-- Right Login/Logout Button -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'login' %}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<!-- Spacer for fixed navbar -->
+<div class="navbar-spacer"></div>
+
+<style>
+/* 🌌 Dark Blue Navbar */
+.dark-navbar {
+  background-color: rgb(27, 43, 64); /* dark blue header */
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.3s ease-in-out;
+  z-index: 1030;
+  border-bottom: 1px solid #1a1c26;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  padding: 0.4rem 0;
+}
+
+/* Spacer for content */
+.navbar-spacer {
+  height: 70px;
+}
+
+/* Brand Text Gradient (blue-teal tones) */
+.brand-text {
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff); /* blue → teal gradient */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.4px;
+}
+
+/* Hide short name by default */
+.short-name {
+  display: none;
+}
+
+/* Gradient Button with Blue-Teal Glow */
+.btn-gradient {
+  position: relative;
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff);
+  box-shadow: 0 0 15px rgba(0, 195, 255, 0.6), 0 0 30px rgba(0, 102, 255, 0.5); /* blue-teal glow */
+  transition: all 0.3s ease;
+  border: none;
+  overflow: hidden;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 195, 255, 0.8), 0 0 50px rgba(0, 102, 255, 0.7); /* hover glow */
+}
+
+/* Mobile Tweaks */
+@media (max-width: 992px) {
+  .btn-gradient {
+    margin-top: 10px;
+    width: 100%;
+  }
+}
+
+/* Show "VCLP" on very small screens */
+@media (max-width: 470px) {
+  .full-name {
+    display: none;
+  }
+  .short-name {
+    display: inline;
+  }
+}
+</style>

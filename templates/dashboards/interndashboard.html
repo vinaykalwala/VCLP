@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head><title>Intern Dashboard</title></head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}Intern Dashboard{% endblock %}
+{% block content %}
+{% load static %}
+<div class="main-content">
 <h2>Welcome Intern: {{ request.user.username }}</h2>
 <p>Your Intern ID: {{ request.user.intern_profile.unique_id }}</p>
 <a href="{% url 'view_lessons' %}">View Lessons</a>
 <a href="{% url 'logout' %}">Logout</a>
-</body>
-</html>
+{% endblock %}
+</div>

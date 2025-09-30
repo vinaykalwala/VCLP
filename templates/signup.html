@@ -1,470 +1,269 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Our Intern Community</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+{% extends 'login_base.html' %}
+{% block title %}Signup{% endblock %}
+{% block content %}
+{% load static %}
 
-        body {
-            background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
+<style>
+/* ---------- Signup Page Styles ---------- */
+.signup-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg), #0f1c2d);
+  color: var(--text-light);
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 20px;
+}
 
-        .container {
-            display: flex;
-            max-width: 1000px;
-            width: 100%;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
-        }
+.signup-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 50px;
+  padding-right: 30px;
+}
+.signup-left h1 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.signup-left h1 span {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.signup-left p {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+.signup-left img {
+  max-width: 120%;   /* allow it to grow larger than the container */
+  width: 500px;      /* optional fixed width for consistency */
+  margin-top: 10px;  /* add spacing from text */
+  border-radius: 12px;
+ 
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
 
-        .left-section {
-            flex: 1;
-            background-color: rgb(27, 43, 64); /* dark blue header */
-            color: white;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
+/* Right section */
+.signup-right {
+  flex: 2; /* make right side slightly bigger */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.signup-box {
+  background: var(--bg-light);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 600px; /* wider form */
+}
 
-        .left-section::before {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            top: -50px;
-            left: -50px;
-        }
+/* Form */
+.signup-box form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.signup-field {
+  display: flex;
+  flex-direction: column;
+}
+.signup-field.full {
+  grid-column: span 2;
+}
+.signup-field label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.signup-field input,
+.signup-field select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2f4d6f;
+  background: #0f1c2d;
+  color: var(--text-light);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+.signup-field input:focus,
+.signup-field select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 195, 255, 0.2);
+}
 
-        .left-section::after {
-            content: '';
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            bottom: -50px;
-            right: -50px;
-        }
+/* Button */
+.signup-btn {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.signup-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
 
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            z-index: 1;
-        }
+/* Link */
+.signup-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+.signup-footer a {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.signup-footer a:hover {
+  text-decoration: underline;
+}
 
-        .logo i {
-            margin-right: 10px;
-            font-size: 28px;
-            color: #00c3ff;
-        }
+/* Responsive */
+@media (max-width: 992px) {
+  .signup-container {
+    flex-direction: column;
+    padding: 20px;
+  }
+  .signup-left {
+    padding: 20px;
+    text-align: center;
+  }
+  .signup-left p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .signup-right {
+    padding: 2px;
+  }
+  .signup-box {
+    max-width: 100%;
+  }
+  .signup-box form {
+    grid-template-columns: 1fr;
+  }
+  .signup-field.full,
+  .signup-btn {
+    grid-column: span 1;
+  }
+}
+@media (max-width: 992px) {
+  .signup-left {
+    padding: 20px;
+    text-align: center;        /* center text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;       /* center everything horizontally */
+    justify-content: center;   /* optional: center vertically if needed */
+  }
 
-        .left-section h1 {
-            font-size: 32px;
-            margin-bottom: 15px;
-            z-index: 1;
-        }
+  .signup-left p {
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-        .left-section p {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            z-index: 1;
-        }
+  .signup-left img {
+    margin: 20px auto;         /* centers the image */
+    max-width: 80%;            /* optional: make image smaller for mobile */
+    width: auto;
+  }
+}
 
-        .features {
-            list-style: none;
-            z-index: 1;
-        }
+</style>
 
-        .features li {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
+<div class="main-content">
+<div class="signup-container">
+  <!-- Left Section -->
+ <div class="signup-left">
+  <h1>Create Accounts for <span>Users</span></h1>
+  <p>
+    This page is for <strong>user registrations</strong>.  
+    Admins and Superusers should create accounts for their team members directly through the admin dashboard.
+  </p>
+  <img src="{% static 'images/signup.webp' %}" alt="Join us">
+</div>
 
-        .features i {
-            margin-right: 10px;
-            font-size: 18px;
-            color: #00c3ff;
-        }
 
-        .right-section {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+  <!-- Right Section -->
+  <div class="signup-right">
+    <div class="signup-box">
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
-        .right-section h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .right-section p {
-            color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-            transition: all 0.3s;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 14px 15px;
-            border: 2px solid #e1e1e1;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-            appearance: none; /* Remove default dropdown styling */
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: #0066ff;
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2);
-            outline: none;
-        }
-
-        .form-group i {
-            position: absolute;
-            right: 15px;
-            top: 45px;
-            color: #999;
-            pointer-events: none; /* Prevent icon from blocking dropdown */
-        }
-
-        /* Fix for select dropdown icon */
-        .form-group select {
-            padding-right: 40px; /* Make space for the icon */
-        }
-
-        .password-strength {
-            height: 5px;
-            background: #eee;
-            border-radius: 5px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-
-        .password-strength-bar {
-            height: 100%;
-            width: 0;
-            border-radius: 5px;
-            transition: width 0.4s, background 0.4s;
-        }
-
-        .name-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        .name-group .form-group {
-            flex: 1;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.6);
-        }
-
-        .btn i {
-            margin-left: 8px;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 25px;
-            color: #666;
-        }
-
-        .login-link a {
-            color: #0066ff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .floating-elements {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .floating-element {
-            position: absolute;
-            background: rgba(0, 195, 255, 0.1);
-            border-radius: 50%;
-            animation: float 15s infinite linear;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                transform: translateY(-1000px) rotate(720deg);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .left-section, .right-section {
-                padding: 30px;
-            }
-            
-            .name-group {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="left-section">
-            <div class="floating-elements">
-                <!-- Floating elements will be generated by JavaScript -->
-            </div>
-            <div class="logo">
-                <i class="fas fa-rocket"></i>
-                InternConnect
-            </div>
-            <h1>Start Your Professional Journey</h1>
-            <p>Join thousands of interns who have kickstarted their careers with our platform. Get access to exclusive opportunities, mentorship, and resources.</p>
-            <ul class="features">
-                <li><i class="fas fa-check-circle"></i> Access to top internship opportunities</li>
-                <li><i class="fas fa-check-circle"></i> Personalized career guidance</li>
-                <li><i class="fas fa-check-circle"></i> Connect with mentors and peers</li>
-                <li><i class="fas fa-check-circle"></i> Build your professional portfolio</li>
-            </ul>
-        </div>
+      <form method="POST">
+        {% csrf_token %}
         
-        <div class="right-section">
-            <h2>Create Your Account</h2>
-            <p>Join our community of aspiring professionals</p>
-            
-            <form method="POST">
-                {% csrf_token %}
-                
-                <div class="name-group">
-                    <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" id="first_name" name="first_name" required>
-                        <i class="fas fa-user"></i>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" required>
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
-                    <i class="fas fa-at"></i>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                    <i class="fas fa-envelope"></i>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone" required>
-                    <i class="fas fa-phone"></i>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password1">Password</label>
-                    <input type="password" id="password1" name="password1" required>
-                    <i class="fas fa-lock"></i>
-                    <div class="password-strength">
-                        <div class="password-strength-bar" id="password-strength-bar"></div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password2">Confirm Password</label>
-                    <input type="password" id="password2" name="password2" required>
-                    <i class="fas fa-lock"></i>
-                </div>
-                
-                <div class="form-group">
-                    <label for="role">Role</label>
-                    <select id="role" name="role" required>
-                        <option value="intern">Intern</option>
-                        <option value="student">Student</option>
-                        <option value="recent_graduate">Recent Graduate</option>
-                        <option value="job_seeker">Job Seeker</option>
-                    </select>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                
-                <button type="submit" class="btn">Create Account <i class="fas fa-arrow-right"></i></button>
-            </form>
-            
-            <div class="login-link">
-                Already have an account? <a href="{% url 'login' %}">Login here</a>
-            </div>
+        <div class="signup-field">
+          <label>Username</label>
+          <input type="text" name="username" required>
         </div>
+
+        <div class="signup-field">
+          <label>First Name</label>
+          <input type="text" name="first_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Last Name</label>
+          <input type="text" name="last_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Phone</label>
+          <input type="text" name="phone" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Password</label>
+          <input type="password" name="password1" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Confirm Password</label>
+          <input type="password" name="password2" required>
+        </div>
+
+        <div class="signup-field full">
+          <label>Role</label>
+          <select name="role" required>
+            {% for value, label in role_choices %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="signup-btn">Create Account</button>
+      </form>
+
+      <div class="signup-footer">
+        Already have an account? <a href="{% url 'login' %}">Sign in</a>
+      </div>
     </div>
-
-    <script>
-        // Create floating elements
-        const floatingContainer = document.querySelector('.floating-elements');
-        for (let i = 0; i < 15; i++) {
-            const element = document.createElement('div');
-            element.classList.add('floating-element');
-            
-            // Random size between 10 and 60px
-            const size = Math.random() * 50 + 10;
-            element.style.width = `${size}px`;
-            element.style.height = `${size}px`;
-            
-            // Random position
-            element.style.left = `${Math.random() * 100}%`;
-            element.style.top = `${Math.random() * 100}%`;
-            
-            // Random animation delay and duration
-            element.style.animationDelay = `${Math.random() * 15}s`;
-            element.style.animationDuration = `${15 + Math.random() * 20}s`;
-            
-            floatingContainer.appendChild(element);
-        }
-
-        // Password strength indicator
-        const passwordInput = document.getElementById('password1');
-        const strengthBar = document.getElementById('password-strength-bar');
-        
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            let strength = 0;
-            
-            if (password.length >= 8) strength += 25;
-            if (/[A-Z]/.test(password)) strength += 25;
-            if (/[0-9]/.test(password)) strength += 25;
-            if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-            
-            strengthBar.style.width = `${strength}%`;
-            
-            if (strength < 50) {
-                strengthBar.style.background = '#ff4757';
-            } else if (strength < 75) {
-                strengthBar.style.background = '#ffa502';
-            } else {
-                strengthBar.style.background = '#2ed573';
-            }
-        });
-
-        // Form validation and animation
-        const form = document.querySelector('form');
-        const inputs = document.querySelectorAll('input, select');
-        
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.querySelector('label').style.color = '#0066ff';
-                this.parentElement.querySelector('label').style.transform = 'translateY(-5px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                if (!this.value) {
-                    this.parentElement.querySelector('label').style.color = '#555';
-                    this.parentElement.querySelector('label').style.transform = 'translateY(0)';
-                }
-            });
-        });
-        
-        form.addEventListener('submit', function(e) {
-            // Add form validation here
-            const password1 = document.getElementById('password1').value;
-            const password2 = document.getElementById('password2').value;
-            
-            if (password1 !== password2) {
-                e.preventDefault();
-                alert('Passwords do not match!');
-                return;
-            }
-            
-            // Add loading animation
-            const btn = document.querySelector('.btn');
-            btn.innerHTML = 'Creating Account <i class="fas fa-spinner fa-spin"></i>';
-        });
-    </script>
-</body>
-</html>
+  </div>
+</div>
+</div>
+{% endblock %}
