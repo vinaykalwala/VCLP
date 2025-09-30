@@ -284,25 +284,37 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
 import io
 import zipfile
 from .models import InternProfile
 from django.db.models import Q
 from .forms import InternFilterForm
+from xhtml2pdf import pisa
 
 # ==================================
 # Helper Function for PDF Generation
 # ==================================
 def generate_pdf_for_intern(intern):
     """
-    Renders an HTML template for a single intern's certificate and returns it as PDF bytes.
+    Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
     """
     context = {'intern': intern}
     html_string = render_to_string('certificates/certificate_template.html', context)
-    pdf_bytes = HTML(string=html_string).write_pdf()
-    return pdf_bytes
 
+    # Create a BytesIO buffer to hold PDF
+    result = io.BytesIO()
+
+    # Convert HTML to PDF
+    pisa_status = pisa.CreatePDF(io.StringIO(html_string), dest=result)
+
+    # Check for errors
+    if pisa_status.err:
+        raise Exception('Error generating PDF')
+
+    # Get PDF bytes
+    pdf_bytes = result.getvalue()
+    result.close()
+    return pdf_bytes
 # ================================
 # Certificate Management View (Admin)
 # ================================
