@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internship Undertaking Certificates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            text-align: center;
+        }
+        form {
+            margin: 20px 0;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input, select, button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Internship Undertaking Certificates</h2>
+
+<!-- Single Intern -->
+<form method="get" action="{% url 'undertaking_single' identifier=0 %}" id="singleForm">
+    <label for="single_id">Enter Intern ID:</label>
+    <input type="number" id="single_id" name="intern_id" required>
+    <button type="submit">Generate Single Certificate</button>
+</form>
+
+<!-- Multiple Interns -->
+<form method="post" action="{% url 'undertaking_multiple' %}" id="multipleForm">
+    {% csrf_token %}
+    <label for="multiple_ids">Enter Intern IDs (comma separated):</label>
+    <input type="text" id="multiple_ids" name="intern_ids" placeholder="e.g. 1,2,3" required>
+    <button type="submit">Generate Multiple Certificates</button>
+</form>
+
+<!-- Batch -->
+<form method="get" action="{% url 'undertaking_batch' identifier=0 %}" id="batchForm">
+    <label for="batch_id">Select Batch:</label>
+    <select id="batch_id" name="batch_id" required>
+        <option value="">-- Select Batch --</option>
+        {% for batch in batches %}
+            <option value="{{ batch.id }}">{{ batch.name }} ({{ batch.course.name }})</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Generate Batch Certificates</button>
+</form>
+
+<script>
+    // Single intern: dynamically update action with entered intern ID
+    document.getElementById("singleForm").addEventListener("submit", function(e){
+        const internId = document.getElementById("single_id").value;
+        if(internId){
+            this.action = `/undertaking/single/${internId}/`;
+        }
+    });
+
+    // Batch: dynamically update action with selected batch ID
+    document.getElementById("batchForm").addEventListener("submit", function(e){
+        const batchId = document.getElementById("batch_id").value;
+        if(batchId){
+            this.action = `/undertaking/batch/${batchId}/`;
+        }
+    });
+
+    // Multiple interns: transform comma-separated IDs into multiple hidden inputs
+    document.getElementById("multipleForm").addEventListener("submit", function(e){
+        const ids = document.getElementById("multiple_ids").value;
+        if(!ids){
+            e.preventDefault();
+            alert("Please enter at least one intern ID");
+        } else {
+            const form = e.target;
+            const oldInput = document.querySelector("input[name='intern_ids']");
+            oldInput.remove(); // remove original text input
+            ids.split(",").forEach(id => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "intern_ids";
+                input.value = id.trim();
+                form.appendChild(input);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

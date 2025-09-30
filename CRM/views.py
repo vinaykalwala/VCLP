@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
+import io
+import zipfile
 
 
 
@@ -213,6 +215,12 @@ def view_lessons(request):
 # -------------------------
 # Helper function to generate PDF
 # -------------------------
+
+
+def undertaking_certificates_home(request):
+    batches = Batch.objects.all() 
+    return render(request, "internshipundertakingcertificates.html",{"batches": batches})
+
 def generate_pdf(html_content):
     response = HttpResponse(content_type='application/pdf')
     pisa_status = pisa.CreatePDF(html_content, dest=response)
@@ -221,60 +229,82 @@ def generate_pdf(html_content):
     return response
 
 
-# -------------------------
-# Single intern PDF
-# -------------------------
-def generate_single_intern_pdf(request, intern_id):
-    intern = get_object_or_404(
-        InternProfile,
-        id=intern_id,
-        internship_status="Ongoing",
-        undertaking_generated=False
-    )
-    
-    html_content = render_to_string("undertaking_letter.html", {"intern": intern})
-    intern.undertaking_generated = True
-    intern.save()
-    return generate_pdf(html_content)
+def generate_intern_pdf(request, mode, identifier=None):
+    """
+    mode can be: 'single', 'multiple', 'batch'
+    identifier:
+        - single -> intern_id
+        - multiple -> handled from request.POST.getlist("intern_ids")
+        - batch -> batch_id
+    """
+    interns = []
 
-# -------------------------
-# Multiple interns PDF
-# `intern_ids` is a list of IDs received via POST
-# -------------------------
-def generate_multiple_interns_pdf(request):
-    intern_ids = request.POST.getlist("intern_ids")
-    interns = InternProfile.objects.filter(
-        id__in=intern_ids,
-        internship_status="Ongoing",
-        undertaking_generated=False
-    )
+    if mode == "single":
+        try:
+            intern = InternProfile.objects.get(
+                id=identifier,
+                internship_status="Ongoing",
+                undertaking_generated=False
+            )
+            interns = [intern]
+        except InternProfile.DoesNotExist:
+            return HttpResponse(f"Cannot generate certificate: Intern with ID {identifier} is either not Ongoing or already has an undertaking generated.")
 
-    html_content = ""
-    for intern in interns:
-        html_content += render_to_string("undertaking_letter.html", {"intern": intern})
-        intern.undertaking_generated = True
-        intern.save()
-    
-    return generate_pdf(html_content)
+    elif mode == "multiple":
+        intern_ids = request.POST.getlist("intern_ids")
+        interns = InternProfile.objects.filter(
+            id__in=intern_ids,
+            internship_status="Ongoing",
+            undertaking_generated=False
+        )
+        if not interns.exists():
+            return HttpResponse("None of the selected interns are eligible for certificate generation (must be Ongoing and not yet generated).")
 
-# -------------------------
-# Batch PDF
-# -------------------------
-def generate_batch_pdf(request, batch_id):
-    batch = get_object_or_404(Batch, id=batch_id)
-    interns = batch.interns.filter(
-        internship_status="Ongoing",
-        undertaking_generated=False
-    )
+    elif mode == "batch":
+        batch = get_object_or_404(Batch, id=identifier)
+        interns = batch.interns.filter(
+            internship_status="Ongoing",
+            undertaking_generated=False
+        )
+        if not interns.exists():
+            return HttpResponse(f"No eligible interns in batch '{batch.name}' for certificate generation.")
 
-    html_content = ""
-    for intern in interns:
-        html_content += render_to_string("undertaking_letter.html", {"intern": intern})
-        intern.undertaking_generated = True
-        intern.save()
-    
-    return generate_pdf(html_content)
+    # ----------------------
+    # Single intern: generate PDF normally
+    # ----------------------
+    if mode == "single":
+        html_content = render_to_string("undertaking_letter.html", {"intern": interns[0]})
+        interns[0].undertaking_generated = True
+        interns[0].save()
+        response = HttpResponse(content_type="application/pdf")
+        filename = f"undertaking_{interns[0].unique_id}.pdf"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        pisa.CreatePDF(html_content, dest=response)
+        return response
 
+    # ----------------------
+    # Multiple/batch: generate separate PDFs in a ZIP
+    # ----------------------
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        for intern in interns:
+            html_content = render_to_string("undertaking_letter.html", {"intern": intern})
+            pdf_buffer = io.BytesIO()
+            pisa.CreatePDF(html_content, dest=pdf_buffer)
+            pdf_buffer.seek(0)
+
+            # Add to ZIP
+            pdf_name = f"{intern.unique_id}_undertaking.pdf"
+            zip_file.writestr(pdf_name, pdf_buffer.read())
+
+            # Update status
+            intern.undertaking_generated = True
+            intern.save()
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type="application/zip")
+    response["Content-Disposition"] = 'attachment; filename="interns_undertakings.zip"'
+    return response
 
 
 

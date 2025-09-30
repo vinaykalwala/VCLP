@@ -14,6 +14,10 @@ urlpatterns = [
     path('attendance/', views.mark_attendance, name='mark_attendance'),
     path('lessons/upload/', views.upload_lesson, name='upload_lesson'),
     path('lessons/view/', views.view_lessons, name='view_lessons'),
+    path("undertaking/", views.undertaking_certificates_home, name="undertaking_home"),
+    path("undertaking/single/<int:identifier>/", views.generate_intern_pdf, {"mode": "single"}, name="undertaking_single"),
+    path("undertaking/multiple/", views.generate_intern_pdf, {"mode": "multiple"}, name="undertaking_multiple"),
+    path("undertaking/batch/<int:identifier>/", views.generate_intern_pdf, {"mode": "batch"}, name="undertaking_batch"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
