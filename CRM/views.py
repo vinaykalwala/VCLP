@@ -278,6 +278,77 @@ def generate_batch_pdf(request, batch_id):
 
 
 
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Batch
+from .forms import BatchForm
+
+# Function-based views approach
+@login_required
+def batch_list(request):
+    batches = Batch.objects.all().select_related('course', 'trainer__user')
+    return render(request, 'batches/batch_list.html', {'batches': batches})
+
+@login_required
+def batch_detail(request, pk):
+    batch = get_object_or_404(Batch.objects.select_related('course', 'trainer__user'), pk=pk)
+    return render(request, 'batches/batch_detail.html', {'batch': batch})
+
+@login_required
+def batch_create(request):
+    if request.method == 'POST':
+        form = BatchForm(request.POST)
+        if form.is_valid():
+            batch = form.save()
+            messages.success(request, f'Batch "{batch.name}" created successfully!')
+            return redirect('batch_detail', pk=batch.pk)
+    else:
+        form = BatchForm()
+    
+    return render(request, 'batches/batch_form.html', {
+        'form': form,
+        'title': 'Create New Batch'
+    })
+
+@login_required
+def batch_update(request, pk):
+    batch = get_object_or_404(Batch, pk=pk)
+    
+    if request.method == 'POST':
+        form = BatchForm(request.POST, instance=batch)
+        if form.is_valid():
+            batch = form.save()
+            messages.success(request, f'Batch "{batch.name}" updated successfully!')
+            return redirect('batch_detail', pk=batch.pk)
+    else:
+        form = BatchForm(instance=batch)
+    
+    return render(request, 'batches/batch_form.html', {
+        'form': form,
+        'title': f'Update Batch: {batch.name}',
+        'batch': batch
+    })
+
+@login_required
+def batch_delete(request, pk):
+    batch = get_object_or_404(Batch, pk=pk)
+    
+    if request.method == 'POST':
+        batch_name = batch.name
+        batch.delete()
+        messages.success(request, f'Batch "{batch_name}" deleted successfully!')
+        return redirect('batch_list')
+    
+    return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
+
+
 # Add these imports to the top of your views.py file
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -430,72 +501,3 @@ def download_certificate_view(request, intern_id):
     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
-
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Batch
-from .forms import BatchForm
-
-# Function-based views approach
-@login_required
-def batch_list(request):
-    batches = Batch.objects.all().select_related('course', 'trainer__user')
-    return render(request, 'batches/batch_list.html', {'batches': batches})
-
-@login_required
-def batch_detail(request, pk):
-    batch = get_object_or_404(Batch.objects.select_related('course', 'trainer__user'), pk=pk)
-    return render(request, 'batches/batch_detail.html', {'batch': batch})
-
-@login_required
-def batch_create(request):
-    if request.method == 'POST':
-        form = BatchForm(request.POST)
-        if form.is_valid():
-            batch = form.save()
-            messages.success(request, f'Batch "{batch.name}" created successfully!')
-            return redirect('batch_detail', pk=batch.pk)
-    else:
-        form = BatchForm()
-    
-    return render(request, 'batches/batch_form.html', {
-        'form': form,
-        'title': 'Create New Batch'
-    })
-
-@login_required
-def batch_update(request, pk):
-    batch = get_object_or_404(Batch, pk=pk)
-    
-    if request.method == 'POST':
-        form = BatchForm(request.POST, instance=batch)
-        if form.is_valid():
-            batch = form.save()
-            messages.success(request, f'Batch "{batch.name}" updated successfully!')
-            return redirect('batch_detail', pk=batch.pk)
-    else:
-        form = BatchForm(instance=batch)
-    
-    return render(request, 'batches/batch_form.html', {
-        'form': form,
-        'title': f'Update Batch: {batch.name}',
-        'batch': batch
-    })
-
-@login_required
-def batch_delete(request, pk):
-    batch = get_object_or_404(Batch, pk=pk)
-    
-    if request.method == 'POST':
-        batch_name = batch.name
-        batch.delete()
-        messages.success(request, f'Batch "{batch_name}" deleted successfully!')
-        return redirect('batch_list')
-    
-    return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
