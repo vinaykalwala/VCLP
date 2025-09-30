@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Completion</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap');
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .certificate-container {
+            width: 297mm;
+            height: 210mm;
+            box-sizing: border-box;
+            padding: 20mm;
+            border: 10px solid #004080;
+            background-color: #ffffff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: #004080;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .intern-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 40px;
+            color: #d4af37; /* Gold color */
+            font-weight: 700;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin: 20px 0;
+        }
+
+        .main-text {
+            font-size: 18px;
+            color: #555;
+            margin: 25px 0;
+            line-height: 1.6;
+        }
+
+        .course-name {
+            font-weight: 700;
+            color: #004080;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 30mm;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .signature-block {
+            width: 40%;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+
+        .signature-block p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <h1 class="header">Certificate of Completion</h1>
+        <p class="subtitle">This is to certify that</p>
+        
+        <h2 class="intern-name">{{ intern.user.get_full_name|upper }}</h2>
+        
+        <p class="main-text">
+            has successfully completed the internship program in <br>
+            <span class="course-name">{{ intern.batch.course.name }}</span>
+        </p>
+        
+        <p class="main-text">
+            from <strong>{{ intern.batch.start_date|date:"F d, Y" }}</strong> to <strong>{{ intern.batch.end_date|date:"F d, Y" }}</strong>.
+        </p>
+
+        <div class="footer">
+            <div class="signature-block">
+                <p>Authorized Signatory</p>
+            </div>
+            <div class="signature-block">
+                <p>Trainer</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

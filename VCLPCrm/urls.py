@@ -14,6 +14,9 @@ urlpatterns = [
     path('attendance/', views.mark_attendance, name='mark_attendance'),
     path('lessons/upload/', views.upload_lesson, name='upload_lesson'),
     path('lessons/view/', views.view_lessons, name='view_lessons'),
+
+    path('managecertificates/', views.manage_certificates_view, name='manage_certificates'),
+    path('certificate/download/<int:intern_id>/', views.download_certificate_view, name='download_certificate'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
