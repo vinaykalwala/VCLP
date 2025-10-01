@@ -18,6 +18,10 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
     plain_password = models.CharField(max_length=128, blank=True, null=True)  # ⚠️ unsafe in prod
 
+    def get_role_display(self):
+        """Get human-readable role name"""
+        return dict(self.ROLE_CHOICES).get(self.role, self.role)
+    
     def __str__(self):
         return f"{self.username} ({self.role})"
 

@@ -29,6 +29,9 @@ urlpatterns = [
     path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
     path('batches/<int:pk>/update/', views.batch_update, name='batch_update'),
     path('batches/<int:pk>/delete/', views.batch_delete, name='batch_delete'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    path('profile/trainer/<int:trainer_id>/', views.trainer_profile_view, name='trainer_profile'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

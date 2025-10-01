@@ -10,10 +10,8 @@ from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
 import zipfile
-
-
-
-from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile,Batch
+from .models import *
+from .forms import *
 
 def home(request):
     return render(request, 'home.html') 
@@ -555,3 +553,81 @@ def download_certificate_view(request, intern_id):
     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
+
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    context = {
+        'user': user,
+    }
+    
+    # Add profile-specific data based on role
+    if hasattr(user, 'intern_profile'):
+        intern_profile = user.intern_profile
+        context.update({
+            'profile': intern_profile,
+            'batch': intern_profile.batch,
+            'course': intern_profile.batch.course if intern_profile.batch else None,
+            'trainer': intern_profile.batch.trainer if intern_profile.batch else None,
+        })
+    elif hasattr(user, 'trainer_profile'):
+        context['profile'] = user.trainer_profile
+    elif hasattr(user, 'admin_profile'):
+        context['profile'] = user.admin_profile
+    elif hasattr(user, 'superuser_profile'):
+        context['profile'] = user.superuser_profile
+    
+    return render(request, 'profile.html', context)
+
+@login_required
+def edit_profile_view(request):
+    user = request.user
+    
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        
+        # Get the appropriate profile form based on user role
+        if hasattr(user, 'intern_profile'):
+            profile_form = InternProfileUpdateForm(request.POST, request.FILES, instance=user.intern_profile)
+        elif hasattr(user, 'trainer_profile'):
+            profile_form = TrainerProfileUpdateForm(request.POST, request.FILES, instance=user.trainer_profile)
+        elif hasattr(user, 'admin_profile'):
+            profile_form = AdminProfileUpdateForm(request.POST, request.FILES, instance=user.admin_profile)
+        elif hasattr(user, 'superuser_profile'):
+            profile_form = SuperUserProfileUpdateForm(request.POST, request.FILES, instance=user.superuser_profile)
+        else:
+            profile_form = None
+
+        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+            user_form.save()
+            if profile_form:
+                profile_form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profile')
+    else:
+        user_form = UserUpdateForm(instance=user)
+        
+        # Initialize the appropriate profile form
+        if hasattr(user, 'intern_profile'):
+            profile_form = InternProfileUpdateForm(instance=user.intern_profile)
+        elif hasattr(user, 'trainer_profile'):
+            profile_form = TrainerProfileUpdateForm(instance=user.trainer_profile)
+        elif hasattr(user, 'admin_profile'):
+            profile_form = AdminProfileUpdateForm(instance=user.admin_profile)
+        elif hasattr(user, 'superuser_profile'):
+            profile_form = SuperUserProfileUpdateForm(instance=user.superuser_profile)
+        else:
+            profile_form = None
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    }
+    return render(request, 'edit_profile.html', context)
+
+@login_required
+def trainer_profile_view(request, trainer_id):
+    trainer_profile = get_object_or_404(TrainerProfile, id=trainer_id)
+    return render(request, 'trainer_profile.html', {'trainer': trainer_profile})
