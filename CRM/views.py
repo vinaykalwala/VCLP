@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
+import io
+import zipfile
 
 
 
@@ -215,6 +217,71 @@ def view_lessons(request):
 # -------------------------
 
 
+def undertaking_certificates_home(request):
+    batches = Batch.objects.all() 
+    return render(request, "internshipundertakingcertificates.html",{"batches": batches})
+
+def generate_pdf(html_content):
+    response = HttpResponse(content_type='application/pdf')
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF")
+    return response
+
+
+def generate_intern_pdf(request, mode, identifier=None):
+    """
+    mode can be: 'single', 'multiple', 'batch'
+    identifier:
+        - single -> intern_id
+        - multiple -> handled from request.POST.getlist("intern_ids")
+        - batch -> batch_id
+    """
+    interns = []
+
+    if mode == "single":
+        try:
+            intern = InternProfile.objects.get(
+                id=identifier,
+                internship_status="Ongoing",
+                undertaking_generated=False
+            )
+            interns = [intern]
+        except InternProfile.DoesNotExist:
+            return HttpResponse(f"Cannot generate certificate: Intern with ID {identifier} is either not Ongoing or already has an undertaking generated.")
+
+    elif mode == "multiple":
+        intern_ids = request.POST.getlist("intern_ids")
+        interns = InternProfile.objects.filter(
+            id__in=intern_ids,
+            internship_status="Ongoing",
+            undertaking_generated=False
+        )
+        if not interns.exists():
+            return HttpResponse("None of the selected interns are eligible for certificate generation (must be Ongoing and not yet generated).")
+
+    elif mode == "batch":
+        batch = get_object_or_404(Batch, id=identifier)
+        interns = batch.interns.filter(
+            internship_status="Ongoing",
+            undertaking_generated=False
+        )
+        if not interns.exists():
+            return HttpResponse(f"No eligible interns in batch '{batch.name}' for certificate generation.")
+
+    # ----------------------
+    # Single intern: generate PDF normally
+    # ----------------------
+    if mode == "single":
+        html_content = render_to_string("undertaking_letter.html", {"intern": interns[0]})
+        interns[0].undertaking_generated = True
+        interns[0].save()
+        response = HttpResponse(content_type="application/pdf")
+        filename = f"undertaking_{interns[0].unique_id}.pdf"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        pisa.CreatePDF(html_content, dest=response)
+        return response
+
 
 # -------------------------
 # Single intern PDF
@@ -295,6 +362,29 @@ def batch_delete(request, pk):
     
     return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
 
+    # ----------------------
+    # Multiple/batch: generate separate PDFs in a ZIP
+    # ----------------------
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        for intern in interns:
+            html_content = render_to_string("undertaking_letter.html", {"intern": intern})
+            pdf_buffer = io.BytesIO()
+            pisa.CreatePDF(html_content, dest=pdf_buffer)
+            pdf_buffer.seek(0)
+
+            # Add to ZIP
+            pdf_name = f"{intern.unique_id}_undertaking.pdf"
+            zip_file.writestr(pdf_name, pdf_buffer.read())
+
+            # Update status
+            intern.undertaking_generated = True
+            intern.save()
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type="application/zip")
+    response["Content-Disposition"] = 'attachment; filename="interns_undertakings.zip"'
+    return response
 
 
 from django.shortcuts import render, get_object_or_404, redirect

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 50px; }
+        h1 { text-align: center; color: #DF9755; }
+        p { font-size: 14px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <h1>Internship Undertaking Letter</h1>
+    <p>To whomsoever it may concern,</p>
+
+    <p>This is to certify that <strong>{{ intern.user.get_full_name }}</strong> (ID: {{ intern.unique_id }}) has joined the internship program at <strong>Company Name</strong> in the batch <strong>{{ intern.batch.name }}</strong>.</p>
+
+    <p>Internship Start Date: <strong>{{ intern.batch.start_date }}</strong><br>
+       Internship End Date: <strong>{{ intern.batch.end_date }}</strong>
+    </p>
+
+    <p>The intern is currently in an ongoing internship, and this undertaking is being issued accordingly.</p>
+
+    <p>Regards,<br>HR Department</p>
+</body>
+</html>
