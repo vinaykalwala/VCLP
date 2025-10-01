@@ -10,10 +10,11 @@ from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
 import zipfile
+import datetime
+import os
+from django.conf import settings
 
-
-
-from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile,Batch
+from .models import User, InternProfile, TrainerProfile, AdminProfile, SuperUserProfile, Attendance, LessonFile,Batch,Course
 
 def home(request):
     return render(request, 'home.html') 
@@ -216,26 +217,57 @@ def view_lessons(request):
 # Helper function to generate PDF
 # -------------------------
 
-
 def undertaking_certificates_home(request):
-    batches = Batch.objects.all() 
-    return render(request, "internshipundertakingcertificates.html",{"batches": batches})
+    """
+    Manage Undertaking Certificates page
+    """
+    courses = Course.objects.all()
+    batches = Batch.objects.all()
 
-def generate_pdf(html_content):
-    response = HttpResponse(content_type='application/pdf')
-    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    interns = InternProfile.objects.select_related("batch", "batch__course")
+
+    # Apply filters
+    course_id = request.GET.get("course_id")
+    batch_id = request.GET.get("batch_id")
+    search = request.GET.get("search")
+
+    if course_id:
+        interns = interns.filter(batch__course_id=course_id)
+    if batch_id:
+        interns = interns.filter(batch_id=batch_id)
+    if search:
+        interns = interns.filter(
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search) |
+            Q(unique_id__icontains=search)
+        )
+
+    return render(
+        request,
+        "internshipundertakingcertificates.html",
+        {"courses": courses, "batches": batches, "interns": interns},
+    )
+
+
+def generate_pdf_from_html(html_content):
+    """
+    Utility: Generate PDF bytes from HTML
+    """
+    pdf_buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_buffer)
     if pisa_status.err:
-        return HttpResponse("Error generating PDF")
-    return response
+        return None
+    pdf_buffer.seek(0)
+    return pdf_buffer
 
 
 def generate_intern_pdf(request, mode, identifier=None):
     """
-    mode can be: 'single', 'multiple', 'batch'
-    identifier:
-        - single -> intern_id
-        - multiple -> handled from request.POST.getlist("intern_ids")
-        - batch -> batch_id
+    Generate Undertaking Certificates
+    mode:
+        - single: one intern (identifier=intern_id)
+        - multiple: many interns (ids in POST)
+        - batch: all interns in a batch (identifier=batch_id)
     """
     interns = []
 
@@ -244,44 +276,116 @@ def generate_intern_pdf(request, mode, identifier=None):
             intern = InternProfile.objects.get(
                 id=identifier,
                 internship_status="Ongoing",
-                undertaking_generated=False
+                undertaking_generated=False,
             )
             interns = [intern]
         except InternProfile.DoesNotExist:
-            return HttpResponse(f"Cannot generate certificate: Intern with ID {identifier} is either not Ongoing or already has an undertaking generated.")
+            return HttpResponse(
+                f"Cannot generate certificate: Intern with ID {identifier} "
+                "is either not Ongoing or already has an undertaking generated."
+            )
 
     elif mode == "multiple":
         intern_ids = request.POST.getlist("intern_ids")
-        interns = InternProfile.objects.filter(
-            id__in=intern_ids,
-            internship_status="Ongoing",
-            undertaking_generated=False
+        interns = list(
+            InternProfile.objects.filter(
+                id__in=intern_ids,
+                internship_status="Ongoing",
+                undertaking_generated=False,
+            )
         )
-        if not interns.exists():
-            return HttpResponse("None of the selected interns are eligible for certificate generation (must be Ongoing and not yet generated).")
+        if not interns:
+            return HttpResponse(
+                "None of the selected interns are eligible for certificate generation "
+                "(must be Ongoing and not yet generated)."
+            )
 
     elif mode == "batch":
         batch = get_object_or_404(Batch, id=identifier)
-        interns = batch.interns.filter(
-            internship_status="Ongoing",
-            undertaking_generated=False
+        interns = list(
+            batch.interns.filter(
+                internship_status="Ongoing",
+                undertaking_generated=False
+            )
         )
-        if not interns.exists():
-            return HttpResponse(f"No eligible interns in batch '{batch.name}' for certificate generation.")
+        if not interns:
+            return HttpResponse(
+                f"No eligible interns in batch '{batch.name}' for certificate generation."
+            )
 
     # ----------------------
-    # Single intern: generate PDF normally
+    # SINGLE PDF
     # ----------------------
-    if mode == "single":
-        html_content = render_to_string("undertaking_letter.html", {"intern": interns[0]})
-        interns[0].undertaking_generated = True
-        interns[0].save()
-        response = HttpResponse(content_type="application/pdf")
-        filename = f"undertaking_{interns[0].unique_id}.pdf"
+    if len(interns) == 1:
+        intern = interns[0]
+        logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        context = {
+            "intern_name": intern.user.get_full_name(),
+            "course": intern.batch.course,
+            "batch": intern.batch,
+            "company": {
+                "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                "cin": "U62099TS2023PTC179794",
+                "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                "phone": "+914049525396",
+                "website": "www.vindusenvironment.com"
+            },
+            "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+            "logo_path": logo_path 
+        }
+
+        html_content = render_to_string("undertaking_letter.html", context)
+        pdf_buffer = generate_pdf_from_html(html_content)
+        if not pdf_buffer:
+            return HttpResponse("Error generating PDF")
+
+        intern.undertaking_generated = True
+        intern.save()
+
+        response = HttpResponse(pdf_buffer, content_type="application/pdf")
+        filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        pisa.CreatePDF(html_content, dest=response)
         return response
 
+    # ----------------------
+    # MULTIPLE/BATCH => ZIP
+    # ----------------------
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+        for intern in interns:
+            logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+            context = {
+                "intern_name": intern.user.get_full_name(),
+                "course": intern.batch.course,
+                "batch": intern.batch,
+                "company": {
+                    "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                    "cin": "U12345XYZ",
+                    "address": "123 Legal Street, City, State, ZIP",
+                    "phone": "+91-1234567890",
+                    "website": "www.vindusenvironment.com"
+                },
+                "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                "logo_path": logo_path
+            }
+            html_content = render_to_string("undertaking_letter.html", context)
+            pdf_buffer = generate_pdf_from_html(html_content)
+            if not pdf_buffer:
+                continue
+
+            filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
+            zip_file.writestr(filename, pdf_buffer.read())
+
+            intern.undertaking_generated = True
+            intern.save()
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type="application/zip")
+    if mode == "batch":
+        response["Content-Disposition"] = f'attachment; filename="{batch.name}_undertakings.zip"'
+    else:
+        response["Content-Disposition"] = 'attachment; filename="undertakings.zip"'
+    return response
 
 # -------------------------
 # Single intern PDF
