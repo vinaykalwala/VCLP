@@ -10,11 +10,11 @@
 
 <style>
 :root {
-  --primary: #d633ff;         /* pink-purple */
+  --primary:gold;         /* pink-purple */
   --primary-dark: #b000e6;    /* darker shade */
   --primary-light: #f05fff;   /* lighter glow */
   --bg: #000000;              /* black sidebar background */
-  --bg-light: #111111;        /* lighter black */
+  --bg-light: #272727;        /* lighter black */
   --text-light: #ffffff;      /* white text */
   --text-muted: #b985d6;      /* muted pink-purple */
   --shadow: 0 4px 12px rgba(0,0,0,0.6);
@@ -87,6 +87,7 @@ body {
   margin: 0 0 15px;
   
 }
+
 .sidebar ul li { margin-bottom: 5px; }
 .sidebar ul li a {
   display: flex;
@@ -175,7 +176,7 @@ body {
 .sidebar-toggle {
   display: none;
   z-index: 999;
-  background: var(--primary);
+  background:#111;
   border: none;
   color: white;
   padding: 12px 14px;
@@ -258,23 +259,23 @@ body {
   <!-- Sidebar Links -->
   <ul>
     {% if request.user.role == "superuser" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i>Super User Dashboard</a></li>
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Super User Dashboard</a></li>
       <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
       
 
     {% elif request.user.role == "admin" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i>Administrator Dashboard</a></li>
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Administrator Dashboard</a></li>
             <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
             
             
 
     {% elif request.user.role == "trainer" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i>Trainer Dashboard</a></li>
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Trainer Dashboard</a></li>
       <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-check-circle"></i> Mark Attendance</a></li>
       <li><a href="{% url 'upload_lesson' %}"><i class="fas fa-upload"></i> Upload Lesson</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i> Lessons</a></li>
     {% elif request.user.role == "intern" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i>Intern Dashboard</a></li>
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Intern Dashboard</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i> Lessons</a></li>
       
            
