@@ -184,6 +184,7 @@ class Attendance(models.Model):
 # =====================
 class LessonFile(models.Model):
     trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="uploaded_files")
+    batches = models.ManyToManyField("Batch", related_name="lessons")
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to="lessons/")
     uploaded_at = models.DateTimeField(auto_now_add=True)

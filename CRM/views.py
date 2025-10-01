@@ -193,15 +193,20 @@ def upload_lesson(request):
     if request.user.role != "trainer":
         return redirect('dashboard')
 
+    trainer = request.user.trainer_profile
+    batches = trainer.assigned_batches.all()  # batches assigned to this trainer
+
     if request.method == "POST" and request.FILES.get("file"):
-        trainer = request.user.trainer_profile
         title = request.POST.get("title")
+        selected_batches = request.POST.getlist("batches")  # get multiple batch IDs
         file = request.FILES["file"]
-        LessonFile.objects.create(trainer=trainer, title=title, file=file)
+
+        lesson = LessonFile.objects.create(trainer=trainer, title=title, file=file)
+        lesson.batches.set(selected_batches)  # assign multiple batches
         messages.success(request, "File uploaded successfully.")
         return redirect("upload_lesson")
 
-    return render(request, "files/upload.html")
+    return render(request, "files/upload.html", {"batches": batches})
 
 # views.py
 from django.shortcuts import render, get_object_or_404
@@ -213,7 +218,17 @@ import os
 
 @login_required
 def view_lessons(request):
-    lessons = LessonFile.objects.all()
+    user = request.user
+
+    if user.role == "intern":
+        batch = user.intern_profile.batch
+        lessons = LessonFile.objects.filter(batches=batch).order_by('-uploaded_at')
+    elif user.role == "trainer":
+        trainer = user.trainer_profile
+        lessons = LessonFile.objects.filter(trainer=trainer).order_by('-uploaded_at')
+    else:  # admin or superuser
+        lessons = LessonFile.objects.all().order_by('-uploaded_at')
+
     return render(request, "files/view.html", {"lessons": lessons})
 
 @login_required
@@ -226,10 +241,10 @@ def secure_pdf_view(request, lesson_id):
         response = HttpResponse(pdf_file.read(), content_type='application/pdf')
         
         # Security headers to discourage downloading
-        response['Content-Disposition'] = 'inline'
+        response['Content-Disposition'] = 'inline; filename="document.pdf"'
         response['X-Content-Type-Options'] = 'nosniff'
         response['X-Frame-Options'] = 'SAMEORIGIN'
-        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate,private'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
         

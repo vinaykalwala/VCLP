@@ -66,6 +66,7 @@
             height: 100%;
             border: none;
             background: white;
+            transform-origin: top left;
         }
         .security-overlay {
             position: fixed;
@@ -143,6 +144,8 @@
             <button class="control-btn">
                 <a href="{% url 'view_lessons' %}" style="text-decoration: none;color: white;">← Back to All Lessons</a>
             </button>
+            
+           
             <button class="control-btn close-btn" onclick="closeViewer()" title="Close">Close</button>
         </div>
     </div>
@@ -151,11 +154,11 @@
         <iframe 
             id="pdfFrame"
             class="pdf-frame" 
-            src="{% url 'secure_pdf_view' lesson.id %}"
-            onload="onPDFLoad()">
-        </iframe>
+            src="{% url 'secure_pdf_view' lesson.id %}#toolbar=0&navpanes=0"
+            onload="onPDFLoad()"
+            sandbox="allow-same-origin allow-scripts"
+        ></iframe>
     </div>
-
     <!-- Security overlay to prevent right-click on iframe -->
     <div class="security-overlay" id="securityOverlay"></div>
     
@@ -178,33 +181,19 @@
             }, 3000);
         }
 
-        function zoomIn() {
-            zoomLevel += 0.1;
-            applyZoom();
-        }
+        
 
-        function zoomOut() {
-            if (zoomLevel > 0.5) {
-                zoomLevel -= 0.1;
-                applyZoom();
-            }
-        }
-
-        function fitToWidth() {
-            // Reset to fit width
-            zoomLevel = 1;
-            applyZoom();
-        }
-
+       
         function applyZoom() {
-            console.log('Zoom level:', zoomLevel);
+            pdfFrame.style.transform = `scale(${zoomLevel})`;
+            pdfFrame.style.width = `${100 / zoomLevel}%`;
+            pdfFrame.style.height = `${100 / zoomLevel}%`;
         }
 
         function closeViewer() {
             window.close();
         }
 
-        // Security measures
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             showWarning();
@@ -213,21 +202,16 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 's':
-                    case 'p':
-                    case 'u':
+                switch(e.key.toLowerCase()) {
+                    case 's': // Ctrl+S
+                    case 'p': // Ctrl+P
+                    case 'u': // Ctrl+U
                         e.preventDefault();
                         showWarning();
                         return false;
                 }
             }
-            if (e.key === 'F12') {
-                e.preventDefault();
-                showWarning();
-                return false;
-            }
-            if (e.key === 'PrintScreen') {
+            if (e.key === 'F12' || e.key === 'PrintScreen') {
                 e.preventDefault();
                 showWarning();
                 return false;
@@ -256,4 +240,5 @@
             document.styleSheets[0].cssRules.length
         );
     </script>
+    
 </body>
