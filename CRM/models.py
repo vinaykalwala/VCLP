@@ -117,8 +117,21 @@ class InternProfile(models.Model):
 
 class TrainerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="trainer_profile")
-    expertise = models.CharField(max_length=150, blank=True, null=True)
-    
+    profile_photo = models.ImageField(upload_to="trainer_profiles/", null=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    expertise = models.CharField(max_length=150, blank=True, null=True)  # e.g., Python, ML, DevOps
+    years_of_experience = models.PositiveIntegerField(blank=True, null=True)
+    designation = models.CharField(max_length=100, blank=True, null=True)  # e.g., Senior Trainer, Tech Lead
+    highest_qualification = models.CharField(max_length=100, blank=True, null=True)
+
+    availability = models.CharField(
+        max_length=50,
+        choices=(("Full-time", "Full-time"), ("Part-time", "Part-time"), ("Guest", "Guest")),
+        default="Full-time"
+    )
+    linkedin_profile = models.URLField(blank=True, null=True)
+    portfolio_link = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
@@ -126,7 +139,9 @@ class TrainerProfile(models.Model):
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin_profile")
+    profile_photo = models.ImageField(upload_to="admin_profiles/", null=True, blank=True)
     office_location = models.CharField(max_length=150, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
@@ -134,7 +149,9 @@ class AdminProfile(models.Model):
 
 class SuperUserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="superuser_profile")
+    profile_photo = models.ImageField(upload_to="superuser_profiles/", null=True, blank=True)
     privileges = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
