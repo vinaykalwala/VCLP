@@ -205,12 +205,43 @@ def upload_lesson(request):
 
     return render(request, "files/upload.html")
 
+# views.py
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.conf import settings
+from .models import LessonFile
+import os
 
 @login_required
 def view_lessons(request):
     lessons = LessonFile.objects.all()
     return render(request, "files/view.html", {"lessons": lessons})
 
+@login_required
+def secure_pdf_view(request, lesson_id):
+    """Serve PDF with security headers to prevent download"""
+    lesson = get_object_or_404(LessonFile, id=lesson_id)
+    
+    # Read the file
+    with open(lesson.file.path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        
+        # Security headers to discourage downloading
+        response['Content-Disposition'] = 'inline'
+        response['X-Content-Type-Options'] = 'nosniff'
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        
+        return response
+
+@login_required
+def pdf_viewer_page(request, lesson_id):
+    """Render a custom PDF viewer page"""
+    lesson = get_object_or_404(LessonFile, id=lesson_id)
+    return render(request, 'files/pdf_viewer.html', {'lesson': lesson})
 
 # -------------------------
 # Helper function to generate PDF
@@ -282,89 +313,6 @@ def generate_intern_pdf(request, mode, identifier=None):
         pisa.CreatePDF(html_content, dest=response)
         return response
 
-
-# -------------------------
-# Single intern PDF
-# -------------------------
-
-
-
-
-# ================================
-# Certificate Management View (Admin)
-# ================================
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .models import Batch
-from .forms import BatchForm
-
-# Function-based views approach
-@login_required
-def batch_list(request):
-    batches = Batch.objects.all().select_related('course', 'trainer__user')
-    return render(request, 'batches/batch_list.html', {'batches': batches})
-
-@login_required
-def batch_detail(request, pk):
-    batch = get_object_or_404(Batch.objects.select_related('course', 'trainer__user'), pk=pk)
-    return render(request, 'batches/batch_detail.html', {'batch': batch})
-
-@login_required
-def batch_create(request):
-    if request.method == 'POST':
-        form = BatchForm(request.POST)
-        if form.is_valid():
-            batch = form.save()
-            messages.success(request, f'Batch "{batch.name}" created successfully!')
-            return redirect('batch_detail', pk=batch.pk)
-    else:
-        form = BatchForm()
-    
-    return render(request, 'batches/batch_form.html', {
-        'form': form,
-        'title': 'Create New Batch'
-    })
-
-@login_required
-def batch_update(request, pk):
-    batch = get_object_or_404(Batch, pk=pk)
-    
-    if request.method == 'POST':
-        form = BatchForm(request.POST, instance=batch)
-        if form.is_valid():
-            batch = form.save()
-            messages.success(request, f'Batch "{batch.name}" updated successfully!')
-            return redirect('batch_detail', pk=batch.pk)
-    else:
-        form = BatchForm(instance=batch)
-    
-    return render(request, 'batches/batch_form.html', {
-        'form': form,
-        'title': f'Update Batch: {batch.name}',
-        'batch': batch
-    })
-
-@login_required
-def batch_delete(request, pk):
-    batch = get_object_or_404(Batch, pk=pk)
-    
-    if request.method == 'POST':
-        batch_name = batch.name
-        batch.delete()
-        messages.success(request, f'Batch "{batch_name}" deleted successfully!')
-        return redirect('batch_list')
-    
-    return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
-
-    # ----------------------
-    # Multiple/batch: generate separate PDFs in a ZIP
-    # ----------------------
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w") as zip_file:
         for intern in interns:

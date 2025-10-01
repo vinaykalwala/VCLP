@@ -36,6 +36,7 @@ class Batch(models.Model):
     trainer = models.ForeignKey("TrainerProfile", on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_batches")
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    timings=models.CharField(max_length=100, blank=True, null=True)  
 
     class Meta:
         unique_together = ('name', 'course')  # batch name should be unique inside a course

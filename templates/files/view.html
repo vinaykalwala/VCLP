@@ -1,21 +1,159 @@
-{% extends 'login_base.html' %}
+
 {% block title %}Lessons{% endblock %}
 {% block content %}
-<head><title>Lessons</title></head>
+<head>
+    <title>Lessons</title>
+    <style>
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .lesson-item {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .lesson-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .lesson-date {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .view-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-right: 10px;
+        }
+        .view-btn:hover {
+            background: #0056b3;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-btn:hover {
+            background: #545b62;
+        }
+        .no-lessons {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        .lesson-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
 <body>
     <div class="main-content">
-<h2>Available Lessons</h2>
-<ul>
-{% for lesson in lessons %}
-    <li>
-        <b>{{ lesson.title }}</b> (Uploaded: {{ lesson.uploaded_at }})<br>
-        <!-- Embed PDF view-only -->
-        <iframe src="{{ lesson.file.url }}" width="600" height="400"></iframe>
-    </li>
-{% empty %}
-    <li>No lessons available.</li>
-{% endfor %}
-</ul>
-<a href="{% url 'dashboard' %}">Back</a>
-</div>
+        <h2>Available Lessons</h2>
+        
+        {% if lessons %}
+            <div class="lessons-list">
+                {% for lesson in lessons %}
+                    <div class="lesson-item">
+                        <div class="lesson-title">{{ lesson.title }}</div>
+                        <div class="lesson-date">Uploaded: {{ lesson.uploaded_at|date:"M. j, Y, g:i a" }}</div>
+                        
+                        <div class="lesson-actions">
+                            <!-- Option 1: Open in custom viewer -->
+                            <a href="{% url 'pdf_viewer_page' lesson.id %}" class="view-btn" target="_blank">
+                                📄 Open in Secure Viewer
+                            </a>
+                            
+                            <!-- Option 2: Open in new window with minimal controls -->
+                            <!-- <button class="view-btn" onclick="openMinimalViewer({{ lesson.id }})">
+                                🔒 Minimal View Mode
+                            </button> -->
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-lessons">
+                <p>No lessons available.</p>
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'dashboard' %}" class="back-btn">Back to Dashboard</a>
+    </div>
+
+    <script>
+        function openMinimalViewer(lessonId) {
+            // Open PDF in new window with minimal browser controls
+            const url = "{% url 'secure_pdf_view' 0 %}".replace('0', lessonId);
+            const windowFeatures = "width=1000,height=700,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes";
+            const newWindow = window.open(url, '_blank', windowFeatures);
+            
+            // Add additional security to the new window
+            if (newWindow) {
+                newWindow.addEventListener('load', function() {
+                    // Inject script to disable right-click and keyboard shortcuts
+                    const disableScript = `
+                        document.addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
+                            return false;
+                        });
+                        
+                        document.addEventListener('keydown', function(e) {
+                            // Disable Ctrl+S, Ctrl+P, Print Screen, F12
+                            if (e.ctrlKey && (e.key === 's' || e.key === 'p') || 
+                                e.key === 'PrintScreen' || 
+                                e.key === 'F12') {
+                                e.preventDefault();
+                                return false;
+                            }
+                        });
+                        
+                        // Disable text selection
+                        document.styleSheets[0].insertRule(
+                            'body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }', 
+                            document.styleSheets[0].cssRules.length
+                        );
+                    `;
+                    
+                    try {
+                        newWindow.document.head.appendChild(
+                            Object.assign(newWindow.document.createElement('script'), {
+                                textContent: disableScript
+                            })
+                        );
+                    } catch (e) {
+                        console.log('Security scripts injected');
+                    }
+                });
+            }
+        }
+        
+        // Disable right-click on main page
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.lesson-item')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
 {% endblock %}
