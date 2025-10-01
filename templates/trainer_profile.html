@@ -72,38 +72,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Contact & Links</h5>
-                        <p><strong>Email:</strong> {{ trainer.user.email }}</p>
-                        {% if trainer.linkedin_profile %}
-                            <p><strong>LinkedIn:</strong> <a href="{{ trainer.linkedin_profile }}" target="_blank">View Profile</a></p>
-                        {% endif %}
-                        {% if trainer.portfolio_link %}
-                            <p><strong>Portfolio:</strong> <a href="{{ trainer.portfolio_link }}" target="_blank">View Portfolio</a></p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Assigned Batches</h5>
-                        {% if trainer.assigned_batches.all %}
-                            <ul class="list-group list-group-flush">
-                                {% for batch in trainer.assigned_batches.all %}
-                                    <li class="list-group-item">
-                                        <strong>{{ batch.name }}</strong><br>
-                                        <small class="text-muted">{{ batch.course.name }}</small>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p class="text-muted">No batches assigned.</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+          
         </div>
     </div>
 

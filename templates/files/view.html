@@ -1,159 +1,232 @@
-
+{% extends 'login_base.html' %}
 {% block title %}Lessons{% endblock %}
 {% block content %}
+{% load static %}
+
 <head>
     <title>Lessons</title>
     <style>
-        .main-content {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Container */
+        .lessons-page {
+            font-family: 'Roboto', sans-serif;
+            padding: 0px 20px;
+            padding-bottom: 30px;
         }
-        .lesson-item {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .lesson-title {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .lesson-date {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-        .view-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-right: 10px;
-        }
-        .view-btn:hover {
-            background: #0056b3;
-        }
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 15px;
-            background: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .back-btn:hover {
-            background: #545b62;
-        }
-        .no-lessons {
+
+        /* Page Header */
+        .lessons-page__header {
             text-align: center;
-            color: #666;
-            font-style: italic;
-            padding: 40px;
+            margin-bottom: 50px;
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #1a1a1a;
+          
         }
-        .lesson-actions {
+
+        /* Lessons grid */
+        .lessons-page__list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 18px;
+        }
+
+        /* Individual lesson card */
+        .lesson-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 22px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border:1px solid black;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+        }
+
+        /* Lesson title & date */
+        .lesson-card__title {
+            font-size: 1.35em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .lesson-card__date {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 18px;
+        }
+
+        /* Action buttons */
+        .lesson-card__actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
+        }
+
+        .lesson-card__btn {
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-card__btn--view {
+            background: linear-gradient(135deg, gold, #b000e6, #f05fff);
+            color: #fff;
+        }
+
+        .lesson-card__btn--view:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Back button */
+        .lessons-page__back-btn {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 12px 18px;
+            background-color: #6c757d;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .lessons-page__back-btn:hover {
+            background-color: #545b62;
+        }
+
+        /* No lessons message */
+        .lessons-page__no-lessons {
+            text-align: center;
+            font-style: italic;
+            color: #999;
+            padding: 60px 0;
+            font-size: 1.05em;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 600px) {
+            .lessons-page__list {
+                grid-template-columns: 1fr;
+            }
+            .lessons-page {
+                padding: 30px 15px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="main-content">
-        <h2>Available Lessons</h2>
-        
-        {% if lessons %}
-            <div class="lessons-list">
-                {% for lesson in lessons %}
-                    <div class="lesson-item">
-                        <div class="lesson-title">{{ lesson.title }}</div>
-                        <div class="lesson-date">Uploaded: {{ lesson.uploaded_at|date:"M. j, Y, g:i a" }}</div>
-                        
-                        <div class="lesson-actions">
-                            <!-- Option 1: Open in custom viewer -->
-                            <a href="{% url 'pdf_viewer_page' lesson.id %}" class="view-btn" target="_blank">
-                                📄 Open in Secure Viewer
-                            </a>
-                            
-                            <!-- Option 2: Open in new window with minimal controls -->
-                            <!-- <button class="view-btn" onclick="openMinimalViewer({{ lesson.id }})">
-                                🔒 Minimal View Mode
-                            </button> -->
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="no-lessons">
-                <p>No lessons available.</p>
-            </div>
-        {% endif %}
-        
-        <a href="{% url 'dashboard' %}" class="back-btn">Back to Dashboard</a>
-    </div>
 
-    <script>
-        function openMinimalViewer(lessonId) {
-            // Open PDF in new window with minimal browser controls
-            const url = "{% url 'secure_pdf_view' 0 %}".replace('0', lessonId);
-            const windowFeatures = "width=1000,height=700,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes";
-            const newWindow = window.open(url, '_blank', windowFeatures);
-            
-            // Add additional security to the new window
-            if (newWindow) {
-                newWindow.addEventListener('load', function() {
-                    // Inject script to disable right-click and keyboard shortcuts
-                    const disableScript = `
-                        document.addEventListener('contextmenu', function(e) {
-                            e.preventDefault();
-                            return false;
-                        });
-                        
-                        document.addEventListener('keydown', function(e) {
-                            // Disable Ctrl+S, Ctrl+P, Print Screen, F12
-                            if (e.ctrlKey && (e.key === 's' || e.key === 'p') || 
-                                e.key === 'PrintScreen' || 
-                                e.key === 'F12') {
-                                e.preventDefault();
-                                return false;
-                            }
-                        });
-                        
-                        // Disable text selection
-                        document.styleSheets[0].insertRule(
-                            'body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }', 
-                            document.styleSheets[0].cssRules.length
-                        );
-                    `;
-                    
-                    try {
-                        newWindow.document.head.appendChild(
-                            Object.assign(newWindow.document.createElement('script'), {
-                                textContent: disableScript
-                            })
-                        );
-                    } catch (e) {
-                        console.log('Security scripts injected');
-                    }
-                });
-            }
+<div class="main-content">
+<div class="lessons-page">
+<!-- Add this just above your lessons list div -->
+<div class="lessons-page__header-banner">
+    <h1>Available Lessons</h1>
+</div>
+
+<style>
+/* Header Banner */
+.lessons-page__header-banner {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffb347, #ffcc33, #b000e6, #f05fff);
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.lessons-page__header-banner::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("{% static 'images/banner.jpg' %}") no-repeat center/cover;
+    opacity: 0.04; /* subtle overlay */
+}
+
+.lessons-page__header-banner h1 {
+    position: relative;
+    font-size: 2.2em;
+    font-weight: 700;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+</style>
+
+    {% if lessons %}
+        <div class="lessons-page__list">
+            {% for lesson in lessons %}
+                <div class="lesson-card">
+                    <div class="lesson-card__title">{{ lesson.title }}</div>
+                    <div class="lesson-card__date">Uploaded: {{ lesson.uploaded_at|date:"M. j, Y, g:i a" }}</div>
+                    <div class="lesson-card__actions">
+                        <a href="{% url 'pdf_viewer_page' lesson.id %}" target="_blank" class="lesson-card__btn lesson-card__btn--view">
+                            📄 Open in Secure Viewer
+                        </a>
+                        <!-- Uncomment if using minimal viewer -->
+                        <!-- <button class="lesson-card__btn lesson-card__btn--view" onclick="openMinimalViewer({{ lesson.id }})">
+                            🔒 Minimal View Mode
+                        </button> -->
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="lessons-page__no-lessons">
+            <p>No lessons available.</p>
+        </div>
+    {% endif %}
+
+</div>
+</div>
+
+<script>
+    function openMinimalViewer(lessonId) {
+        const url = "{% url 'secure_pdf_view' 0 %}".replace('0', lessonId);
+        const windowFeatures = "width=1000,height=700,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes";
+        const newWindow = window.open(url, '_blank', windowFeatures);
+
+        if (newWindow) {
+            newWindow.addEventListener('load', function() {
+                const disableScript = `
+                    document.addEventListener('contextmenu', e => e.preventDefault());
+                    document.addEventListener('keydown', e => {
+                        if (e.ctrlKey && (e.key === 's' || e.key === 'p') || 
+                            e.key === 'PrintScreen' || e.key === 'F12') e.preventDefault();
+                    });
+                    document.styleSheets[0].insertRule(
+                        'body { user-select: none; }',
+                        document.styleSheets[0].cssRules.length
+                    );
+                `;
+                try {
+                    newWindow.document.head.appendChild(
+                        Object.assign(newWindow.document.createElement('script'), { textContent: disableScript })
+                    );
+                } catch (e) {
+                    console.log('Security scripts injected');
+                }
+            });
         }
-        
-        // Disable right-click on main page
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.closest('.lesson-item')) {
-                e.preventDefault();
-            }
-        });
-    </script>
-</body>
+    }
+
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('.lesson-card')) e.preventDefault();
+    });
+</script>
+
 {% endblock %}

@@ -27,11 +27,11 @@
       <ul class="navbar-nav align-items-center">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
+            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'login' %}">Login</a>
           </li>
         {% endif %}
       </ul>
@@ -81,10 +81,9 @@
   display: inline-block;
   padding: 0.3rem 0.6rem;
   font-weight: 600;
-  color: #fff;
+  color:#000;
   text-decoration: none;
-  border-radius: 50px;
-  background: #d633ff; /* solid pink-purple */
+  background:#fff; /* solid pink-purple */
   box-shadow: 0 0 15px rgba(255, 78, 205, 0.6), 0 0 30px rgba(181, 76, 255, 0.5);
   transition: all 0.3s ease;
   border: none;
@@ -93,7 +92,8 @@
 
 .btn-gradient:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(255, 78, 205, 0.8), 0 0 50px rgba(181, 76, 255, 0.7);
+  background-color: #fff;
+  color: #1a1c26;
 }
 
 /* Mobile Tweaks */

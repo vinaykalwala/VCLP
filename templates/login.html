@@ -65,7 +65,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); /* black transparent overlay */
+            background: rgba(0,0,0,0.9); /* black transparent overlay */
         }
 
         .login-left h1,
@@ -205,7 +205,6 @@
         .btn-login {
             width: 100%;
             padding: 15px;
-            background: var(--gradient);
             border: none;
             border-radius: var(--border-radius);
             color: white;
@@ -213,11 +212,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            background-color: #0d0d0d;
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 195, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -233,13 +233,19 @@
                 padding: 30px 20px;
             }
         }
+        .gradient-text {
+    background: linear-gradient(135deg, #ffb347, #ffcc33, #b000e6, #f05fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* for Firefox */
+}
     </style>
 </head>
 <body>
     <div class="login-container">
         <!-- LEFT SIDE -->
         <div class="login-left">
-            <h1>Welcome Back</h1>
+            <h1><span class="gradient-text">Welcome</span> Back</h1>
             <p>Log in to access your personalized dashboard, continue your journey with us, and track the Career Launch Program details.</p>
             <ul class="feature-list">
                 <li><i class="fas fa-shield-alt"></i> Secure & Encrypted Login</li>
