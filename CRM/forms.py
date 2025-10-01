@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Batch
+from .models import *
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -68,3 +68,62 @@ class BatchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Only show trainers in the trainer dropdown
         self.fields['trainer'].queryset = TrainerProfile.objects.all()
+
+
+from django.contrib.auth.forms import UserChangeForm
+
+
+class UserUpdateForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'phone']
+        exclude = ['password']  # Don't show password field
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove password field completely
+        if 'password' in self.fields:
+            del self.fields['password']
+
+class InternProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = InternProfile
+        exclude = [
+            'user', 
+            'unique_id', 
+            'created_at',
+            'undertaking_generated',
+            'completion_certificate_generated',
+            'lor_generated',
+            'internship_status'
+        ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'skills': forms.Textarea(attrs={'rows': 3}),
+            'prior_experience': forms.Textarea(attrs={'rows': 3}),
+            'why_choose': forms.Textarea(attrs={'rows': 3}),
+            'expectations': forms.Textarea(attrs={'rows': 3}),
+            'career_goals': forms.Textarea(attrs={'rows': 3}),
+            'address': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class TrainerProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = TrainerProfile
+        exclude = ['user', 'created_at']
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 4}),
+        }
+
+class AdminProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = AdminProfile
+        exclude = ['user', 'created_at']
+
+class SuperUserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = SuperUserProfile
+        exclude = ['user', 'created_at']
+        widgets = {
+            'privileges': forms.Textarea(attrs={'rows': 4}),
+        }

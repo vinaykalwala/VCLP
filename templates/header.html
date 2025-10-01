@@ -27,11 +27,11 @@
       <ul class="navbar-nav align-items-center">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
+            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="btn btn-gradient rounded-pill px-4 fw-bold" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'login' %}">Login</a>
           </li>
         {% endif %}
       </ul>
@@ -44,14 +44,14 @@
 <div class="navbar-spacer"></div>
 
 <style>
-/* 🌌 Dark Blue Navbar */
+/* 🌑 Black Navbar */
 .dark-navbar {
-  background-color: rgb(27, 43, 64); /* dark blue header */
+  background-color: #000; /* pure black header */
   font-family: 'Roboto', sans-serif;
   transition: all 0.3s ease-in-out;
   z-index: 1030;
   border-bottom: 1px solid #1a1c26;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
   padding: 0.4rem 0;
 }
 
@@ -60,11 +60,11 @@
   height: 70px;
 }
 
-/* Brand Text Gradient (blue-teal tones) */
+/* Brand Text Gradient (Pink → Purple) */
 .brand-text {
   font-size: 1rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff); /* blue → teal gradient */
+  background:#fff;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.4px;
@@ -75,17 +75,16 @@
   display: none;
 }
 
-/* Gradient Button with Blue-Teal Glow */
+/* Gradient Button (Pink → Purple) */
 .btn-gradient {
   position: relative;
   display: inline-block;
   padding: 0.3rem 0.6rem;
   font-weight: 600;
-  color: #fff;
+  color:#000;
   text-decoration: none;
-  border-radius: 50px;
-  background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff);
-  box-shadow: 0 0 15px rgba(0, 195, 255, 0.6), 0 0 30px rgba(0, 102, 255, 0.5); /* blue-teal glow */
+  background:#fff; /* solid pink-purple */
+  box-shadow: 0 0 15px rgba(255, 78, 205, 0.6), 0 0 30px rgba(181, 76, 255, 0.5);
   transition: all 0.3s ease;
   border: none;
   overflow: hidden;
@@ -93,7 +92,8 @@
 
 .btn-gradient:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(0, 195, 255, 0.8), 0 0 50px rgba(0, 102, 255, 0.7); /* hover glow */
+  background-color: #fff;
+  color: #1a1c26;
 }
 
 /* Mobile Tweaks */
