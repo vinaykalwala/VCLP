@@ -198,16 +198,28 @@
                 <img src="{% static 'images/upload.png' %}" alt="Lesson Image">
             </div>
             
-            <!-- Right form -->
             <div class="upload-card-right">
                 <h2>Upload Lesson File</h2>
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
+                    
+                    <!-- Lesson Title -->
                     <div class="form-group">
                         <input type="text" name="title" id="title" placeholder=" " required>
                         <label for="title">Lesson Title</label>
                     </div>
+
+                    <!-- Multi-Batch Selection -->
+                    <div class="form-group">
+                        <select name="batches" id="batches" multiple required class="form-control" style="height:120px; border-radius:16px; padding:1rem;">
+                            {% for batch in batches %}
+                                <option value="{{ batch.id }}">{{ batch.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="batches" style="top:-0.8rem; left:1rem; font-size:0.8rem; color:#6b7280;">Select Batch(es)</label>
+                    </div>
                     
+                    <!-- File Upload -->
                     <div class="form-group">
                         <input type="file" name="file" id="file" required>
                         <label for="file">Choose Lesson File</label>
