@@ -18,6 +18,10 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
     plain_password = models.CharField(max_length=128, blank=True, null=True)  # ⚠️ unsafe in prod
 
+    def get_role_display(self):
+        """Get human-readable role name"""
+        return dict(self.ROLE_CHOICES).get(self.role, self.role)
+    
     def __str__(self):
         return f"{self.username} ({self.role})"
 
@@ -36,6 +40,7 @@ class Batch(models.Model):
     trainer = models.ForeignKey("TrainerProfile", on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_batches")
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    timings=models.CharField(max_length=100, blank=True, null=True)  
 
     class Meta:
         unique_together = ('name', 'course')  # batch name should be unique inside a course
@@ -179,6 +184,7 @@ class Attendance(models.Model):
 # =====================
 class LessonFile(models.Model):
     trainer = models.ForeignKey(TrainerProfile, on_delete=models.CASCADE, related_name="uploaded_files")
+    batches = models.ManyToManyField("Batch", related_name="lessons")
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to="lessons/")
     uploaded_at = models.DateTimeField(auto_now_add=True)

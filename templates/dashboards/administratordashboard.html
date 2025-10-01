@@ -2,8 +2,186 @@
 {% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 {% load static %}
+
+<style>
+/* Base layout */
+.admin-landing {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f0f0f3 0%, #e6e6eb 100%);
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating gradient shapes for depth */
+.admin-landing::before,
+.admin-landing::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.admin-landing::before {
+    width: 600px;
+    height: 600px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: -200px;
+    left: -150px;
+}
+
+.admin-landing::after {
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    bottom: -150px;
+    right: -100px;
+}
+
+/* Glass Card */
+.admin-landing__card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
+    border-radius: 32px;
+    padding: 4rem 3rem;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.08), 0 10px 25px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.admin-landing__card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.1), 0 15px 35px rgba(0,0,0,0.05);
+}
+
+/* Title */
+.admin-landing__title {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+.admin-landing__title span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Subtitle */
+.admin-landing__subtitle {
+    font-size: 1.125rem;
+    color: #4b5563;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Button */
+.admin-landing__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 0.875rem 3rem;
+    border-radius: 24px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.125rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(214, 51, 255, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.admin-landing__btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 120%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+}
+
+.admin-landing__btn:hover::before {
+    left: 100%;
+}
+
+.admin-landing__btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(214, 51, 255, 0.4);
+}
+
+.admin-landing__btn:active {
+    transform: translateY(-1px);
+}
+
+/* Animations */
+.admin-landing__card,
+.admin-landing__title,
+.admin-landing__subtitle,
+.admin-landing__btn {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.admin-landing__card { animation-delay: 0s; }
+.admin-landing__title { animation-delay: 0.2s; }
+.admin-landing__subtitle { animation-delay: 0.4s; }
+.admin-landing__btn { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-landing__card { padding: 3rem 2rem; border-radius: 28px; }
+    .admin-landing__title { font-size: 2.25rem; }
+    .admin-landing__subtitle { font-size: 1rem; }
+    .admin-landing__btn { padding: 0.75rem 2.5rem; font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+    .admin-landing__card { padding: 2.5rem 1.5rem; border-radius: 22px; }
+    .admin-landing__title { font-size: 1.85rem; }
+    .admin-landing__subtitle { font-size: 0.95rem; }
+    .admin-landing__btn { width: 100%; padding: 0.75rem; font-size: 0.95rem; }
+}
+</style>
+
 <div class="main-content">
-<h2>Welcome Admin: {{ request.user.username }}</h2>
-<a href="{% url 'logout' %}">Logout</a>
+    <div class="admin-landing">
+        <div class="admin-landing__card">
+            <h1 class="admin-landing__title">Welcome <span>Admin</span> {{ request.user.username }}</h1>
+            <p class="admin-landing__subtitle">
+                Manage users, letters, and certificates with style. Access all your dashboard tools in a clean, modern interface.
+            </p>
+            <a href="{% url 'signup' %}" class="admin-landing__btn">Create Users</a>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

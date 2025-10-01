@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ trainer.user.get_full_name }} - Trainer Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .trainer-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="trainer-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    {% if trainer.profile_photo %}
+                        <img src="{{ trainer.profile_photo.url }}" alt="Trainer Photo" class="profile-photo">
+                    {% else %}
+                        <img src="https://via.placeholder.com/150" alt="Default Trainer" class="profile-photo">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h1>{{ trainer.user.get_full_name }}</h1>
+                    <p class="lead mb-1">{{ trainer.designation|default:"Trainer" }}</p>
+                    <p class="mb-0">{{ trainer.user.email }}</p>
+                </div>
+                <div class="col-md-2 text-end">
+                    <a href="javascript:history.back()" class="btn btn-light">Go Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">About</h3>
+                        <p class="card-text">{{ trainer.bio|default:"No bio provided." }}</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Professional Information</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Expertise:</strong> {{ trainer.expertise|default:"Not specified" }}</p>
+                                <p><strong>Designation:</strong> {{ trainer.designation|default:"Not specified" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Experience:</strong> {{ trainer.years_of_experience|default:"Not specified" }} years</p>
+                                <p><strong>Availability:</strong> {{ trainer.get_availability_display }}</p>
+                            </div>
+                        </div>
+                        <p><strong>Highest Qualification:</strong> {{ trainer.highest_qualification|default:"Not specified" }}</p>
+                    </div>
+                </div>
+            </div>
+
+          
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

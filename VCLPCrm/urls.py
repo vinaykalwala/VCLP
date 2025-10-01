@@ -14,6 +14,8 @@ urlpatterns = [
     path('attendance/', views.mark_attendance, name='mark_attendance'),
     path('lessons/upload/', views.upload_lesson, name='upload_lesson'),
     path('lessons/view/', views.view_lessons, name='view_lessons'),
+    path('lessons/<int:lesson_id>/secure-view/', views.secure_pdf_view, name='secure_pdf_view'),
+    path('lessons/<int:lesson_id>/viewer/', views.pdf_viewer_page, name='pdf_viewer_page'),
     path("undertaking/", views.undertaking_certificates_home, name="undertaking_home"),
     path("undertaking/single/<int:identifier>/", views.generate_intern_pdf, {"mode": "single"}, name="undertaking_single"),
     path("undertaking/multiple/", views.generate_intern_pdf, {"mode": "multiple"}, name="undertaking_multiple"),
@@ -21,12 +23,17 @@ urlpatterns = [
 
     path('managecertificates/', views.manage_certificates_view, name='manage_certificates'),
     path('certificate/download/<int:intern_id>/', views.download_certificate_view, name='download_certificate'),
+    path('lors/', views.manage_lor_view, name='manage_lor'),
+    path('lor/download/<int:intern_id>/', views.download_lor_view, name='download_lor'),
     
     path('batches/', views.batch_list, name='batch_list'),
     path('batches/create/', views.batch_create, name='batch_create'),
     path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
     path('batches/<int:pk>/update/', views.batch_update, name='batch_update'),
     path('batches/<int:pk>/delete/', views.batch_delete, name='batch_delete'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    path('profile/trainer/<int:trainer_id>/', views.trainer_profile_view, name='trainer_profile'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
