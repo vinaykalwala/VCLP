@@ -5,9 +5,12 @@
       <!-- Contact Details -->
       <div class="footer-contact">
         <p>
-          <i class="fas fa-phone-alt"></i> <a href="tel:+919989760462">9989760462</a> &nbsp;|&nbsp;
-          <i class="fas fa-globe"></i> <a href="https://www.vindusenvironment.com" target="_blank">www.vindusenvironment.com</a> &nbsp;|&nbsp;
-          <i class="fas fa-envelope"></i> <a href="mailto:info.vindus@gmail.com">info.vindus@gmail.com</a>
+          <i class="fas fa-phone-alt"></i> 
+          <a href="tel:+919989760462">9989760462</a> &nbsp;|&nbsp;
+          <i class="fas fa-globe"></i> 
+          <a href="https://www.vindusenvironment.com" target="_blank">www.vindusenvironment.com</a> &nbsp;|&nbsp;
+          <i class="fas fa-envelope"></i> 
+          <a href="mailto:info.vindus@gmail.com">info.vindus@gmail.com</a>
         </p>
       </div>
 
@@ -22,53 +25,57 @@
 
 <style>
 .footer {
-  background-color: rgb(27, 43, 64);
-  color: white;
-  padding: 20px;
+  background-color: #000; /* pure black */
+  color: #fff;
+  padding: 20px 40px;
   font-family: 'Roboto', sans-serif;
-  border-top: 1px solid #1a1c26;
+  border-top: 1px solid #222;
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* Bottom line layout */
 .footer-bottom-line {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* left & right corners */
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 /* Contact Details Box */
 .footer-contact {
-  background: linear-gradient(135deg, #00c3ff, #0066ff, #00f5ff);
+  background: #111; /* dark gray box */
   padding: 8px 15px;
   border-radius: 25px;
   display: inline-block;
+  border: 1px solid #333;
 }
 
 .footer-contact p {
   margin: 0;
   font-size: 0.95rem;
-  color: white;
+  color: #fff;
 }
 
 .footer-contact a {
-  color: white;
+  color: #fff;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
 
 .footer-contact a:hover {
-  color: #a5f3fc;
+  color: #ccc;
 }
 
 .footer-contact i {
   margin-right: 5px;
+  color: #bbb;
 }
 
 /* Copyright */
@@ -79,10 +86,10 @@
 }
 
 /* Responsive */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 992px) {
   .footer-bottom-line {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     text-align: center;
   }
 }
