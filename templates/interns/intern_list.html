@@ -1,77 +1,248 @@
-<h1>Interns</h1>
+{% extends 'login_base.html' %}
+{% block title %}Interns{% endblock %}
+{% block content %}
+{% load static %}
 
-<form method="get">
-    <input type="text" name="q" placeholder="Search by username, name, batch, trainer, unique ID, gender, certificates..." value="{{ request.GET.q }}">
-    
-    <label>Batch Start:</label>
-    <input type="date" name="batch_start" value="{{ request.GET.batch_start }}">
-    
-    <label>Batch End:</label>
-    <input type="date" name="batch_end" value="{{ request.GET.batch_end }}">
+<style>
+/* ====== Main Container ====== */
 
-    <label>Internship Status:</label>
-    <select name="internship_status">
-        <option value="">All</option>
-        <option value="Ongoing" {% if request.GET.internship_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
-        <option value="Completed" {% if request.GET.internship_status == 'Completed' %}selected{% endif %}>Completed</option>
-        <option value="Dropped" {% if request.GET.internship_status == 'Dropped' %}selected{% endif %}>Dropped</option>
-    </select>
 
-    <button type="submit">Search</button>
-</form>
+.main-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    border-left: 5px solid #5932EA;
+    padding-left: 10px;
+}
 
-<ul>
-  <table border="1" cellspacing="0" cellpadding="5">
-    <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Full Name</th>
-            <th>Unique ID</th>
-            <th>Batch</th>
-            <th>Trainer</th>
-            <th>Undertaking</th>
-            <th>Completion Certificate</th>
-            <th>LOR</th>
-            <th>Internship Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for intern in interns %}
-            <tr>
-                <td>{{ intern.user.username}}</td>
-                 <td>{{ intern.user.get_full_name }}</td>
-                <td>{{ intern.unique_id }}</td>
-                <td>
-                    {% if intern.batch %}
-                        {{ intern.batch.name }}
-                    {% else %}
-                        Not Assigned
-                    {% endif %}
-                </td>
+/* ====== Filter/Search Section ====== */
+.filter-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    align-items: center;
+}
 
-                <td>
-                    {% if intern.batch and intern.batch.trainer %}
-                        {{ intern.batch.trainer.user.get_full_name }}
-                    {% else %}
-                        Not Assigned
-                    {% endif %}
-                </td>
-                <td>{{ intern.undertaking_generated|yesno:"Yes,No" }}</td>
-                <td>{{ intern.completion_certificate_generated|yesno:"Yes,No" }}</td>
-                <td>{{ intern.lor_generated|yesno:"Yes,No" }}</td>
-                <td>{{ intern.internship_status }}</td>
-                <td>
-                    <a href="{% url 'intern_detail' intern.pk %}">View</a> |
-                    <a href="{% url 'intern_update' intern.pk %}">Edit</a> |
-                    <a href="{% url 'intern_delete' intern.pk %}">Delete</a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="9">No interns found.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</ul>
+.filter-box input,
+.filter-box select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: 0.2s ease;
+}
+
+.filter-box input:focus,
+.filter-box select:focus {
+    border-color: #5932EA;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.15);
+}
+
+.filter-box button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-yellow {
+    background-color: #FBBF24;
+    color: #000;
+}
+
+.btn-yellow:hover {
+    background-color: #f59e0b;
+    transform: translateY(-2px);
+}
+
+.btn-green {
+    background-color: #10B981;
+    color: #fff;
+}
+
+.btn-green:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* ====== Table Section ====== */
+.table-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    padding: 15px;
+}
+
+/* Full table grid with vertical lines */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px 14px;
+    border: 1px solid #eee; /* full grid */
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+}
+
+.custom-table th {
+    background: #5932EA;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+/* Actions Buttons */
+.action-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s ease;
+    margin: 2px 2px 2px 0;
+    white-space: nowrap;
+}
+
+.action-btn.view { background-color: #10B981; }
+.action-btn.view:hover { background-color: #059669; }
+
+.action-btn.edit { background-color: #FBBF24; color: #000; }
+.action-btn.edit:hover { background-color: #f59e0b; }
+
+.action-btn.delete { background-color: #EF4444; }
+.action-btn.delete:hover { background-color: #b91c1c; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-box {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .main-content h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2b2b2b;
+        margin-bottom: 25px;
+        border-left:none;
+        padding-left: 10px;
+        text-align: center;
+    }
+
+    /* Stack action buttons vertically on mobile */
+    .custom-table td .action-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Internship Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    text-transform: capitalize;
+    color: #fff;
+}
+
+.status-ongoing { color: #10B981; }   /* green */
+.status-completed { color: #FBBF24; color: #000; }  /* yellow */
+.status-dropped { color: #EF4444; }   /* red */
+
+</style>
+
+<div class="main-content">
+    <h1>Interns</h1>
+
+    <!-- Filter/Search Form -->
+    <form method="get" class="filter-box">
+        <input type="text" name="q" placeholder="Search by username, name, batch, trainer, unique ID, gender, certificates..." value="{{ request.GET.q }}">
+
+        <label>Batch Start:</label>
+        <input type="date" name="batch_start" value="{{ request.GET.batch_start }}">
+
+        <label>Batch End:</label>
+        <input type="date" name="batch_end" value="{{ request.GET.batch_end }}">
+
+        <label>Internship Status:</label>
+        <select name="internship_status"
+        class="{% if request.GET.internship_status == 'Ongoing' %}ongoing{% elif request.GET.internship_status == 'Completed' %}completed{% elif request.GET.internship_status == 'Dropped' %}dropped{% endif %}">
+    <option value="">All</option>
+    <option value="Ongoing" {% if request.GET.internship_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+    <option value="Completed" {% if request.GET.internship_status == 'Completed' %}selected{% endif %}>Completed</option>
+    <option value="Dropped" {% if request.GET.internship_status == 'Dropped' %}selected{% endif %}>Dropped</option>
+</select>
+
+
+        <button type="submit" class="btn-yellow">Search</button>
+    </form>
+
+    <!-- Table -->
+    <div class="table-box">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Unique ID</th>
+                    <th>Batch</th>
+                    <th>Undertaking</th>
+                    <th>Completion Certificate</th>
+                    <th>LOR</th>
+                    <th>Internship Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for intern in interns %}
+                    <tr>
+                        <td>{{ intern.user.get_full_name }}</td>
+                        <td>{{ intern.unique_id }}</td>
+                        <td>{% if intern.batch %}{{ intern.batch.name }}{% else %}Not Assigned{% endif %}</td>
+                        <td>{{ intern.undertaking_generated|yesno:"Yes,No" }}</td>
+                        <td>{{ intern.completion_certificate_generated|yesno:"Yes,No" }}</td>
+                        <td>{{ intern.lor_generated|yesno:"Yes,No" }}</td>
+<td>
+    <span class="status-badge 
+        {% if intern.internship_status == 'Ongoing' %}status-ongoing{% elif intern.internship_status == 'Completed' %}status-completed{% elif intern.internship_status == 'Dropped' %}status-dropped{% endif %}">
+        {{ intern.internship_status }}
+    </span>
+</td>
+                        <td>
+                            <a href="{% url 'intern_detail' intern.pk %}" class="action-btn view">View</a>
+                            <a href="{% url 'intern_update' intern.pk %}" class="action-btn edit">Edit</a>
+                            <a href="{% url 'intern_delete' intern.pk %}" class="action-btn delete">Delete</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align:center; color:#777; font-style:italic;">No interns found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

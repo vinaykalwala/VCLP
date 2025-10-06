@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Curriculum List</h2>
+
+    {% if user_role != "intern" %}
+<form method="get" class="mb-3">
+    <label for="batch">Filter by Batch:</label>
+    <select name="batch" id="batch" onchange="this.form.submit()">
+        <option value="">-- All Batches --</option>
+        {% for batch in batches %}
+            <option value="{{ batch.id }}" {% if selected_batch == batch.id|stringformat:'s' %}selected{% endif %}>
+                {{ batch.name }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+{% endif %}
+
+    <a href="{% url 'create_curriculum' %}" class="btn btn-primary mb-3">Add Curriculum</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Course</th>
+                <th>Batch</th>
+                <th>File</th>
+                <th>Uploaded By</th>
+                <th>Uploaded At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for c in curriculums %}
+    <tr>
+        <td>{{ c.title }}</td>
+        <td>{{ c.course.name }}</td>
+        <td>
+            {% if c.batch %}
+                {{ c.batch.name }}
+            {% else %}
+                All Batches
+            {% endif %}
+        </td>
+        <td><a href="{{ c.file.url }}" target="_blank">View</a></td>
+        <td>
+            {% if c.uploaded_by %}
+                {{ c.uploaded_by.user.username }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td>{{ c.uploaded_at|date:"M d, Y" }}</td>
+
+        <td>
+            {% if user_role == "trainer" or user_role == "admin" or user_role == "superuser" %}
+                {% if c.uploaded_by and c.uploaded_by.user == request.user or user_role in "admin superuser" %}
+                    <a href="{% url 'update_curriculum' c.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_curriculum' c.id %}" class="btn btn-sm btn-danger">Delete</a>
+                {% endif %}
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7" class="text-center">No curriculum found.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+    </table>
+</div>
+{% endblock %}

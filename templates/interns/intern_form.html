@@ -1,6 +1,185 @@
-<h1>{{ form.instance.pk|yesno:"Edit Intern,Create Intern" }}</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+{% extends 'login_base.html' %}
+{% block title %}{{ form.instance.pk|yesno:"Edit Intern,Create Intern" }}{% endblock %}
+{% block content %}
+{% load static %}
+
+<style>
+/* Card Wrapper & Hover */
+.main-content .card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    max-width: 1000px;
+    margin: 10px auto;
+}
+.main-content .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+}
+
+/* Card Header */
+.card-header {
+    background: linear-gradient(135deg, #5932EA, #6366f1);
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    padding: 1.5rem 2rem;
+    border-bottom: none;
+    text-align: center;
+}
+
+/* Form Group Wrapper */
+.form-group-custom {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.form-group-custom label {
+    font-weight: 600;
+    color:  #6B7280;
+    margin-bottom: 0.5rem;
+}
+
+/* Inputs, Textareas, Selects */
+.form-group-custom input:not([type="checkbox"]):not([type="radio"]),
+.form-group-custom textarea,
+.form-group-custom select {
+    padding: 0.65rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border 0.3s, box-shadow 0.3s;
+    background: #eef5ff;
+    width: 100%;
+    box-sizing: border-box;
+    height: 50px;
+}
+
+/* Checkboxes & Radios */
+.form-group-custom input[type="checkbox"],
+.form-group-custom input[type="radio"] {
+    width: auto;
+    height: auto;
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+}
+
+/* Focus styles */
+.form-group-custom input:focus,
+.form-group-custom select:focus,
+.form-group-custom textarea:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+
+/* Hide help text */
+.form-group-custom small.text-muted {
+    display: none;
+}
+/* Checkboxes & Radios: same line with label */
+.form-group-custom input[type="checkbox"],
+.form-group-custom input[type="radio"] {
+    width: auto;
+    height: auto;
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.form-group-custom label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between checkbox and label text */
+}
+
+/* Buttons */
+.btn-primary {
+    background: #4f46e5;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 0.65rem 1.4rem;
+    transition: background 0.3s;
+    border: none;
+}
+.btn-primary:hover {
+    background: #3730a3;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 0.65rem 1.4rem;
+    color: #374151;
+    border: none;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Responsive Fix */
+@media (max-width: 1200px) {
+    .main-content .card {
+        max-width: 90%;
+    }
+}
+@media (max-width: 768px) {
+    .card-header {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    .row > [class*="col-"] {
+        margin-bottom: 1rem;
+    }
+    .d-grid.gap-2.d-md-flex.justify-content-md-end {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .main-content .card {
+        max-width: 100%;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">{{ form.instance.pk|yesno:"Edit Intern,Create Intern" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                {% for field in form %}
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label>{{ field.label }}</label>
+                                            {{ field }}
+                                            {% for error in field.errors %}
+                                                <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                <a href="{% url 'intern_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
