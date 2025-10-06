@@ -545,6 +545,18 @@ def manage_certificates_view(request):
 
 
 # ================================
+# Helper Functions
+# ================================
+def render_to_pdf(template_path, context_dict):
+    template = render_to_string(template_path, context_dict)
+    pdf_bytes = io.BytesIO()
+    pisa_status = pisa.CreatePDF(template, dest=pdf_bytes)
+    if pisa_status.err:
+        return None
+    pdf_bytes.seek(0)
+    return pdf_bytes.getvalue()
+
+# ================================
 # Individual Certificate Download View
 # ================================
 @login_required
@@ -711,3 +723,311 @@ def course_delete_ajax(request, pk):
         course.delete()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
+# ================================
+# LETTER OF RECOMMENDATION (LOR) VIEWS
+# ================================
+
+@login_required
+def manage_lor_view(request):
+    """
+    Allows an admin to filter, search, and bulk-download Letters of Recommendation.
+    """
+    if not (request.user.is_superuser or request.user.role == 'admin'):
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('dashboard')
+
+    interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
+    
+    filter_form = InternFilterForm(request.GET)
+    selected_batch = None # Initialize selected_batch
+
+    if filter_form.is_valid():
+        selected_course = filter_form.cleaned_data.get('course')
+        selected_batch = filter_form.cleaned_data.get('batch') # Get selected_batch from form
+        query = filter_form.cleaned_data.get('q')
+
+        if selected_course:
+            interns_qs = interns_qs.filter(batch__course=selected_course)
+        if selected_batch:
+            interns_qs = interns_qs.filter(batch=selected_batch)
+        if query:
+            interns_qs = interns_qs.filter(
+                Q(unique_id__icontains=query) |
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query)
+            )
+
+    if request.method == 'POST':
+        # This POST logic for bulk downloads is now fully supported
+        intern_ids = request.POST.getlist('intern_ids')
+        if not intern_ids:
+            messages.error(request, "Please select at least one intern.")
+            return redirect('manage_lor')
+
+        selected_interns = InternProfile.objects.filter(id__in=intern_ids, internship_status='Completed')
+
+        if not selected_interns.exists():
+            messages.warning(request, "No completed interns were selected for LOR generation.")
+            return redirect('manage_lor')
+
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for intern in selected_interns:
+                pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+                if pdf_bytes:
+                    filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
+                    zf.writestr(filename, pdf_bytes)
+        
+        selected_interns.update(lor_generated=True)
+
+        zip_buffer.seek(0)
+        response = HttpResponse(zip_buffer, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
+        return response
+
+    # Add selected_batch to the context
+    context = {
+        'interns': interns_qs,
+        'filter_form': filter_form,
+        'selected_batch': selected_batch, 
+    }
+    return render(request, 'lors/manage_lors.html', context)
+
+
+@login_required
+def download_lor_view(request, intern_id):
+    intern = get_object_or_404(InternProfile, id=intern_id)
+    if intern.internship_status != 'Completed':
+        messages.error(request, "LOR not available for this intern yet.")
+        return redirect('manage_lor')
+
+    pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+    if pdf_bytes:
+        intern.lor_generated = True
+        intern.save()
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        filename = f"LOR_{intern.unique_id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    messages.error(request, "Error generating LOR PDF.")
+    return redirect('manage_lor')
+from django.db.models import Q
+from .models import InternProfile
+
+@login_required
+def intern_list(request):
+    interns = InternProfile.objects.all()
+
+    query = request.GET.get('q')  # single search bar
+    batch_start = request.GET.get('batch_start')
+    batch_end = request.GET.get('batch_end')
+    internship_status = request.GET.get('internship_status')
+
+    if query:
+        interns = interns.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(batch__name__icontains=query) |
+            Q(batch__trainer__user__first_name__icontains=query) |
+            Q(unique_id__icontains=query) |
+            Q(gender__icontains=query) |
+            Q(undertaking_generated__icontains=query) |
+            Q(completion_certificate_generated__icontains=query) |
+            Q(lor_generated__icontains=query)
+        )
+
+    if batch_start:
+        interns = interns.filter(batch__start_date__gte=batch_start)
+    if batch_end:
+        interns = interns.filter(batch__end_date__lte=batch_end)
+    if internship_status:
+        interns = interns.filter(internship_status=internship_status)
+
+    return render(request, "interns/intern_list.html", {"interns": interns})
+
+@login_required
+def intern_create(request):
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            intern = form.save(commit=False)
+            
+            # Optional: create a User for this intern
+            if not intern.user_id:
+                user = User.objects.create_user(
+                    username=request.POST.get("username"),
+                    password=request.POST.get("password"),
+                    first_name=request.POST.get("first_name"),
+                    last_name=request.POST.get("last_name"),
+                    email=request.POST.get("email"),
+                )
+                intern.user = user
+
+            intern.save()
+            messages.success(request, "Intern profile created successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm()
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_update(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES, instance=intern)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Intern profile updated successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm(instance=intern)
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_delete(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        intern.delete()  # This will also delete the user
+        messages.success(request, "Intern profile and associated user deleted.")
+        return redirect("intern_list")
+    return render(request, "interns/intern_confirm_delete.html", {"intern": intern})
+
+@login_required
+def intern_detail(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    return render(request, "interns/intern_detail.html", {"intern": intern})
+
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Count, Q
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from .models import Attendance, Batch
+from datetime import datetime
+import calendar
+import openpyxl
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+
+@login_required
+def attendance_report(request):
+    batches = Batch.objects.all()
+    selected_batch_id = request.GET.get('batch')
+    date_input = request.GET.get('date')
+    month_input = request.GET.get('month')
+    export_type = request.GET.get('export')
+
+    attendances = Attendance.objects.none()
+    summary = []
+    today = datetime.today().date()
+    batch = None
+
+    if selected_batch_id:
+        batch = get_object_or_404(Batch, pk=selected_batch_id)
+        attendances = Attendance.objects.filter(batch=batch)
+
+        # Default or specific date
+        if date_input:
+            try:
+                selected_date = datetime.strptime(date_input, "%Y-%m-%d").date()
+            except ValueError:
+                selected_date = today
+        else:
+            selected_date = today
+
+        attendances = attendances.filter(date=selected_date)
+
+        # Monthwise report
+        if month_input and month_input != "None":
+            try:
+                month_number = list(calendar.month_name).index(month_input)
+                attendances = Attendance.objects.filter(
+                    batch=batch,
+                    date__month=month_number
+                )
+                selected_date = None
+            except ValueError:
+                pass
+
+        # Summary
+        summary = attendances.values(
+            'intern__unique_id',
+            'intern__user__first_name',
+            'intern__user__last_name'
+        ).annotate(
+            present_count=Count('id', filter=Q(status='Present')),
+            absent_count=Count('id', filter=Q(status='Absent'))
+        )
+
+    # ---------- Excel Export ----------
+    if export_type == 'excel' and attendances.exists():
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=attendance_report.xlsx'
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Attendance Report"
+
+        # Header for attendance
+        ws.append(["Attendance Report"])
+        ws.append(["Batch", batch.name if batch else ""])
+        ws.append([])
+        ws.append(['Date', 'Intern Name', 'Unique ID', 'Status', 'Trainer'])
+
+        # Attendance Data
+        for att in attendances:
+            ws.append([
+                att.date.strftime("%Y-%m-%d"),
+                att.intern.user.get_full_name(),
+                att.intern.unique_id,
+                att.status,
+                att.trainer.user.get_full_name()
+            ])
+
+        # Add spacing
+        ws.append([])
+        ws.append([])
+
+        # Summary Section
+        ws.append(["Summary"])
+        ws.append(['Intern Name', 'Unique ID', 'Present Days', 'Absent Days'])
+
+        for s in summary:
+            ws.append([
+                f"{s['intern__user__first_name']} {s['intern__user__last_name']}",
+                s['intern__unique_id'],
+                s['present_count'],
+                s['absent_count']
+            ])
+
+        wb.save(response)
+        return response
+
+    # ---------- PDF Export ----------
+    if export_type == 'pdf' and attendances.exists():
+        template = get_template('attendance/attendance_report_pdf.html')
+        html = template.render({
+            'attendances': attendances,
+            'summary': summary,
+            'batch': batch,
+            'selected_date': date_input or today,
+            'month_input': month_input
+        })
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        if pisa_status.err:
+            return HttpResponse("Error generating PDF")
+        return response
+
+    # ---------- Render HTML Page ----------
+    return render(request, "attendance/attendance_report.html", {
+        "batches": batches,
+        "attendances": attendances,
+        "summary": summary,
+        "selected_batch_id": selected_batch_id,
+        "selected_date": date_input if date_input else today,
+        "month_input": month_input,
+        "months": list(calendar.month_name)[1:],  # January–December
+    })

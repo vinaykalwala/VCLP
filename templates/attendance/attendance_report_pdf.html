@@ -1,0 +1,46 @@
+<h1>Attendance Report - {{ batch.name }}</h1>
+
+<table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Intern</th>
+            <th>Unique ID</th>
+            <th>Status</th>
+            <th>Trainer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for att in attendances %}
+            <tr>
+                <td>{{ att.date }}</td>
+                <td>{{ att.intern.user.get_full_name }}</td>
+                <td>{{ att.intern.unique_id }}</td>
+                <td>{{ att.status }}</td>
+                <td>{{ att.trainer.user.get_full_name }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Summary</h2>
+<table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <thead>
+        <tr>
+            <th>Intern</th>
+            <th>Unique ID</th>
+            <th>Present</th>
+            <th>Absent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in summary %}
+            <tr>
+                <td>{{ s.intern__user__first_name }} {{ s.intern__user__last_name }}</td>
+                <td>{{ s.intern__unique_id }}</td>
+                <td>{{ s.present_count }}</td>
+                <td>{{ s.absent_count }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
