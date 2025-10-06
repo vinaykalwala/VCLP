@@ -22,6 +22,7 @@ class User(AbstractUser):
         """Get human-readable role name"""
         return dict(self.ROLE_CHOICES).get(self.role, self.role)
     
+    
     def __str__(self):
         return f"{self.username} ({self.role})"
 
@@ -115,6 +116,12 @@ class InternProfile(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def delete(self, *args, **kwargs):
+        # Delete associated user first
+        if self.user:
+            self.user.delete()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"{self.unique_id} - {self.user.get_full_name()}"

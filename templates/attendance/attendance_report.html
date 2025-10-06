@@ -1,0 +1,80 @@
+<h1>Attendance Report</h1>
+
+<form method="get">
+    <label>Batch:</label>
+    <select name="batch" required>
+        <option value="">Select Batch</option>
+        {% for batch in batches %}
+            <option value="{{ batch.id }}" {% if batch.id|stringformat:"s" == selected_batch_id|stringformat:"s" %}selected{% endif %}>{{ batch.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Date:</label>
+    <input type="date" name="date" value="{{ selected_date }}">
+
+    <label>Month:</label>
+    <select name="month">
+        <option value="">--Select Month--</option>
+        {% for month in months %}
+            <option value="{{ month }}" {% if month == month_input %}selected{% endif %}>{{ month }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filter</button>
+    <button type="submit" name="export" value="excel">Export Excel</button>
+    <button type="submit" name="export" value="pdf">Export PDF</button>
+</form>
+
+<h2>Attendance Records</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Intern</th>
+            <th>Unique ID</th>
+            <th>Status</th>
+            <th>Trainer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for att in attendances %}
+            <tr>
+                <td>{{ att.date }}</td>
+                <td>{{ att.intern.user.get_full_name }}</td>
+                <td>{{ att.intern.unique_id }}</td>
+                <td>{{ att.status }}</td>
+                <td>{{ att.trainer.user.get_full_name }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">No records found.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Summary</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Intern</th>
+            <th>Unique ID</th>
+            <th>Present</th>
+            <th>Absent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in summary %}
+            <tr>
+                <td>{{ s.intern__user__first_name }} {{ s.intern__user__last_name }}</td>
+                <td>{{ s.intern__unique_id }}</td>
+                <td>{{ s.present_count }}</td>
+                <td>{{ s.absent_count }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No summary available.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

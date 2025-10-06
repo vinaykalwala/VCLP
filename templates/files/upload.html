@@ -14,7 +14,7 @@
     padding: 2rem;
 }
 
-/* Split card */
+/* Card */
 .upload-card {
     display: flex;
     max-width: 900px;
@@ -24,37 +24,31 @@
     box-shadow: 0 25px 50px rgba(0,0,0,0.1);
     background: #fff;
     transition: transform 0.4s, box-shadow 0.4s;
-    border: 2px solid black;
+    border: 2px solid #2563EB;
 }
 
 .upload-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 40px 80px rgba(0,0,0,0.15);
+    box-shadow: 0 40px 80px rgba(37, 99, 235, 0.25);
 }
 
-/* Left section - image */
+/* Left Section */
 .upload-card-left {
     flex: 1;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    background: linear-gradient(135deg,#5932EA,#2563EB);
 }
 
 .upload-card-left img {
     width: 80%;
     height: auto;
+    border-radius: 16px;
 }
 
-/* Optional overlay for contrast */
-.upload-card-left::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-}
-
-/* Right section - form */
+/* Right Section */
 .upload-card-right {
     flex: 1.6;
     padding: 3rem 2rem;
@@ -63,15 +57,15 @@
     justify-content: center;
 }
 
-/* Form header */
+/* Header */
 .upload-card-right h2 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    color: #1f2937;
+    color: #2563EB;
 }
 
-/* Floating labels form */
+/* Floating labels */
 .form-group {
     position: relative;
     margin-bottom: 2rem;
@@ -81,11 +75,16 @@
 .form-group input[type="file"] {
     width: 100%;
     padding: 1rem 1rem 1rem 1rem;
-    border: 1px solid #303030;
+    border: 1px solid #2563EB;
     border-radius: 16px;
     font-size: 1rem;
     background: transparent;
     outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #ff63c3;
 }
 
 .form-group label {
@@ -99,7 +98,6 @@
     font-size: 1rem;
     pointer-events: none;
     transition: 0.3s ease all;
-    margin-bottom: 10px;
 }
 
 .form-group input:focus + label,
@@ -111,15 +109,111 @@
     font-weight: 500;
 }
 
-/* Submit button */
+/* Batch grid wrapper with fixed height & vertical scroll */
+.batch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    max-height: 60px; /* adjust as needed */
+    overflow-y: auto; /* vertical scroll if too many */
+    padding-right: 5px; /* for scrollbar spacing */
+}
+
+/* Batch labels */
+.batch-grid label {
+    display: block;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 2px solid #2563EB;
+    background: #f0f4ff;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 0.8rem 1rem;
+    position: relative;
+    height: 60px;          /* fixed height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide checkbox */
+.batch-grid input[type="checkbox"] {
+    display: none;
+}
+
+/* When checked, cover the whole label */
+.batch-grid input[type="checkbox"]:checked + span {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(89,50,234,0.9); /* #5932EA in RGBA */
+    color: #fff;
+    border-radius: 12px;
+    transform: scale(1);
+    transition: all 0.3s;
+    z-index: 1;
+    pointer-events: none; /* ensure clicks pass to label */
+}
+
+/* Span inside label should fill label */
+.batch-grid label span {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+
+/* File Upload */
+.file-input-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.file-input-container input[type="file"] {
+    width: 100%;
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-input-container .file-label {
+    display: block;
+    padding: 1rem;
+    border: 1px dashed #2563EB;
+    border-radius: 16px;
+    text-align: center;
+    color: #2563EB;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.file-input-container input[type="file"]:hover + .file-label,
+.file-input-container input[type="file"]:focus + .file-label {
+    background: #f0f4ff;
+    border-color: #b000e6;
+}
+
+/* Submit Button */
 .upload-card-right button {
-    padding:10px;
+    padding:10px 15px;
     font-size: 1rem;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 16px;
     border: none;
-    background: linear-gradient(135deg, #ffbf00, #b000e6, #f05fff);
-    color: #fff;
+  background-color: #FBBF24; /* Amber */
+    color: #333;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -129,7 +223,7 @@
     box-shadow: 0 15px 35px rgba(214,51,255,0.35);
 }
 
-/* Back link */
+/* Back Link */
 .upload-card-right a.back-link {
     display: inline-block;
     margin-top: 1rem;
@@ -144,93 +238,67 @@
 }
 
 /* Responsive */
-/* Responsive */
 @media(max-width:768px){
     .upload-card {
         flex-direction: column;
         max-width: 100%;
         border-radius: 16px;
-        overflow: hidden;
     }
-
-    /* Make the form appear first */
     .upload-card-right {
-        order: 1; /* Form comes first */
-        padding: 2rem 1.5rem; /* Reduce padding for mobile */
+        padding: 2rem 1.5rem;
     }
-
-    /* Image goes second */
     .upload-card-left {
-        order: 2; /* Image comes after form */
         height: auto;
         width: 100%;
-        padding: 0.5rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 1rem;
     }
-
     .upload-card-left img {
         width: 100%;
         height: auto;
         object-fit: contain;
     }
-
-    .upload-container {
-        min-height: 90vh;
-        display: flex;
-        flex-direction: column; /* Stack vertically */
-        justify-content: center;
-        align-items: center;
-        font-family: 'Roboto', sans-serif;
-        padding: 0;
-    }
 }
-
-
 </style>
-
 <div class="main-content">
-    <div class="upload-container">
-        <div class="upload-card">
-            <!-- Left section with image -->
-            <div class="upload-card-left">
-                <img src="{% static 'images/upload.png' %}" alt="Lesson Image">
-            </div>
-            
-            <div class="upload-card-right">
-                <h2>Upload Lesson File</h2>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <!-- Lesson Title -->
-                    <div class="form-group">
-                        <input type="text" name="title" id="title" placeholder=" " required>
-                        <label for="title">Lesson Title</label>
-                    </div>
+<div class="upload-container">
+    <div class="upload-card">
+        <div class="upload-card-left">
+            <img src="{% static 'images/upload.png' %}" alt="Lesson Image">
+        </div>
+        
+        <div class="upload-card-right">
+            <h2>Upload Lesson File</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-                    <!-- Multi-Batch Selection -->
-                    <div class="form-group">
-                        <select name="batches" id="batches" multiple required class="form-control" style="height:120px; border-radius:16px; padding:1rem;">
-                            {% for batch in batches %}
-                                <option value="{{ batch.id }}">{{ batch.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="batches" style="top:-0.8rem; left:1rem; font-size:0.8rem; color:#6b7280;">Select Batch(es)</label>
-                    </div>
-                    
-                    <!-- File Upload -->
-                    <div class="form-group">
-                        <input type="file" name="file" id="file" required>
-                        <label for="file">Choose Lesson File</label>
-                    </div>
-                    
-                    <button type="submit">Upload Lesson File</button>
-                </form>
-                <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
-            </div>
+                <!-- Lesson Title -->
+                <div class="form-group">
+                    <input type="text" name="title" id="title" placeholder=" " required>
+                    <label for="title">Lesson Title</label>
+                </div>
+
+                <!-- Modern Batch Selector -->
+                <div class="batch-grid">
+                    {% for batch in batches %}
+                    <label>
+                        <input type="checkbox" name="batches" value="{{ batch.id }}">
+                        <span>{{ batch.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <!-- File Upload -->
+                <div class="file-input-container">
+                    <input type="file" name="file" id="file" required>
+                    <label class="file-label" for="file">Choose Lesson File</label>
+                </div>
+
+                <button type="submit">Upload Lesson File</button>
+            </form>
+
+            <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
         </div>
     </div>
 </div>
-
+</div>
 {% endblock %}
