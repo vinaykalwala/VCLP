@@ -15,7 +15,6 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0; /* For browser preview */
         }
 
         .certificate-container {
@@ -23,7 +22,7 @@
             height: 210mm;
             box-sizing: border-box;
             padding: 15mm;
-            background-color: #f8f7f2; /* Parchment color */
+            background-color: #f8f7f2;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -32,7 +31,6 @@
             text-align: center;
         }
 
-        /* --- Decorative Border --- */
         .certificate-border {
             position: absolute;
             top: 10mm;
@@ -60,7 +58,6 @@
             border: 1px solid #002d5c;
         }
 
-        /* --- Watermark --- */
         .watermark {
             position: absolute;
             top: 50%;
@@ -71,7 +68,6 @@
             color: #002d5c;
         }
 
-        /* --- Content Z-Index --- */
         .certificate-content {
             position: relative;
             z-index: 2;
@@ -107,7 +103,7 @@
         .intern-name {
             font-family: 'Playfair Display', serif;
             font-size: 42px;
-            color: #bda068; /* Gold color */
+            color: #bda068;
             font-weight: 700;
             border-bottom: 2px solid #002d5c;
             padding-bottom: 5px;
@@ -147,7 +143,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* --- Official Seal --- */
         .seal {
             position: absolute;
             bottom: 20mm;
@@ -156,7 +151,6 @@
             height: 100px;
             background: radial-gradient(circle, #c8ab73 0%, #bda068 100%);
             border-radius: 50%;
-            /* Flexbox properties for perfect centering */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,7 +163,6 @@
             height: 90px;
             border: 2px solid #fff;
             border-radius: 50%;
-            /* Flexbox properties for perfect centering */
             display: flex;
             align-items: center;
             justify-content: center;

@@ -2,9 +2,206 @@
 {% block title %}Trainer Dashboard{% endblock %}
 {% block content %}
 {% load static %}
+
+<style>
+/* Trainer Dashboard Wrapper */
+.trainer-dashboard {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating gradient blobs */
+.trainer-dashboard::before,
+.trainer-dashboard::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.25;
+  z-index: 0;
+}
+
+.trainer-dashboard::before {
+  width: 450px;
+  height: 450px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  top: -150px;
+  left: -100px;
+}
+
+.trainer-dashboard::after {
+  width: 400px;
+  height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  bottom: -120px;
+  right: -100px;
+}
+
+/* Glass Container */
+.trainer-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  border-radius: 28px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 950px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Welcome Header */
+.trainer-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.trainer-header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.trainer-header h1 span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.trainer-header p {
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* Dashboard Grid */
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Common card styling */
+.trainer-box {
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trainer-box:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 18px 35px rgba(0,0,0,0.1);
+}
+
+/* Individual card gradients - Thicker */
+.trainer-box.lessons {
+  background: linear-gradient(145deg, rgba(255, 145, 198, 0.35), rgba(255, 152, 236, 0.15));
+}
+
+.trainer-box.attendance {
+  background: linear-gradient(145deg, rgba(39,174,96,0.35), rgba(39,174,96,0.15));
+}
+
+.trainer-box.profile {
+  background: linear-gradient(145deg, rgba(155,89,182,0.35), rgba(155,89,182,0.15));
+}
+
+
+.trainer-box i {
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+}
+
+.trainer-box.lessons i { color: #3498db; }
+.trainer-box.attendance i { color: #27ae60; }
+.trainer-box.profile i { color: #9b59b6; }
+
+.trainer-box h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+.trainer-box p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .trainer-header h1 { font-size: 2rem; }
+  .trainer-card { padding: 1rem 1rem;margin: 0; }
+  .trainer-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .trainer-box { width: 100%; margin: 0; }
+  .trainer-dashboard{background-color: none;}
+}
+</style>
+
+
 <div class="main-content">
+<<<<<<< HEAD
 <h2>Welcome Trainer: {{ request.user.username }}</h2>
 <P>Hello</P>
-</div>
-{% endblock %}
+=======
+  <div class="trainer-dashboard">
+    <div class="trainer-card">
+      
+      <!-- Welcome Section -->
+      <div class="trainer-header">
+        <h1>Welcome, <span>{{ request.user.first_name|default:request.user.username }}</span> 👋</h1>
+        <p>
+          This is your personalized trainer dashboard. Monitor your lessons, track attendance,
+          and update your profile — all in one sleek interface.
+        </p>
+      </div>
 
+      <!-- Dashboard Grid -->
+      <div class="trainer-grid">
+
+        <div class="trainer-box lessons">
+          <i class="fas fa-upload"></i>
+          <h3>Lessons Uploaded</h3>
+          <p>You’ve uploaded <b>{{ request.user.trainer_profile.uploaded_files.count }}</b> lessons.</p>
+        </div>
+
+        <div class="trainer-box attendance">
+          <i class="fas fa-check-circle"></i>
+          <h3>Attendance</h3>
+          <p>Quickly mark and review trainee attendance records.</p>
+        </div>
+
+        <div class="trainer-box profile">
+          <i class="fas fa-user-circle"></i>
+          <h3>Profile</h3>
+          <p>Keep your trainer profile updated for a personalized experience.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+>>>>>>> 89f6e6139dc4926b1af9ebfb508d4e1b5f123fe7
+</div>
+
+{% endblock %}

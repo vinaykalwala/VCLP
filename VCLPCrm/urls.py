@@ -23,6 +23,8 @@ urlpatterns = [
 
     path('managecertificates/', views.manage_certificates_view, name='manage_certificates'),
     path('certificate/download/<int:intern_id>/', views.download_certificate_view, name='download_certificate'),
+    path('lors/', views.manage_lor_view, name='manage_lor'),
+    path('lor/download/<int:intern_id>/', views.download_lor_view, name='download_lor'),
     
     path('batches/', views.batch_list, name='batch_list'),
     path('batches/create/', views.batch_create, name='batch_create'),
