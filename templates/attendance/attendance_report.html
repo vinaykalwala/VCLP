@@ -1,80 +1,278 @@
-<h1>Attendance Report</h1>
+{% extends 'login_base.html' %}
+{% load static %}
 
-<form method="get">
-    <label>Batch:</label>
+{% block content %}
+<style>
+/* ====== Base Page Styling ====== */
+.report-page-container {
+  padding: 30px 40px;
+  background-color: #f7f9fc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.report-page-header {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b2b2b;
+  margin-bottom: 25px;
+  border-left: 5px solid #5932EA;
+  padding-left: 10px;
+}
+
+/* ====== Filter Section ====== */
+.filter-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.filter-box select,
+.filter-box input[type="date"] {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  transition: 0.2s ease;
+}
+
+.filter-box select:focus,
+.filter-box input:focus {
+  border-color: #5932EA;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.15);
+}
+
+.filter-box button {
+  background: #5932EA;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 14px;
+}
+
+.filter-box button:hover {
+  background: #4523c9;
+  transform: translateY(-2px);
+}
+
+.tab-button-group {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.8px solid #5932EA;
+  border-radius: 6px;
+  color: #5932EA;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tab-btn:hover {
+  background: #f1f0fe;
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: #5932EA;
+  color: #fff;
+  box-shadow: 0 3px 6px rgba(89, 50, 234, 0.25);
+}
+
+/* ====== Table Section ====== */
+.table-box {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  padding: 15px;
+  display: none; /* hidden by default */
+}
+
+.table-box.active {
+  display: block; /* visible only when active */
+}
+
+.table-box h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+}
+
+.custom-table th {
+  background: #5932EA;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* ====== Status Badges ====== */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.status-present {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-absent {
+  background: #f8d7da;
+  color: #721c24;
+}
+</style>
+
+<div class="main-content">
+<div class="report-page-container">
+  <h2 class="report-page-header">Attendance Report</h2>
+
+  <!-- Filter Form -->
+  <form method="get" class="filter-box">
     <select name="batch" required>
-        <option value="">Select Batch</option>
-        {% for batch in batches %}
-            <option value="{{ batch.id }}" {% if batch.id|stringformat:"s" == selected_batch_id|stringformat:"s" %}selected{% endif %}>{{ batch.name }}</option>
-        {% endfor %}
+      <option value="">Select Batch</option>
+      {% for batch in batches %}
+        <option value="{{ batch.id }}" {% if batch.id|stringformat:"s" == selected_batch_id|stringformat:"s" %}selected{% endif %}>{{ batch.name }}</option>
+      {% endfor %}
     </select>
 
-    <label>Date:</label>
     <input type="date" name="date" value="{{ selected_date }}">
 
-    <label>Month:</label>
     <select name="month">
-        <option value="">--Select Month--</option>
-        {% for month in months %}
-            <option value="{{ month }}" {% if month == month_input %}selected{% endif %}>{{ month }}</option>
-        {% endfor %}
+      <option value="">--Select Month--</option>
+      {% for month in months %}
+        <option value="{{ month }}" {% if month == month_input %}selected{% endif %}>{{ month }}</option>
+      {% endfor %}
     </select>
 
     <button type="submit">Filter</button>
     <button type="submit" name="export" value="excel">Export Excel</button>
     <button type="submit" name="export" value="pdf">Export PDF</button>
-</form>
+  </form>
 
-<h2>Attendance Records</h2>
-<table border="1" cellspacing="0" cellpadding="5">
-    <thead>
+  <!-- Tab Buttons -->
+  <div class="tab-button-group">
+    <button class="tab-btn active" id="recordsBtn">Attendance Records</button>
+    <button class="tab-btn" id="summaryBtn">Summary</button>
+  </div>
+
+  <!-- Attendance Records Table -->
+  <div class="table-box active" id="recordsTable">
+    <h3>Attendance Records</h3>
+    <table class="custom-table">
+      <thead>
         <tr>
-            <th>Date</th>
-            <th>Intern</th>
-            <th>Unique ID</th>
-            <th>Status</th>
-            <th>Trainer</th>
+          <th>Date</th>
+          <th>Intern</th>
+          <th>Unique ID</th>
+          <th>Status</th>
+          <th>Trainer</th>
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {% for att in attendances %}
-            <tr>
-                <td>{{ att.date }}</td>
-                <td>{{ att.intern.user.get_full_name }}</td>
-                <td>{{ att.intern.unique_id }}</td>
-                <td>{{ att.status }}</td>
-                <td>{{ att.trainer.user.get_full_name }}</td>
-            </tr>
+          <tr>
+            <td>{{ att.date }}</td>
+            <td>{{ att.intern.user.get_full_name }}</td>
+            <td>{{ att.intern.unique_id }}</td>
+            <td>
+              <span class="status-badge {% if att.status == 'Present' %}status-present{% else %}status-absent{% endif %}">
+                {{ att.status }}
+              </span>
+            </td>
+            <td>{{ att.trainer.user.get_full_name }}</td>
+          </tr>
         {% empty %}
-            <tr>
-                <td colspan="5">No records found.</td>
-            </tr>
+          <tr>
+            <td colspan="5" style="text-align:center; color:#777; font-style:italic;">No records found.</td>
+          </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
 
-<h2>Summary</h2>
-<table border="1" cellspacing="0" cellpadding="5">
-    <thead>
+  <!-- Summary Table -->
+  <div class="table-box" id="summaryTable">
+    <h3>Summary</h3>
+    <table class="custom-table">
+      <thead>
         <tr>
-            <th>Intern</th>
-            <th>Unique ID</th>
-            <th>Present</th>
-            <th>Absent</th>
+          <th>Intern</th>
+          <th>Unique ID</th>
+          <th>Present</th>
+          <th>Absent</th>
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {% for s in summary %}
-            <tr>
-                <td>{{ s.intern__user__first_name }} {{ s.intern__user__last_name }}</td>
-                <td>{{ s.intern__unique_id }}</td>
-                <td>{{ s.present_count }}</td>
-                <td>{{ s.absent_count }}</td>
-            </tr>
+          <tr>
+            <td>{{ s.intern__user__first_name }} {{ s.intern__user__last_name }}</td>
+            <td>{{ s.intern__unique_id }}</td>
+            <td>{{ s.present_count }}</td>
+            <td>{{ s.absent_count }}</td>
+          </tr>
         {% empty %}
-            <tr>
-                <td colspan="4">No summary available.</td>
-            </tr>
+          <tr>
+            <td colspan="4" style="text-align:center; color:#777; font-style:italic;">No summary available.</td>
+          </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+<script>
+// Toggle between Attendance Records & Summary
+document.getElementById('recordsBtn').addEventListener('click', function() {
+  document.getElementById('recordsTable').classList.add('active');
+  document.getElementById('summaryTable').classList.remove('active');
+  this.classList.add('active');
+  document.getElementById('summaryBtn').classList.remove('active');
+});
+
+document.getElementById('summaryBtn').addEventListener('click', function() {
+  document.getElementById('summaryTable').classList.add('active');
+  document.getElementById('recordsTable').classList.remove('active');
+  this.classList.add('active');
+  document.getElementById('recordsBtn').classList.remove('active');
+});
+</script>
+{% endblock %}
