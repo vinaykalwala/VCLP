@@ -646,3 +646,60 @@ def edit_profile_view(request):
 def trainer_profile_view(request, trainer_id):
     trainer_profile = get_object_or_404(TrainerProfile, id=trainer_id)
     return render(request, 'trainer_profile.html', {'trainer': trainer_profile})
+
+@login_required
+def intern_list(request):
+    interns = InternProfile.objects.all()
+    return render(request, "interns/intern_list.html", {"interns": interns})
+
+@login_required
+def intern_create(request):
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            intern = form.save(commit=False)
+            
+            # Optional: create a User for this intern
+            if not intern.user_id:
+                user = User.objects.create_user(
+                    username=request.POST.get("username"),
+                    password=request.POST.get("password"),
+                    first_name=request.POST.get("first_name"),
+                    last_name=request.POST.get("last_name"),
+                    email=request.POST.get("email"),
+                )
+                intern.user = user
+
+            intern.save()
+            messages.success(request, "Intern profile created successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm()
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_update(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES, instance=intern)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Intern profile updated successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm(instance=intern)
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_delete(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        intern.delete()  # This will also delete the user
+        messages.success(request, "Intern profile and associated user deleted.")
+        return redirect("intern_list")
+    return render(request, "interns/intern_confirm_delete.html", {"intern": intern})
+
+@login_required
+def intern_detail(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    return render(request, "interns/intern_detail.html", {"intern": intern})

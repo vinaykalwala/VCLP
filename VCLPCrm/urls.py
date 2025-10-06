@@ -32,6 +32,12 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
     path('profile/trainer/<int:trainer_id>/', views.trainer_profile_view, name='trainer_profile'),
+
+    path("interns/", views.intern_list, name="intern_list"),
+    path("intern_create/", views.intern_create, name="intern_create"),
+    path("intern_update/<int:pk>/", views.intern_update, name="intern_update"),
+    path("intern_delete/<int:pk>/", views.intern_delete, name="intern_delete"),
+    path("intern_detail/<int:pk>/", views.intern_detail, name="intern_detail"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -127,3 +127,8 @@ class SuperUserProfileUpdateForm(forms.ModelForm):
         widgets = {
             'privileges': forms.Textarea(attrs={'rows': 4}),
         }
+
+class InternProfileForm(forms.ModelForm):
+    class Meta:
+        model = InternProfile
+        exclude = ('created_at',)
