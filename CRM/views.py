@@ -9,10 +9,11 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
-import datetime
+from datetime import date
 import zipfile
 from .models import *
 from .forms import *
+
 
 def home(request):
     return render(request, 'home.html') 
@@ -94,7 +95,7 @@ def signup_view(request):
             SuperUserProfile.objects.create(user=user)
 
         messages.success(request, "Account created successfully! Please log in.")
-        return redirect('login')
+        return redirect('signup')
 
     return render(request, 'signup.html', {'role_choices': User.ROLE_CHOICES})
 
@@ -375,8 +376,8 @@ def generate_intern_pdf(request, mode, identifier=None):
                 "phone": "+914049525396",
                 "website": "www.vindusenvironment.com"
             },
-            "today_date": datetime.date.today().strftime("%d-%m-%Y"),
-            "logo_path": logo_path 
+            "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
+            "logo_path": logo_path
         }
 
         html_content = render_to_string("undertaking_letter.html", context)
@@ -410,7 +411,7 @@ def generate_intern_pdf(request, mode, identifier=None):
                     "phone": "+914049525396",
                     "website": "www.vindusenvironment.com"
                 },
-                "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
                 "logo_path": logo_path
             }
             html_content = render_to_string("undertaking_letter.html", context)
@@ -985,7 +986,7 @@ from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Attendance, Batch
-from datetime import datetime
+from datetime import datetime,date
 import calendar
 import openpyxl
 from xhtml2pdf import pisa
@@ -1089,12 +1090,14 @@ def attendance_report(request):
     # ---------- PDF Export ----------
     if export_type == 'pdf' and attendances.exists():
         template = get_template('attendance/attendance_report_pdf.html')
+        logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
         html = template.render({
             'attendances': attendances,
             'summary': summary,
             'batch': batch,
-            'selected_date': date_input or today,
-            'month_input': month_input
+            'selected_date': (date_input or today).strftime('%d-%m-%Y'),
+            'month_input': month_input,
+            'logo_path': logo_path,
         })
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'
@@ -1242,3 +1245,170 @@ def delete_curriculum(request, pk):
         curriculum.delete()
         return redirect('curriculum_list')
     return render(request, 'curriculum/curriculum_confirm_delete.html', {'curriculum': curriculum})
+
+
+
+
+from django.db.models.functions import TruncMonth
+from django.utils.dateformat import format
+
+@login_required
+def daily_update_list(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    # Base queryset
+    if user_role in ["admin", "superuser"]:
+        updates = DailySessionUpdate.objects.all().order_by('-date')
+
+        # Prepare months list from existing updates
+        months_qs = updates.annotate(month=TruncMonth('date')).values('month').distinct()
+        month_options = [(m['month'].strftime('%Y-%m'), m['month'].strftime('%B %Y')) for m in months_qs]
+
+        # Filters
+        date_filter = request.GET.get('date')
+        month_filter = request.GET.get('month')  # format: YYYY-MM
+
+        if date_filter:
+            updates = updates.filter(date=date_filter)
+        elif month_filter:
+            year, month = map(int, month_filter.split('-'))
+            updates = updates.filter(date__year=year, date__month=month)
+
+    # Trainer view
+    elif user_role == "trainer":
+        trainer_profile = get_object_or_404(TrainerProfile, user=user)
+        updates = DailySessionUpdate.objects.filter(trainer=trainer_profile).order_by('-date')
+        month_options = []
+
+    # Intern view
+    elif user_role == "intern":
+        try:
+            intern_batch = user.intern_profile.batch
+            updates = DailySessionUpdate.objects.filter(batch=intern_batch).order_by('-date')
+        except AttributeError:
+            updates = DailySessionUpdate.objects.none()
+        month_options = []
+
+    else:
+        updates = DailySessionUpdate.objects.none()
+        month_options = []
+
+    return render(request, 'daily_updates/daily_update_list.html', {
+        'updates': updates,
+        'user_role': user_role,
+        'month_options': month_options,
+        'date_filter': date_filter if 'date_filter' in locals() else '',
+        'month_filter': month_filter if 'month_filter' in locals() else '',
+    })
+
+
+
+@login_required
+def daily_update_create(request):
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    if request.method == "POST":
+        form = DailySessionUpdateForm(request.POST)
+        if form.is_valid():
+            update = form.save(commit=False)
+            update.trainer = trainer_profile
+            update.save()
+            messages.success(request, "Daily session update submitted successfully!")
+            return redirect('daily_update_list')
+    else:
+        form = DailySessionUpdateForm()
+
+    return render(request, 'daily_updates/daily_update_form.html', {'form': form, 'title': 'Add Daily Session Update'})
+
+
+@login_required
+def daily_update_edit(request, pk):
+    update = get_object_or_404(DailySessionUpdate, pk=pk)
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    # Only the trainer who created can edit
+    if update.trainer != trainer_profile:
+        messages.error(request, "You are not authorized to edit this entry.")
+        return redirect('daily_update_list')
+
+    if request.method == "POST":
+        form = DailySessionUpdateForm(request.POST, instance=update)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Session update edited successfully!")
+            return redirect('daily_update_list')
+    else:
+        form = DailySessionUpdateForm(instance=update)
+
+    return render(request, 'daily_updates/daily_update_form.html', {'form': form, 'title': 'Edit Daily Session Update'})
+
+
+@login_required
+def daily_update_delete(request, pk):
+    update = get_object_or_404(DailySessionUpdate, pk=pk)
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    if update.trainer != trainer_profile:
+        messages.error(request, "You are not authorized to delete this entry.")
+        return redirect('daily_update_list')
+
+    if request.method == "POST":
+        update.delete()
+        messages.success(request, "Session update deleted successfully!")
+        return redirect('daily_update_list')
+
+    return render(request, 'daily_updates/daily_update_confirm_delete.html', {'update': update})
+
+
+@login_required
+def daily_update_dashboard(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    if user_role not in ["admin", "superuser"]:
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('daily_update_list')
+
+    # Filters from GET request
+    selected_trainer = request.GET.get('trainer')
+    selected_batch = request.GET.get('batch')
+    selected_month = request.GET.get('month')  # format: YYYY-MM
+
+    # Dropdown options
+    trainers = TrainerProfile.objects.all().order_by('user__username')
+    batches = Batch.objects.all().order_by('name')
+
+    # Prepare months from existing updates
+    all_updates = DailySessionUpdate.objects.all()
+    months_qs = all_updates.annotate(month=TruncMonth('date')).values('month').distinct()
+    month_options = [(m['month'].strftime('%Y-%m'), m['month'].strftime('%B %Y')) for m in months_qs]
+
+    # Filtered trainer updates
+    trainer_updates = []
+
+    for trainer in trainers:
+        updates = DailySessionUpdate.objects.filter(trainer=trainer).order_by('-date')
+
+        if selected_trainer and str(trainer.id) != selected_trainer:
+            updates = DailySessionUpdate.objects.none()
+        if selected_batch:
+            updates = updates.filter(batch_id=selected_batch)
+        if selected_month:
+            year, month = map(int, selected_month.split('-'))
+            updates = updates.filter(date__year=year, date__month=month)
+
+        trainer_updates.append({
+            'trainer': trainer,
+            'updates': updates
+        })
+
+    return render(request, 'daily_updates/daily_update_dashboard.html', {
+        'trainer_updates': trainer_updates,
+        'trainers': trainers,
+        'batches': batches,
+        'month_options': month_options,
+        'selected_trainer': selected_trainer,
+        'selected_batch': selected_batch,
+        'selected_month': selected_month
+    })

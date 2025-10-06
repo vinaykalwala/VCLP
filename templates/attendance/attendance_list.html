@@ -1,11 +1,160 @@
+{% extends 'login_base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>Attendance Records</h3>
+<style>
+/* ======= Attendance Page Styling ======= */
+.attendance-wrapper {
+    max-width: 1150px;
+    margin: 50px auto;
+    padding: 35px;
+    background: #f9fafb;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
 
-    <form method="get" class="mb-3">
-        <label>Select Batch:</label>
-        <select name="batch" onchange="this.form.submit()">
+.attendance-header h3 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+}
+
+/* Form */
+.batch-form {
+    background: #fff;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.batch-form label {
+    font-weight: 600;
+    color: #333;
+}
+
+.batch-form select {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.batch-form select:hover {
+    border-color: #5932EA;
+}
+
+/* Table */
+.attendance-table-container {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.attendance-table th {
+    background: #5932EA;
+    color: #fff;
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.attendance-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.attendance-table tr:hover {
+    background: #f1f7ff;
+}
+
+/* Status tags */
+.status-tag {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+.status-present {
+    background: #d1f7d6;
+    color: #1a7c27;
+}
+.status-absent {
+    background: #ffe3e3;
+    color: #d32f2f;
+}
+.status-late {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Edit button */
+.edit-btn {
+    background: #5932EA;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.edit-btn:hover {
+    background:#5932EA;
+}
+
+/* No data */
+.no-data-text {
+    text-align: center;
+    color: #555;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .batch-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .attendance-header h3 {
+        font-size: 22px;
+    }
+
+    .attendance-table th, .attendance-table td {
+        font-size: 14px;
+    }
+}
+</style>
+<div class="main-content">
+<div class="attendance-wrapper">
+    <div class="attendance-header">
+        <h3>Attendance Records</h3>
+    </div>
+
+    <!-- Batch Selection Form -->
+    <form method="get" class="batch-form">
+        <label for="batch">Select Batch:</label>
+        <select name="batch" id="batch" onchange="this.form.submit()">
             <option value="">-- Choose Batch --</option>
             {% for b in batches %}
             <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_batch_id %}selected{% endif %}>
@@ -15,33 +164,43 @@
         </select>
     </form>
 
+    <!-- Attendance Table -->
     {% if attendances %}
-    <table border="1" cellpadding="8">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Intern</th>
-                <th>Unique ID</th>
-                <th>Trainer</th>
-                <th>Status</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for att in attendances %}
-            <tr>
-                <td>{{ att.date }}</td>
-                <td>{{ att.intern.user.get_full_name }}</td>
-                <td>{{ att.intern.unique_id }}</td>
-                <td>{{ att.trainer.user.get_full_name }}</td>
-                <td>{{ att.status }}</td>
-                <td><a href="{% url 'edit_attendance' att.id %}">Edit</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="attendance-table-container">
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Intern</th>
+                    <th>Unique ID</th>
+                    <th>Trainer</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.date }}</td>
+                    <td>{{ att.intern.user.get_full_name }}</td>
+                    <td>{{ att.intern.unique_id }}</td>
+                    <td>{{ att.trainer.user.get_full_name }}</td>
+                    <td>
+                        <span class="status-tag {% if att.status == 'Present' %}status-present{% elif att.status == 'Absent' %}status-absent{% else %}status-late{% endif %}">
+                            {{ att.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_attendance' att.id %}" class="edit-btn">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <p>No attendance records found for this batch.</p>
+    <p class="no-data-text">No attendance records found for this batch.</p>
     {% endif %}
+</div>
 </div>
 {% endblock %}

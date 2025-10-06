@@ -1,24 +1,184 @@
+{% extends 'login_base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>Edit Attendance</h3>
+<style>
+/* === Unique Classes for Edit Attendance Page === */
+.edit-attendance-wrapper {
+  max-width: 650px;
+  margin: 60px auto;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 40px 30px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  font-family: "Poppins", sans-serif;
+}
 
-    <form method="post">
+.edit-attendance-heading {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2b2b2b;
+  margin-bottom: 25px;
+  border-left: 6px solid #4b49ac;
+  padding-left: 12px;
+  letter-spacing: 0.3px;
+}
+
+.edit-attendance-details {
+  background: #f8f9fc;
+  padding: 18px 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border: 1px solid #e2e6ea;
+}
+
+.edit-attendance-details p {
+  margin: 10px 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.label {
+  font-weight: 600;
+  color: #222;
+  margin-right: 8px;
+}
+
+.status-chip {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip-present {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.chip-absent {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.edit-attendance-input {
+  margin-bottom: 25px;
+}
+
+.edit-attendance-input select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.edit-attendance-input select:focus {
+  border-color: #4b49ac;
+  outline: none;
+}
+
+.edit-attendance-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-save {
+  background-color: #5932EA;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background-color: #5932EA;
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  text-decoration: none;
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-cancel:hover {
+  background-color: #c9c9c9;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-attendance-wrapper {
+    padding: 30px 20px;
+  }
+  .edit-attendance-heading {
+    font-size: 22px;
+  }
+  .edit-attendance-buttons {
+    flex-direction: column;
+  }
+  .btn-save, .btn-cancel {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-attendance-wrapper {
+    margin: 30px 15px;
+    padding: 25px 15px;
+  }
+  .edit-attendance-heading {
+    font-size: 20px;
+  }
+  .edit-attendance-details p {
+    font-size: 14px;
+  }
+}
+</style>
+
+<div class="main-content">
+<div class="edit-attendance-wrapper">
+    <h2 class="edit-attendance-heading">Edit Attendance</h2>
+
+    <form method="post" class="edit-attendance-card">
         {% csrf_token %}
-        <p><strong>Intern:</strong> {{ attendance.intern.user.get_full_name }}</p>
-        <p><strong>Unique ID:</strong> {{ attendance.intern.unique_id }}</p>
-        <p><strong>Date:</strong> {{ attendance.date }}</p>
-        <p><strong>Current Status:</strong> {{ attendance.status }}</p>
 
-        <label>Change Status:</label>
-        <select name="status">
-            <option value="Present" {% if attendance.status == 'Present' %}selected{% endif %}>Present</option>
-            <option value="Absent" {% if attendance.status == 'Absent' %}selected{% endif %}>Absent</option>
-        </select>
+        <div class="edit-attendance-details">
+            <p><span class="label">Intern:</span> {{ attendance.intern.user.get_full_name }}</p>
+            <p><span class="label">Unique ID:</span> {{ attendance.intern.unique_id }}</p>
+            <p><span class="label">Date:</span> {{ attendance.date }}</p>
+            <p>
+                <span class="label">Current Status:</span>
+                <span class="status-chip {% if attendance.status == 'Present' %}chip-present{% else %}chip-absent{% endif %}">
+                    {{ attendance.status }}
+                </span>
+            </p>
+        </div>
 
-        <br><br>
-        <button type="submit">Update</button>
-        <a href="{% url 'attendance_list' %}">Cancel</a>
+        <div class="edit-attendance-input">
+            <label for="status" class="label">Change Status:</label>
+            <select name="status" id="status" required>
+                <option value="Present" {% if attendance.status == 'Present' %}selected{% endif %}>Present</option>
+                <option value="Absent" {% if attendance.status == 'Absent' %}selected{% endif %}>Absent</option>
+            </select>
+        </div>
+
+        <div class="edit-attendance-buttons">
+            <button type="submit" class="btn-save">Update</button>
+            <a href="{% url 'attendance_list' %}" class="btn-cancel">Cancel</a>
+        </div>
     </form>
+</div>
 </div>
 {% endblock %}

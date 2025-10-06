@@ -1,50 +1,242 @@
-<!DOCTYPE html>
-<html>
-<head><title>Mark Attendance</title></head>
-<body>
-<h2>Mark Attendance</h2>
-<form method="post">
-    {% csrf_token %}
+{% extends 'login_base.html' %}
+{% load static %}
 
-    <label>Select Batch:</label>
-    <select name="batch" onchange="this.form.submit()">
-        <option value="">--Select--</option>
-        {% for batch in batches %}
-            <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
-                {{ batch.name }} ({{ batch.course.name }})
-            </option>
-        {% endfor %}
-    </select>
+{% block content %}
+<style>
+/* ======== Mark Attendance Page Styling ======== */
+.mark-attendance-wrapper {
+    max-width: 1100px;
+    margin: 50px auto;
+    background: #f9fafb;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    padding: 40px 30px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
 
-    {% if selected_batch %}
-        <br><br>
-        <label>Date:</label>
-        <input type="date" name="date" required><br><br>
+.mark-attendance-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+}
 
-        <table border="1">
-            <tr>
-                <th>Intern ID</th>
-                <th>Name</th>
-                <th>Status</th>
-            </tr>
-            {% for intern in interns %}
-            <tr>
-                <td>{{ intern.unique_id }}</td>
-                <td>{{ intern.user.username }}</td>
-                <td>
-                    <select name="status_{{ intern.id }}">
-                        <option value="">--</option>
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                    </select>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+/* Batch selection */
+.batch-select-container {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-        <button type="submit" name="save_attendance">Save Attendance</button>
-    {% endif %}
-</form>
-<a href="{% url 'dashboard' %}">Back</a>
-</body>
-</html>
+.batch-select-container label {
+    font-weight: 600;
+    color: #333;
+}
+
+.batch-select-container select {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    outline: none;
+    background: #fff;
+    transition: all 0.3s;
+}
+.batch-select-container select:hover {
+    border-color: #007bff;
+}
+
+/* Date picker */
+.attendance-date-container {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.attendance-date-container label {
+    font-weight: 600;
+    color: #333;
+}
+
+.attendance-date-container input[type="date"] {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    background: #fff;
+    transition: all 0.3s;
+}
+.attendance-date-container input[type="date"]:focus {
+    border-color: #007bff;
+}
+
+/* Table */
+.attendance-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.attendance-table th {
+    background: #5932EA;
+    color: #fff;
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.attendance-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.attendance-table tr:hover {
+    background: #f1f7ff;
+}
+
+/* Status dropdown */
+.status-dropdown {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+.status-dropdown:hover {
+    border-color: #007bff;
+}
+
+/* Buttons */
+.submit-btn-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.save-btn {
+    background: #5932EA;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.save-btn:hover {
+    background: #5932EA;
+}
+
+.back-btn-container {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.back-btn {
+    text-decoration: none;
+    color: #5932EA;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.back-btn:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .batch-select-container, .attendance-date-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mark-attendance-wrapper {
+        padding: 25px 20px;
+    }
+
+    .mark-attendance-title {
+        font-size: 24px;
+    }
+}
+</style>
+
+<div class="main-content">
+<div class="mark-attendance-wrapper">
+    <h2 class="mark-attendance-title">Mark Attendance</h2>
+
+    <form method="post" class="mark-attendance-form">
+        {% csrf_token %}
+
+        <!-- Batch Selection -->
+        <div class="batch-select-container">
+            <label for="batch">Select Batch:</label>
+            <select name="batch" id="batch" onchange="this.form.submit()">
+                <option value="">-- Select Batch --</option>
+                {% for batch in batches %}
+                <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
+                    {{ batch.name }} ({{ batch.course.name }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if selected_batch %}
+        <!-- Attendance Date -->
+        <div class="attendance-date-container">
+            <label for="date">Date:</label>
+            <input type="date" name="date" id="date" required>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="attendance-table-wrapper">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Intern ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for intern in interns %}
+                    <tr>
+                        <td>{{ intern.unique_id }}</td>
+                        <td>{{ intern.user.username }}</td>
+                        <td>
+                            <select name="status_{{ intern.id }}" class="status-dropdown">
+                                <option value="">--</option>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-btn-container">
+            <button type="submit" name="save_attendance" class="save-btn">Save Attendance</button>
+        </div>
+        {% endif %}
+    </form>
+
+    <div class="back-btn-container">
+        <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
+    </div>
+</div>
+</div>
+
+{% endblock %}
