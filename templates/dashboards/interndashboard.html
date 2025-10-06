@@ -6,6 +6,5 @@
 <h2>Welcome Intern: {{ request.user.username }}</h2>
 <p>Your Intern ID: {{ request.user.intern_profile.unique_id }}</p>
 <a href="{% url 'view_lessons' %}">View Lessons</a>
-<a href="{% url 'logout' %}">Logout</a>
 {% endblock %}
 </div>
