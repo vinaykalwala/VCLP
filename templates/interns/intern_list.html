@@ -1,10 +1,77 @@
 <h1>Interns</h1>
+
+<form method="get">
+    <input type="text" name="q" placeholder="Search by username, name, batch, trainer, unique ID, gender, certificates..." value="{{ request.GET.q }}">
+    
+    <label>Batch Start:</label>
+    <input type="date" name="batch_start" value="{{ request.GET.batch_start }}">
+    
+    <label>Batch End:</label>
+    <input type="date" name="batch_end" value="{{ request.GET.batch_end }}">
+
+    <label>Internship Status:</label>
+    <select name="internship_status">
+        <option value="">All</option>
+        <option value="Ongoing" {% if request.GET.internship_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+        <option value="Completed" {% if request.GET.internship_status == 'Completed' %}selected{% endif %}>Completed</option>
+        <option value="Dropped" {% if request.GET.internship_status == 'Dropped' %}selected{% endif %}>Dropped</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
 <ul>
-  {% for intern in interns %}
-    <li>
-      {{ intern.user.get_full_name }} - <a href="{% url 'intern_detail' intern.pk %}">View</a> |
-      <a href="{% url 'intern_update' intern.pk %}">Edit</a> |
-      <a href="{% url 'intern_delete' intern.pk %}">Delete</a>
-    </li>
-  {% endfor %}
+  <table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Full Name</th>
+            <th>Unique ID</th>
+            <th>Batch</th>
+            <th>Trainer</th>
+            <th>Undertaking</th>
+            <th>Completion Certificate</th>
+            <th>LOR</th>
+            <th>Internship Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for intern in interns %}
+            <tr>
+                <td>{{ intern.user.username}}</td>
+                 <td>{{ intern.user.get_full_name }}</td>
+                <td>{{ intern.unique_id }}</td>
+                <td>
+                    {% if intern.batch %}
+                        {{ intern.batch.name }}
+                    {% else %}
+                        Not Assigned
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if intern.batch and intern.batch.trainer %}
+                        {{ intern.batch.trainer.user.get_full_name }}
+                    {% else %}
+                        Not Assigned
+                    {% endif %}
+                </td>
+                <td>{{ intern.undertaking_generated|yesno:"Yes,No" }}</td>
+                <td>{{ intern.completion_certificate_generated|yesno:"Yes,No" }}</td>
+                <td>{{ intern.lor_generated|yesno:"Yes,No" }}</td>
+                <td>{{ intern.internship_status }}</td>
+                <td>
+                    <a href="{% url 'intern_detail' intern.pk %}">View</a> |
+                    <a href="{% url 'intern_update' intern.pk %}">Edit</a> |
+                    <a href="{% url 'intern_delete' intern.pk %}">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="9">No interns found.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </ul>

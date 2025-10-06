@@ -647,9 +647,39 @@ def trainer_profile_view(request, trainer_id):
     trainer_profile = get_object_or_404(TrainerProfile, id=trainer_id)
     return render(request, 'trainer_profile.html', {'trainer': trainer_profile})
 
+from django.db.models import Q
+from .models import InternProfile
+
 @login_required
 def intern_list(request):
     interns = InternProfile.objects.all()
+
+    query = request.GET.get('q')  # single search bar
+    batch_start = request.GET.get('batch_start')
+    batch_end = request.GET.get('batch_end')
+    internship_status = request.GET.get('internship_status')
+
+    if query:
+        interns = interns.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(batch__name__icontains=query) |
+            Q(batch__trainer__user__first_name__icontains=query) |
+            Q(unique_id__icontains=query) |
+            Q(gender__icontains=query) |
+            Q(undertaking_generated__icontains=query) |
+            Q(completion_certificate_generated__icontains=query) |
+            Q(lor_generated__icontains=query)
+        )
+
+    if batch_start:
+        interns = interns.filter(batch__start_date__gte=batch_start)
+    if batch_end:
+        interns = interns.filter(batch__end_date__lte=batch_end)
+    if internship_status:
+        interns = interns.filter(internship_status=internship_status)
+
     return render(request, "interns/intern_list.html", {"interns": interns})
 
 @login_required
