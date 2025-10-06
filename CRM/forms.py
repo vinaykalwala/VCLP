@@ -132,3 +132,8 @@ class InternProfileForm(forms.ModelForm):
     class Meta:
         model = InternProfile
         exclude = ('created_at',)
+
+class CurriculumForm(forms.ModelForm):
+    class Meta:
+        model = Curriculum
+        fields = ['course', 'batch', 'title', 'file', 'description']
