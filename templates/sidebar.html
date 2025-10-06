@@ -264,6 +264,8 @@ body {
       <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i>Profile</a></li>
 
       <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
+      <li><a href="{% url 'course_list' %}"><i class="fas fa-book"></i>Courses</a></li>
+      
       
 
     {% elif request.user.role == "admin" %}
