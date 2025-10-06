@@ -249,6 +249,25 @@ body {
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
 <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
 <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
+           <!-- <li>
+  <a href="{% url 'daily_update_dashboard' %}">
+    <i class="fas fa-clipboard-list"></i> Session Portfolio's
+  </a>
+</li>
+
+<li>
+  <a href="{% url 'daily_update_list' %}">
+    <i class="fas fa-calendar-alt"></i> Sessions List
+  </a>
+</li>
+
+<li>
+  <a href="{% url 'curriculum_list' %}">
+    <i class="fas fa-book-open"></i> Curriculum
+  </a>
+</li> -->
+
+
 
       <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
     {% elif request.user.role == "admin" %}

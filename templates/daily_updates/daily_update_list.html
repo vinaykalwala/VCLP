@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">Daily Session Updates</h3>
+
+    {% if user_role == "trainer" %}
+        <a href="{% url 'daily_update_create' %}" class="btn btn-primary mb-3">+ Add New Update</a>
+    {% endif %}
+
+    {% if user_role in "admin superuser" %}
+<form method="get" class="mb-3 d-flex gap-2">
+    <input type="date" name="date" class="form-control" placeholder="Filter by Date" value="{{ date_filter }}">
+
+    <select name="month" class="form-control">
+        <option value="">-- Select Month --</option>
+        {% for value, name in month_options %}
+            <option value="{{ value }}" {% if value == month_filter %}selected{% endif %}>
+                {{ name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-secondary">Filter</button>
+</form>
+{% endif %}
+
+
+    {% if updates %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Trainer</th>
+                    <th>Batch</th>
+                    <th>Topic Covered</th>
+                    <th>Summary</th>
+                    {% if user_role == "trainer" %}
+                        <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for update in updates %}
+                <tr>
+                    <td>{{ update.date }}</td>
+                    <td>{{ update.trainer.user.username }}</td>
+                    <td>{{ update.batch.name }}</td>
+                    <td>{{ update.topic_covered|truncatechars:50 }}</td>
+                    <td>{{ update.summary|truncatechars:50 }}</td>
+
+                    {% if user_role == "trainer" %}
+                        <td>
+                            {% if update.trainer.user == request.user %}
+                                <a href="{% url 'daily_update_edit' update.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{% url 'daily_update_delete' update.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No session updates found.</p>
+    {% endif %}
+</div>
+{% endblock %}
