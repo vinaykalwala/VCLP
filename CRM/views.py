@@ -833,3 +833,137 @@ def intern_delete(request, pk):
 def intern_detail(request, pk):
     intern = get_object_or_404(InternProfile, pk=pk)
     return render(request, "interns/intern_detail.html", {"intern": intern})
+
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Count, Q
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from .models import Attendance, Batch
+from datetime import datetime
+import calendar
+import openpyxl
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+
+@login_required
+def attendance_report(request):
+    batches = Batch.objects.all()
+    selected_batch_id = request.GET.get('batch')
+    date_input = request.GET.get('date')
+    month_input = request.GET.get('month')
+    export_type = request.GET.get('export')
+
+    attendances = Attendance.objects.none()
+    summary = []
+    today = datetime.today().date()
+    batch = None
+
+    if selected_batch_id:
+        batch = get_object_or_404(Batch, pk=selected_batch_id)
+        attendances = Attendance.objects.filter(batch=batch)
+
+        # Default or specific date
+        if date_input:
+            try:
+                selected_date = datetime.strptime(date_input, "%Y-%m-%d").date()
+            except ValueError:
+                selected_date = today
+        else:
+            selected_date = today
+
+        attendances = attendances.filter(date=selected_date)
+
+        # Monthwise report
+        if month_input and month_input != "None":
+            try:
+                month_number = list(calendar.month_name).index(month_input)
+                attendances = Attendance.objects.filter(
+                    batch=batch,
+                    date__month=month_number
+                )
+                selected_date = None
+            except ValueError:
+                pass
+
+        # Summary
+        summary = attendances.values(
+            'intern__unique_id',
+            'intern__user__first_name',
+            'intern__user__last_name'
+        ).annotate(
+            present_count=Count('id', filter=Q(status='Present')),
+            absent_count=Count('id', filter=Q(status='Absent'))
+        )
+
+    # ---------- Excel Export ----------
+    if export_type == 'excel' and attendances.exists():
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=attendance_report.xlsx'
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Attendance Report"
+
+        # Header for attendance
+        ws.append(["Attendance Report"])
+        ws.append(["Batch", batch.name if batch else ""])
+        ws.append([])
+        ws.append(['Date', 'Intern Name', 'Unique ID', 'Status', 'Trainer'])
+
+        # Attendance Data
+        for att in attendances:
+            ws.append([
+                att.date.strftime("%Y-%m-%d"),
+                att.intern.user.get_full_name(),
+                att.intern.unique_id,
+                att.status,
+                att.trainer.user.get_full_name()
+            ])
+
+        # Add spacing
+        ws.append([])
+        ws.append([])
+
+        # Summary Section
+        ws.append(["Summary"])
+        ws.append(['Intern Name', 'Unique ID', 'Present Days', 'Absent Days'])
+
+        for s in summary:
+            ws.append([
+                f"{s['intern__user__first_name']} {s['intern__user__last_name']}",
+                s['intern__unique_id'],
+                s['present_count'],
+                s['absent_count']
+            ])
+
+        wb.save(response)
+        return response
+
+    # ---------- PDF Export ----------
+    if export_type == 'pdf' and attendances.exists():
+        template = get_template('attendance/attendance_report_pdf.html')
+        html = template.render({
+            'attendances': attendances,
+            'summary': summary,
+            'batch': batch,
+            'selected_date': date_input or today,
+            'month_input': month_input
+        })
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        if pisa_status.err:
+            return HttpResponse("Error generating PDF")
+        return response
+
+    # ---------- Render HTML Page ----------
+    return render(request, "attendance/attendance_report.html", {
+        "batches": batches,
+        "attendances": attendances,
+        "summary": summary,
+        "selected_batch_id": selected_batch_id,
+        "selected_date": date_input if date_input else today,
+        "month_input": month_input,
+        "months": list(calendar.month_name)[1:],  # January–December
+    })
