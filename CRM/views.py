@@ -543,6 +543,18 @@ def manage_certificates_view(request):
 
 
 # ================================
+# Helper Functions
+# ================================
+def render_to_pdf(template_path, context_dict):
+    template = render_to_string(template_path, context_dict)
+    pdf_bytes = io.BytesIO()
+    pisa_status = pisa.CreatePDF(template, dest=pdf_bytes)
+    if pisa_status.err:
+        return None
+    pdf_bytes.seek(0)
+    return pdf_bytes.getvalue()
+
+# ================================
 # Individual Certificate Download View
 # ================================
 @login_required
@@ -646,3 +658,92 @@ def edit_profile_view(request):
 def trainer_profile_view(request, trainer_id):
     trainer_profile = get_object_or_404(TrainerProfile, id=trainer_id)
     return render(request, 'trainer_profile.html', {'trainer': trainer_profile})
+
+# ================================
+# LETTER OF RECOMMENDATION (LOR) VIEWS
+# ================================
+
+@login_required
+def manage_lor_view(request):
+    """
+    Allows an admin to filter, search, and bulk-download Letters of Recommendation.
+    """
+    if not (request.user.is_superuser or request.user.role == 'admin'):
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('dashboard')
+
+    interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
+    
+    filter_form = InternFilterForm(request.GET)
+    selected_batch = None # Initialize selected_batch
+
+    if filter_form.is_valid():
+        selected_course = filter_form.cleaned_data.get('course')
+        selected_batch = filter_form.cleaned_data.get('batch') # Get selected_batch from form
+        query = filter_form.cleaned_data.get('q')
+
+        if selected_course:
+            interns_qs = interns_qs.filter(batch__course=selected_course)
+        if selected_batch:
+            interns_qs = interns_qs.filter(batch=selected_batch)
+        if query:
+            interns_qs = interns_qs.filter(
+                Q(unique_id__icontains=query) |
+                Q(user__first_name__icontains=query) |
+                Q(user__last_name__icontains=query)
+            )
+
+    if request.method == 'POST':
+        # This POST logic for bulk downloads is now fully supported
+        intern_ids = request.POST.getlist('intern_ids')
+        if not intern_ids:
+            messages.error(request, "Please select at least one intern.")
+            return redirect('manage_lor')
+
+        selected_interns = InternProfile.objects.filter(id__in=intern_ids, internship_status='Completed')
+
+        if not selected_interns.exists():
+            messages.warning(request, "No completed interns were selected for LOR generation.")
+            return redirect('manage_lor')
+
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for intern in selected_interns:
+                pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+                if pdf_bytes:
+                    filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
+                    zf.writestr(filename, pdf_bytes)
+        
+        selected_interns.update(lor_generated=True)
+
+        zip_buffer.seek(0)
+        response = HttpResponse(zip_buffer, content_type='application/zip')
+        response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
+        return response
+
+    # Add selected_batch to the context
+    context = {
+        'interns': interns_qs,
+        'filter_form': filter_form,
+        'selected_batch': selected_batch, 
+    }
+    return render(request, 'lors/manage_lors.html', context)
+
+
+@login_required
+def download_lor_view(request, intern_id):
+    intern = get_object_or_404(InternProfile, id=intern_id)
+    if intern.internship_status != 'Completed':
+        messages.error(request, "LOR not available for this intern yet.")
+        return redirect('manage_lor')
+
+    pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+    if pdf_bytes:
+        intern.lor_generated = True
+        intern.save()
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        filename = f"LOR_{intern.unique_id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    messages.error(request, "Error generating LOR PDF.")
+    return redirect('manage_lor')
