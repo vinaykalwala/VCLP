@@ -1,0 +1,47 @@
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Attendance Records</h3>
+
+    <form method="get" class="mb-3">
+        <label>Select Batch:</label>
+        <select name="batch" onchange="this.form.submit()">
+            <option value="">-- Choose Batch --</option>
+            {% for b in batches %}
+            <option value="{{ b.id }}" {% if b.id|stringformat:'s' == selected_batch_id %}selected{% endif %}>
+                {{ b.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if attendances %}
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Intern</th>
+                <th>Unique ID</th>
+                <th>Trainer</th>
+                <th>Status</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for att in attendances %}
+            <tr>
+                <td>{{ att.date }}</td>
+                <td>{{ att.intern.user.get_full_name }}</td>
+                <td>{{ att.intern.unique_id }}</td>
+                <td>{{ att.trainer.user.get_full_name }}</td>
+                <td>{{ att.status }}</td>
+                <td><a href="{% url 'edit_attendance' att.id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No attendance records found for this batch.</p>
+    {% endif %}
+</div>
+{% endblock %}

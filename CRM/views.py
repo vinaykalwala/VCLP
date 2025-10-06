@@ -1052,3 +1052,46 @@ def attendance_report(request):
         "month_input": month_input,
         "months": list(calendar.month_name)[1:],  # January–December
     })
+
+
+from django.shortcuts import redirect
+from django.contrib import messages
+
+@login_required
+def attendance_list(request):
+    """Displays all attendance records for a selected batch (with edit option)."""
+    batches = Batch.objects.all()
+    selected_batch_id = request.GET.get('batch')
+    attendances = Attendance.objects.none()
+    batch = None
+
+    if selected_batch_id:
+        batch = get_object_or_404(Batch, pk=selected_batch_id)
+        attendances = Attendance.objects.filter(batch=batch).order_by('-date')
+
+    return render(request, "attendance/attendance_list.html", {
+        "batches": batches,
+        "selected_batch_id": selected_batch_id,
+        "attendances": attendances,
+        "batch": batch,
+    })
+
+
+@login_required
+def edit_attendance(request, attendance_id):
+    """Allows trainer/admin to edit attendance status."""
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status in ["Present", "Absent"]:
+            attendance.status = new_status
+            attendance.save()
+            messages.success(request, "Attendance updated successfully!")
+            return redirect('attendance_list')
+        else:
+            messages.error(request, "Invalid status selected.")
+
+    return render(request, "attendance/edit_attendance.html", {
+        "attendance": attendance
+    })
