@@ -94,7 +94,7 @@ def signup_view(request):
             SuperUserProfile.objects.create(user=user)
 
         messages.success(request, "Account created successfully! Please log in.")
-        return redirect('login')
+        return redirect('signup')
 
     return render(request, 'signup.html', {'role_choices': User.ROLE_CHOICES})
 
