@@ -1,81 +1,200 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ trainer.user.get_full_name }} - Trainer Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .trainer-header {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-        }
-        .profile-photo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid white;
-        }
-    </style>
-</head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}Trainer Profile{% endblock %}
+{% block content %}
+{% load static %}
+
+<style>
+/* Trainer Header */
+.trainer-header {
+    background: linear-gradient(135deg, #10B981);
+    color: #fff;
+    padding: 2rem;
+    border-radius: 16px 16px 0 0;
+    margin-bottom: -1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.trainer-header .profile-photo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.trainer-header h1 {
+    margin: 0 0 0.3rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.trainer-header p.lead {
+    margin: 0;
+    font-weight: 500;
+}
+
+.trainer-header p.mb-0 {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.85;
+}
+
+.trainer-header .btn-light {
+    background: #FBBF24;
+    color: #333;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.trainer-header .btn-light:hover {
+    background: rgba(255,255,255,1);
+}
+
+
+
+/* Cards */
+.card.profile-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    border: none;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card.profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #5932EA;
+    margin-bottom: 1rem;
+    border-bottom: 2px dotted #ffc299;
+    padding-bottom: 0.25rem;
+}
+
+/* Professional Info Table */
+.professional-info-table {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.professional-info-table th {
+    background-color: #D1FAE5;
+    color: #065F46;
+    font-weight: 600;
+    padding: 0.9rem 1rem;
+    border: none;
+    vertical-align: middle;
+    width: 30%;
+}
+
+.professional-info-table td {
+    background-color: #F9FAFB;
+    color: #374151;
+    padding: 0.9rem 1rem;
+    border: none;
+    vertical-align: middle;
+}
+
+.professional-info-table tr:nth-child(even) td {
+    background-color: #ECFDF5;
+}
+
+.professional-info-table tr:hover td {
+    background-color: #D1FAE5;
+    transition: 0.3s ease;
+}
+
+/* Responsive */
+@media(max-width: 992px) {
+    .trainer-header {
+        text-align: center;
+    }
+    .trainer-header .col-md-2,
+    .trainer-header .col-md-8,
+    .trainer-header .col-md-2.text-end {
+        flex: 1 1 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<div class="main-content">
+
+    <!-- Trainer Header -->
     <div class="trainer-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-2 text-center">
-                    {% if trainer.profile_photo %}
-                        <img src="{{ trainer.profile_photo.url }}" alt="Trainer Photo" class="profile-photo">
-                    {% else %}
-                        <img src="https://via.placeholder.com/150" alt="Default Trainer" class="profile-photo">
-                    {% endif %}
-                </div>
-                <div class="col-md-8">
-                    <h1>{{ trainer.user.get_full_name }}</h1>
-                    <p class="lead mb-1">{{ trainer.designation|default:"Trainer" }}</p>
-                    <p class="mb-0">{{ trainer.user.email }}</p>
-                </div>
-                <div class="col-md-2 text-end">
-                    <a href="javascript:history.back()" class="btn btn-light">Go Back</a>
-                </div>
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                {% if trainer.profile_photo %}
+                    <img src="{{ trainer.profile_photo.url }}" alt="Trainer Photo" class="profile-photo">
+                {% else %}
+                    <img src="{% static 'images/user.webp' %}" alt="Default Trainer" class="profile-photo">
+                {% endif %}
             </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row">
             <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h3 class="card-title">About</h3>
-                        <p class="card-text">{{ trainer.bio|default:"No bio provided." }}</p>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h3 class="card-title">Professional Information</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Expertise:</strong> {{ trainer.expertise|default:"Not specified" }}</p>
-                                <p><strong>Designation:</strong> {{ trainer.designation|default:"Not specified" }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Experience:</strong> {{ trainer.years_of_experience|default:"Not specified" }} years</p>
-                                <p><strong>Availability:</strong> {{ trainer.get_availability_display }}</p>
-                            </div>
-                        </div>
-                        <p><strong>Highest Qualification:</strong> {{ trainer.highest_qualification|default:"Not specified" }}</p>
-                    </div>
-                </div>
+                <h1>{{ trainer.user.get_full_name }}</h1>
+                <p class="lead mb-1">{{ trainer.designation|default:"Trainer" }}</p>
+                <p class="mb-0">{{ trainer.user.email }}</p>
             </div>
-
-          
+            <div class="col-md-2 text-end">
+                <a href="javascript:history.back()" class="btn btn-light btn-lg">Go Back</a>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Trainer Details -->
+    <div class="card profile-card">
+        <div class="card-body">
+            <h3 class="section-title">About</h3>
+            <p>{{ trainer.bio|default:"No bio provided." }}</p>
+        </div>
+
+    <!-- Professional Information (Now Table) -->
+        <div class="card-body">
+            <h3 class="section-title">Professional Information</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle professional-info-table">
+                    <tbody>
+                        <tr>
+                            <th>Expertise</th>
+                            <td>{{ trainer.expertise|default:"Not specified" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Designation</th>
+                            <td>{{ trainer.designation|default:"Not specified" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Experience</th>
+                            <td>{{ trainer.years_of_experience|default:"Not specified" }} years</td>
+                        </tr>
+                        <tr>
+                            <th>Availability</th>
+                            <td>{{ trainer.get_availability_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Highest Qualification</th>
+                            <td>{{ trainer.highest_qualification|default:"Not specified" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- main-content -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
