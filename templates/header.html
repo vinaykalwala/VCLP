@@ -22,10 +22,18 @@
       <i class="fas fa-bars" style="color:#fff;"></i>
     </button>
 
-    <!-- Right Login/Logout Button -->
+    <!-- Right Login/Logout & Conditional Home/Dashboard -->
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav align-items-center">
+
         {% if user.is_authenticated %}
+          <!-- Conditional Home/Dashboard Link -->
+          <li class="nav-item me-2">
+              <a class="btn btn-accent1 px-4 fw-bold" href="{% url 'dashboard' %}">Dashboard</a>
+           
+          </li>
+
+          <!-- Logout Button -->
           <li class="nav-item">
             <a class="btn btn-accent px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
           </li>
@@ -34,6 +42,7 @@
             <a class="btn btn-accent px-4 fw-bold" href="{% url 'login' %}">Login</a>
           </li>
         {% endif %}
+
       </ul>
     </div>
 
@@ -84,6 +93,21 @@
 .btn-accent:hover {
   background-color: #10B981; /* Teal Green */
   color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
+}
+.btn-accent1 {
+  background-color: #10B981; /* Amber */
+  color: #ffff; /* Dark text */
+  border: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+.btn-accent1:hover {
+  background-color: #FBBF24; /* Teal Green */
+  color: #1f2937;
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
 }

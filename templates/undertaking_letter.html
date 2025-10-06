@@ -1,25 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; padding: 50px; }
-        h1 { text-align: center; color: #DF9755; }
-        p { font-size: 14px; line-height: 1.6; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Internship Undertaking & Offer Letter</title>
+  <style>
+    @page { size: A4 portrait; margin: 2cm; }
+    html, body { margin:0; padding:0; font-family: Arial, sans-serif; color: #222; }
+    h1, h2, h3, h4, h5, h6 { margin:0; padding:0; }
+    .paragraph { margin:10px 0; font-size:12.5px; line-height:1.45; }
+    ul.simple, ol.terms { font-size:12.5px; margin:6px 0; padding-left:18px; }
+    ol.terms li { margin:6px 0; }
+    table { border-collapse: collapse; }
+    .center { text-align:center; }
+  </style>
 </head>
 <body>
-    <h1>Internship Undertaking Letter</h1>
-    <p>To whomsoever it may concern,</p>
+  <div class="container">
 
-    <p>This is to certify that <strong>{{ intern.user.get_full_name }}</strong> (ID: {{ intern.unique_id }}) has joined the internship program at <strong>Company Name</strong> in the batch <strong>{{ intern.batch.name }}</strong>.</p>
+    <!-- Header with Logo and Company Info -->
+    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:6px;">
+      <tr>
+        <td class="center" style="vertical-align:middle;">
+          <img src="{{ logo_path }}" alt="Company Logo" style="height:60px; vertical-align:middle; margin-right:10px;">
+          <h1 style="font-size:20px; display:inline-block; vertical-align:middle; color:#660B05;">
+            {{ company.name }}
+            </h1>
+        </td>
+      </tr>
+      <tr>
+        <td class="center" style="font-size:11px; padding-top:6px; color:#333;">
+          CIN: {{ company.cin }} | Address: {{ company.address }}
+        </td>
+      </tr>
+      <tr>
+        <td class="center" style="font-size:11px;  padding-top:2px; color:#333;">
+          Phone: {{ company.phone }} | Website: {{ company.website }}
+        </td>
+      </tr>
+    </table>
 
-    <p>Internship Start Date: <strong>{{ intern.batch.start_date }}</strong><br>
-       Internship End Date: <strong>{{ intern.batch.end_date }}</strong>
+    <!-- Divider Line -->
+    <hr style="border:0; border-top:1px solid #333; margin:8px 0;">
+
+    <!-- Letter Title & Date -->
+    <div class="center" style="margin-bottom:15px;">
+      <p style="font-size:13px; font-weight:bold; margin:0;">Internship Undertaking & Offer Letter</p>
+      <p style="font-size:12px; margin:0;">Date: {{ today_date }}</p>
+    </div>
+
+    <!-- Subject & Greeting -->
+    <p style="font-size:13px;"><strong>Subject:</strong> Offer for {{ course.name }} – Paid Internship</p>
+    <p style="font-size:13px;">Dear {{ intern_name }},</p>
+
+    <!-- Introduction -->
+    <p class="paragraph">
+      We are delighted to offer you a position in our <strong>{{ course.name }}</strong> Internship Program.
+      This program provides hands-on experience and exposure to real-world projects in {{ course.description }}.
     </p>
 
-    <p>The intern is currently in an ongoing internship, and this undertaking is being issued accordingly.</p>
+    <!-- Program Details -->
+    <h4 style="font-size:14px; margin-top:12px;">Program Details</h4>
+    <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-size:12.5px;">
+      <tr><td style="width:25%;"><strong>Mode:</strong></td><td style="width:75%;">Online</td></tr>
+      <tr><td><strong>Duration:</strong></td><td>3 months</td></tr>
+      <tr><td><strong>Start Date:</strong></td><td>{{ batch.start_date }}</td></tr>
+      <tr><td><strong>End Date:</strong></td><td>{{ batch.end_date }}</td></tr>
+      <tr><td><strong>Role:</strong></td><td>Trainee</td></tr>
+      <tr><td><strong>Course:</strong></td><td>{{ course.name }}</td></tr>
+      <tr><td><strong>Batch:</strong></td><td>{{ batch.name }}</td></tr>
+      <tr><td><strong>Trainer:</strong></td><td>{{ batch.trainer_name }}</td></tr>
+      <tr><td><strong>Working Days:</strong></td><td>Monday to Friday</td></tr>
+      <tr><td><strong>Timings:</strong></td><td>{{ batch.timings }}</td></tr>
+    </table>
 
-    <p>Regards,<br>HR Department</p>
+    <!-- Highlights -->
+    <h4 style="font-size:14px; margin-top:12px;">Program Highlights</h4>
+    <ul class="simple">
+      <li>Interactive online sessions with industry experts.</li>
+      <li>Real-time project work and practical assignments.</li>
+      <li>Mentorship from experienced professionals.</li>
+      <li>Certificate of Completion and Letter of Recommendation upon successful completion.</li>
+    </ul>
+
+    <!-- Terms -->
+    <h4 style="font-size:14px; margin-top:12px;">Terms and Conditions</h4>
+    <ol class="terms">
+      <li><strong>Program Duration & Schedule</strong>
+        <ul class="simple">
+          <li>The internship will run from {{ batch.start_date }} to {{ batch.end_date }}.</li>
+          <li>Attendance is mandatory.</li>
+        </ul>
+      </li>
+      <li><strong>Eligibility & Conduct</strong>
+        <ul class="simple"><li>Maintain professional behavior.</li></ul>
+      </li>
+      <li><strong>Payment & Fees</strong>
+        <ul class="simple"><li>Paid internship covering training and guidance.</li></ul>
+      </li>
+      <li><strong>Attendance & Performance</strong>
+        <ul class="simple"><li>Completion of assignments required for certification.</li></ul>
+      </li>
+      <li><strong>Confidentiality</strong>
+        <ul class="simple"><li>Maintain confidentiality of all internal processes and documents.</li></ul>
+      </li>
+      <li><strong>Certificate & Recommendation</strong>
+        <ul class="simple"><li>Successful interns will receive a Certificate of Completion and Letter of Recommendation.</li></ul>
+      </li>
+      <li><strong>Termination</strong>
+        <ul class="simple"><li>The organization reserves the right to terminate the internship for misconduct or non-compliance.</li></ul>
+      </li>
+    </ol>
+
+    <!-- Signatures -->
+    <table width="100%" style="margin-top:20px;">
+      <tr>
+        <td style="width:50%; text-align:left;">
+          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>HR Department</strong></div>
+          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+        </td>
+        <td style="width:50%; text-align:right;">
+          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>Authorized Signatory</strong></div>
+          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+        </td>
+      </tr>
+    </table>
+
+  </div>
 </body>
 </html>
