@@ -8,11 +8,11 @@
       integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfN1dqklQmQCWmvMRGsiE09z1FMvx6bMpiKFF9volG/Gp1pc5xJj3Bg==" 
       crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-<nav class="navbar navbar-expand-lg dark-navbar fixed-top">
+<nav class="navbar navbar-expand-lg royal-navbar fixed-top">
   <div class="container-fluid px-3 px-md-3">
 
     <!-- Logo + Brand -->
-    <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'home' %}">
+    <a class="navbar-brand d-flex align-items-center fw-bold text-white" href="{% url 'home' %}">
       <span class="brand-text full-name ms-2">Vindus Career Launch Program</span>
       <span class="brand-text short-name ms-2">VCLP</span>
     </a>
@@ -27,11 +27,11 @@
       <ul class="navbar-nav align-items-center">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
+            <a class="btn btn-accent px-4 fw-bold" href="{% url 'logout' %}">Logout</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="btn btn-gradient  px-4 fw-bold" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-accent px-4 fw-bold" href="{% url 'login' %}">Login</a>
           </li>
         {% endif %}
       </ul>
@@ -44,29 +44,25 @@
 <div class="navbar-spacer"></div>
 
 <style>
-/* 🌑 Black Navbar */
-.dark-navbar {
-  background-color: #000; /* pure black header */
+/* 💙 Royal Blue Navbar */
+.royal-navbar {
+  background-color: #5932EA; /* Royal Blue */
   font-family: 'Roboto', sans-serif;
   transition: all 0.3s ease-in-out;
   z-index: 1030;
-  border-bottom: 1px solid #1a1c26;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
-  padding: 0.4rem 0;
+  padding: 0.6rem 0;
 }
 
-/* Spacer for content */
+/* Spacer */
 .navbar-spacer {
-  height: 70px;
+  height: 75px;
 }
 
-/* Brand Text Gradient (Pink → Purple) */
+/* Brand Text */
 .brand-text {
   font-size: 1rem;
   font-weight: 700;
-  background:#fff;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FFFFFF;
   letter-spacing: 0.4px;
 }
 
@@ -75,30 +71,26 @@
   display: none;
 }
 
-/* Gradient Button (Pink → Purple) */
-.btn-gradient {
-  position: relative;
-  display: inline-block;
-  padding: 0.3rem 0.6rem;
-  font-weight: 600;
-  color:#000;
-  text-decoration: none;
-  background:#fff; /* solid pink-purple */
-  box-shadow: 0 0 15px rgba(255, 78, 205, 0.6), 0 0 30px rgba(181, 76, 255, 0.5);
-  transition: all 0.3s ease;
+/* 🌟 Accent Button (Amber → Teal hover) */
+.btn-accent {
+  background-color: #FBBF24; /* Amber */
+  color: #1F2937; /* Dark text */
   border: none;
-  overflow: hidden;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
 }
 
-.btn-gradient:hover {
+.btn-accent:hover {
+  background-color: #10B981; /* Teal Green */
+  color: #FFFFFF;
   transform: translateY(-2px);
-  background-color: #fff;
-  color: #1a1c26;
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
 }
 
 /* Mobile Tweaks */
 @media (max-width: 992px) {
-  .btn-gradient {
+  .btn-accent {
     margin-top: 10px;
     width: 100%;
   }

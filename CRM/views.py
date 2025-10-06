@@ -747,3 +747,89 @@ def download_lor_view(request, intern_id):
         return response
     messages.error(request, "Error generating LOR PDF.")
     return redirect('manage_lor')
+from django.db.models import Q
+from .models import InternProfile
+
+@login_required
+def intern_list(request):
+    interns = InternProfile.objects.all()
+
+    query = request.GET.get('q')  # single search bar
+    batch_start = request.GET.get('batch_start')
+    batch_end = request.GET.get('batch_end')
+    internship_status = request.GET.get('internship_status')
+
+    if query:
+        interns = interns.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(batch__name__icontains=query) |
+            Q(batch__trainer__user__first_name__icontains=query) |
+            Q(unique_id__icontains=query) |
+            Q(gender__icontains=query) |
+            Q(undertaking_generated__icontains=query) |
+            Q(completion_certificate_generated__icontains=query) |
+            Q(lor_generated__icontains=query)
+        )
+
+    if batch_start:
+        interns = interns.filter(batch__start_date__gte=batch_start)
+    if batch_end:
+        interns = interns.filter(batch__end_date__lte=batch_end)
+    if internship_status:
+        interns = interns.filter(internship_status=internship_status)
+
+    return render(request, "interns/intern_list.html", {"interns": interns})
+
+@login_required
+def intern_create(request):
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            intern = form.save(commit=False)
+            
+            # Optional: create a User for this intern
+            if not intern.user_id:
+                user = User.objects.create_user(
+                    username=request.POST.get("username"),
+                    password=request.POST.get("password"),
+                    first_name=request.POST.get("first_name"),
+                    last_name=request.POST.get("last_name"),
+                    email=request.POST.get("email"),
+                )
+                intern.user = user
+
+            intern.save()
+            messages.success(request, "Intern profile created successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm()
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_update(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        form = InternProfileForm(request.POST, request.FILES, instance=intern)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Intern profile updated successfully.")
+            return redirect("intern_list")
+    else:
+        form = InternProfileForm(instance=intern)
+    return render(request, "interns/intern_form.html", {"form": form})
+
+@login_required
+def intern_delete(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    if request.method == "POST":
+        intern.delete()  # This will also delete the user
+        messages.success(request, "Intern profile and associated user deleted.")
+        return redirect("intern_list")
+    return render(request, "interns/intern_confirm_delete.html", {"intern": intern})
+
+@login_required
+def intern_detail(request, pk):
+    intern = get_object_or_404(InternProfile, pk=pk)
+    return render(request, "interns/intern_detail.html", {"intern": intern})

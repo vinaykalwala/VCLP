@@ -1,0 +1,73 @@
+<h1>Intern Details</h1>
+
+<h2>Basic Info</h2>
+<p><strong>Full Name:</strong> {{ intern.user.get_full_name }}</p>
+<p><strong>Username:</strong> {{ intern.user.username }}</p>
+<p><strong>Email:</strong> {{ intern.user.email }}</p>
+<p><strong>Gender:</strong> {{ intern.gender }}</p>
+<p><strong>Date of Birth:</strong> {{ intern.date_of_birth }}</p>
+<p><strong>Address:</strong> {{ intern.address }}</p>
+{% if intern.profile_photo %}
+    <p><strong>Profile Photo:</strong> <img src="{{ intern.profile_photo.url }}" alt="Profile Photo" width="150"></p>
+{% endif %}
+
+<h2>Academic Info</h2>
+<p><strong>Qualification:</strong> {{ intern.qualification }}</p>
+<p><strong>Specialization:</strong> {{ intern.specialization }}</p>
+<p><strong>College:</strong> {{ intern.college }}</p>
+<p><strong>University:</strong> {{ intern.university }}</p>
+<p><strong>Graduation Year:</strong> {{ intern.graduation_year }}</p>
+<p><strong>Aggregate Percentage:</strong> {{ intern.aggregate_percentage }}%</p>
+
+<h2>Skills & Experience</h2>
+<p><strong>Skills:</strong> {{ intern.skills }}</p>
+<p><strong>Prior Experience:</strong> {{ intern.prior_experience }}</p>
+
+<h2>Internship Motivation</h2>
+<p><strong>Why Choose:</strong> {{ intern.why_choose }}</p>
+<p><strong>Expectations:</strong> {{ intern.expectations }}</p>
+<p><strong>Career Goals:</strong> {{ intern.career_goals }}</p>
+
+<h2>Internship Details</h2>
+<p><strong>Batch:</strong> {{ intern.batch }}</p>
+<p><strong>Project Title:</strong> {{ intern.project_title }}</p>
+
+<h2>Device & Documents</h2>
+<p><strong>Device Access:</strong> {{ intern.device_access|yesno:"Yes,No" }}</p>
+{% if intern.resume %}
+    <p><strong>Resume:</strong> <a href="{{ intern.resume.url }}" target="_blank">Download</a></p>
+{% endif %}
+{% if intern.cover_letter %}
+    <p><strong>Cover Letter:</strong> <a href="{{ intern.cover_letter.url }}" target="_blank">Download</a></p>
+{% endif %}
+{% if intern.college_id_card %}
+    <p><strong>College ID Card:</strong> <a href="{{ intern.college_id_card.url }}" target="_blank">Download</a></p>
+{% endif %}
+
+<h2>Emergency & Guardian Info</h2>
+<p><strong>Emergency Contact Name:</strong> {{ intern.emergency_contact_name }}</p>
+<p><strong>Emergency Contact Phone:</strong> {{ intern.emergency_contact_phone }}</p>
+<p><strong>Guardian Name:</strong> {{ intern.guardian_name }}</p>
+<p><strong>Guardian Contact:</strong> {{ intern.guardian_contact }}</p>
+
+<h2>Links</h2>
+{% if intern.linkedin_profile %}
+    <p><strong>LinkedIn Profile:</strong> <a href="{{ intern.linkedin_profile }}" target="_blank">{{ intern.linkedin_profile }}</a></p>
+{% endif %}
+{% if intern.portfolio_link %}
+    <p><strong>Portfolio Link:</strong> <a href="{{ intern.portfolio_link }}" target="_blank">{{ intern.portfolio_link }}</a></p>
+{% endif %}
+
+<h2>Reference</h2>
+<p><strong>Reference:</strong> {{ intern.reference }}</p>
+
+<h2>Certificates & Status</h2>
+<p><strong>Undertaking Generated:</strong> {{ intern.undertaking_generated|yesno:"Yes,No" }}</p>
+<p><strong>Completion Certificate Generated:</strong> {{ intern.completion_certificate_generated|yesno:"Yes,No" }}</p>
+<p><strong>LOR Generated:</strong> {{ intern.lor_generated|yesno:"Yes,No" }}</p>
+<p><strong>Internship Status:</strong> {{ intern.internship_status }}</p>
+
+<p><strong>Created At:</strong> {{ intern.created_at }}</p>
+
+<a href="{% url 'intern_update' intern.pk %}">Edit</a> |
+<a href="{% url 'intern_list' %}">Back to List</a>
