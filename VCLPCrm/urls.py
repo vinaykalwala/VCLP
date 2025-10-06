@@ -51,6 +51,19 @@ urlpatterns = [
     path("intern_delete/<int:pk>/", views.intern_delete, name="intern_delete"),
     path("intern_detail/<int:pk>/", views.intern_detail, name="intern_detail"),
     path('attendance-report/', views.attendance_report, name='attendance_report'),
+    path('attendance-list/', views.attendance_list, name='attendance_list'),
+    path('attendance/edit/<int:attendance_id>/', views.edit_attendance, name='edit_attendance'),
+
+    path('curriculums/', views.curriculum_list, name='curriculum_list'),
+    path('curriculums/add/', views.create_curriculum, name='create_curriculum'),
+    path('curriculums/edit/<int:pk>/', views.update_curriculum, name='update_curriculum'),
+    path('curriculums/delete/<int:pk>/', views.delete_curriculum, name='delete_curriculum'),
+
+    path('daily_update_list/', views.daily_update_list, name='daily_update_list'),
+    path('daily_update_add/', views.daily_update_create, name='daily_update_create'),
+    path('daily_update_edit/<int:pk>/', views.daily_update_edit, name='daily_update_edit'),
+    path('daily_update_delete/<int:pk>/', views.daily_update_delete, name='daily_update_delete'),
+    path('daily_update_dashboard/', views.daily_update_dashboard, name='daily_update_dashboard'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

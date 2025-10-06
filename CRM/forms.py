@@ -137,3 +137,18 @@ class InternProfileForm(forms.ModelForm):
     class Meta:
         model = InternProfile
         exclude = ('created_at',)
+
+class CurriculumForm(forms.ModelForm):
+    class Meta:
+        model = Curriculum
+        fields = ['course', 'batch', 'title', 'file', 'description']
+
+class DailySessionUpdateForm(forms.ModelForm):
+    class Meta:
+        model = DailySessionUpdate
+        fields = ['batch', 'topic_covered', 'summary', 'challenges']
+        widgets = {
+            'topic_covered': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Topics covered today'}),
+            'summary': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Summary of session'}),
+            'challenges': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Challenges (if any)'}),
+        }

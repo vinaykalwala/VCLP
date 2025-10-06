@@ -322,6 +322,7 @@ class AssessmentSubmission(models.Model):
 
 class Curriculum(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="curriculums")
+    batch = models.ForeignKey('Batch', on_delete=models.CASCADE, related_name="curriculums", null=True, blank=True)
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to="curriculums/")
     description = models.TextField(blank=True, null=True)

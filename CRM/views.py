@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
+import datetime
 import zipfile
 from .models import *
 from .forms import *
@@ -262,26 +263,58 @@ def pdf_viewer_page(request, lesson_id):
 # Helper function to generate PDF
 # -------------------------
 
-
+@login_required
 def undertaking_certificates_home(request):
-    batches = Batch.objects.all() 
-    return render(request, "internshipundertakingcertificates.html",{"batches": batches})
+    """
+    Manage Undertaking Certificates page
+    """
+    courses = Course.objects.all()
+    batches = Batch.objects.all()
 
-def generate_pdf(html_content):
-    response = HttpResponse(content_type='application/pdf')
-    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    interns = InternProfile.objects.select_related("batch", "batch__course")
+
+    # Apply filters
+    course_id = request.GET.get("course_id")
+    batch_id = request.GET.get("batch_id")
+    search = request.GET.get("search")
+
+    if course_id:
+        interns = interns.filter(batch__course_id=course_id)
+    if batch_id:
+        interns = interns.filter(batch_id=batch_id)
+    if search:
+        interns = interns.filter(
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search) |
+            Q(unique_id__icontains=search)
+        )
+
+    return render(
+        request,
+        "internshipundertakingcertificates.html",
+        {"courses": courses, "batches": batches, "interns": interns},
+    )
+
+
+def generate_pdf_from_html(html_content):
+    """
+    Utility: Generate PDF bytes from HTML
+    """
+    pdf_buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_buffer)
     if pisa_status.err:
-        return HttpResponse("Error generating PDF")
-    return response
+        return None
+    pdf_buffer.seek(0)
+    return pdf_buffer
 
-
+@login_required
 def generate_intern_pdf(request, mode, identifier=None):
     """
-    mode can be: 'single', 'multiple', 'batch'
-    identifier:
-        - single -> intern_id
-        - multiple -> handled from request.POST.getlist("intern_ids")
-        - batch -> batch_id
+    Generate Undertaking Certificates
+    mode:
+        - single: one intern (identifier=intern_id)
+        - multiple: many interns (ids in POST)
+        - batch: all interns in a batch (identifier=batch_id)
     """
     interns = []
 
@@ -290,63 +323,115 @@ def generate_intern_pdf(request, mode, identifier=None):
             intern = InternProfile.objects.get(
                 id=identifier,
                 internship_status="Ongoing",
-                undertaking_generated=False
+                undertaking_generated=False,
             )
             interns = [intern]
         except InternProfile.DoesNotExist:
-            return HttpResponse(f"Cannot generate certificate: Intern with ID {identifier} is either not Ongoing or already has an undertaking generated.")
+            return HttpResponse(
+                f"Cannot generate certificate: Intern with ID {identifier} "
+                "is either not Ongoing or already has an undertaking generated."
+            )
 
     elif mode == "multiple":
         intern_ids = request.POST.getlist("intern_ids")
-        interns = InternProfile.objects.filter(
-            id__in=intern_ids,
-            internship_status="Ongoing",
-            undertaking_generated=False
+        interns = list(
+            InternProfile.objects.filter(
+                id__in=intern_ids,
+                internship_status="Ongoing",
+                undertaking_generated=False,
+            )
         )
-        if not interns.exists():
-            return HttpResponse("None of the selected interns are eligible for certificate generation (must be Ongoing and not yet generated).")
+        if not interns:
+            return HttpResponse(
+                "None of the selected interns are eligible for certificate generation "
+                "(must be Ongoing and not yet generated)."
+            )
 
     elif mode == "batch":
         batch = get_object_or_404(Batch, id=identifier)
-        interns = batch.interns.filter(
-            internship_status="Ongoing",
-            undertaking_generated=False
+        interns = list(
+            batch.interns.filter(
+                internship_status="Ongoing",
+                undertaking_generated=False
+            )
         )
-        if not interns.exists():
-            return HttpResponse(f"No eligible interns in batch '{batch.name}' for certificate generation.")
+        if not interns:
+            return HttpResponse(
+                f"No eligible interns in batch '{batch.name}' for certificate generation."
+            )
 
     # ----------------------
-    # Single intern: generate PDF normally
+    # SINGLE PDF
     # ----------------------
-    if mode == "single":
-        html_content = render_to_string("undertaking_letter.html", {"intern": interns[0]})
-        interns[0].undertaking_generated = True
-        interns[0].save()
-        response = HttpResponse(content_type="application/pdf")
-        filename = f"undertaking_{interns[0].unique_id}.pdf"
+    if len(interns) == 1:
+        intern = interns[0]
+        logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        context = {
+            "intern_name": intern.user.get_full_name(),
+            "course": intern.batch.course,
+            "batch": intern.batch,
+            "company": {
+                "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                "cin": "U62099TS2023PTC179794",
+                "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                "phone": "+914049525396",
+                "website": "www.vindusenvironment.com"
+            },
+            "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+            "logo_path": logo_path 
+        }
+
+        html_content = render_to_string("undertaking_letter.html", context)
+        pdf_buffer = generate_pdf_from_html(html_content)
+        if not pdf_buffer:
+            return HttpResponse("Error generating PDF")
+
+        intern.undertaking_generated = True
+        intern.save()
+
+        response = HttpResponse(pdf_buffer, content_type="application/pdf")
+        filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        pisa.CreatePDF(html_content, dest=response)
         return response
 
+    # ----------------------
+    # MULTIPLE/BATCH => ZIP
+    # ----------------------
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w") as zip_file:
         for intern in interns:
-            html_content = render_to_string("undertaking_letter.html", {"intern": intern})
-            pdf_buffer = io.BytesIO()
-            pisa.CreatePDF(html_content, dest=pdf_buffer)
-            pdf_buffer.seek(0)
+            logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+            context = {
+                "intern_name": intern.user.get_full_name(),
+                "course": intern.batch.course,
+                "batch": intern.batch,
+                "company": {
+                    "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                    "cin": "U62099TS2023PTC179794",
+                    "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                    "phone": "+914049525396",
+                    "website": "www.vindusenvironment.com"
+                },
+                "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                "logo_path": logo_path
+            }
+            html_content = render_to_string("undertaking_letter.html", context)
+            pdf_buffer = generate_pdf_from_html(html_content)
+            if not pdf_buffer:
+                continue
 
-            # Add to ZIP
-            pdf_name = f"{intern.unique_id}_undertaking.pdf"
-            zip_file.writestr(pdf_name, pdf_buffer.read())
+            filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
+            zip_file.writestr(filename, pdf_buffer.read())
 
-            # Update status
             intern.undertaking_generated = True
             intern.save()
 
     zip_buffer.seek(0)
     response = HttpResponse(zip_buffer, content_type="application/zip")
-    response["Content-Disposition"] = 'attachment; filename="interns_undertakings.zip"'
+    if mode == "batch":
+        response["Content-Disposition"] = f'attachment; filename="{batch.name}_undertakings.zip"'
+    else:
+        response["Content-Disposition"] = 'attachment; filename="undertakings.zip"'
     return response
 
 
@@ -1030,4 +1115,300 @@ def attendance_report(request):
         "selected_date": date_input if date_input else today,
         "month_input": month_input,
         "months": list(calendar.month_name)[1:],  # January–December
+    })
+
+
+from django.shortcuts import redirect
+from django.contrib import messages
+
+@login_required
+def attendance_list(request):
+    """Displays all attendance records for a selected batch (with edit option)."""
+    batches = Batch.objects.all()
+    selected_batch_id = request.GET.get('batch')
+    attendances = Attendance.objects.none()
+    batch = None
+
+    if selected_batch_id:
+        batch = get_object_or_404(Batch, pk=selected_batch_id)
+        attendances = Attendance.objects.filter(batch=batch).order_by('-date')
+
+    return render(request, "attendance/attendance_list.html", {
+        "batches": batches,
+        "selected_batch_id": selected_batch_id,
+        "attendances": attendances,
+        "batch": batch,
+    })
+
+
+@login_required
+def edit_attendance(request, attendance_id):
+    """Allows trainer/admin to edit attendance status."""
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status in ["Present", "Absent"]:
+            attendance.status = new_status
+            attendance.save()
+            messages.success(request, "Attendance updated successfully!")
+            return redirect('attendance_list')
+        else:
+            messages.error(request, "Invalid status selected.")
+
+    return render(request, "attendance/edit_attendance.html", {
+        "attendance": attendance
+    })
+
+
+from .forms import CurriculumForm
+
+# Create Curriculum
+@login_required
+def create_curriculum(request):
+    if request.method == "POST":
+        form = CurriculumForm(request.POST, request.FILES)
+        if form.is_valid():
+            curriculum = form.save(commit=False)
+            curriculum.uploaded_by = request.user.trainer_profile  # assuming trainer logged in
+            curriculum.save()
+            return redirect('curriculum_list')
+    else:
+        form = CurriculumForm()
+    return render(request, 'curriculum/curriculum_form.html', {'form': form, 'title': 'Add Curriculum'})
+
+# List & Filter by Batch
+@login_required
+def curriculum_list(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    if user_role == "intern":
+        # Show only curriculums for the intern's batch
+        try:
+            intern_batch = user.intern_profile.batch  # assuming intern_profile has a batch field
+            curriculums = Curriculum.objects.filter(batch=intern_batch)
+        except AttributeError:
+            curriculums = Curriculum.objects.none()  # fallback if batch not set
+        batches = None  # No batch filter for interns
+        selected_batch = None
+    else:
+        # Trainers/Admins see all curriculums, optional batch filter
+        batches = Batch.objects.all()
+        selected_batch = request.GET.get('batch')
+        if selected_batch:
+            curriculums = Curriculum.objects.filter(batch_id=selected_batch)
+        else:
+            curriculums = Curriculum.objects.all()
+
+    return render(request, 'curriculum/curriculum_list.html', {
+        'curriculums': curriculums,
+        'batches': batches,
+        'selected_batch': selected_batch,
+        'user_role': user_role,
+    })
+
+# Update
+@login_required
+def update_curriculum(request, pk):
+    curriculum = get_object_or_404(Curriculum, pk=pk)
+
+    # Restrict interns
+    if request.user.role == "intern":
+        return redirect('curriculum_list')
+
+    # Only allow trainers who uploaded or admins
+    if request.user.role == "trainer" and curriculum.uploaded_by.user != request.user:
+        return redirect('curriculum_list')
+
+    if request.method == "POST":
+        form = CurriculumForm(request.POST, request.FILES, instance=curriculum)
+        if form.is_valid():
+            form.save()
+            return redirect('curriculum_list')
+    else:
+        form = CurriculumForm(instance=curriculum)
+    return render(request, 'curriculum/curriculum_form.html', {'form': form, 'title': 'Edit Curriculum'})
+
+# Delete
+@login_required
+def delete_curriculum(request, pk):
+    curriculum = get_object_or_404(Curriculum, pk=pk)
+
+    if request.user.role == "intern":
+        return redirect('curriculum_list')
+
+    if request.user.role == "trainer" and curriculum.uploaded_by.user != request.user:
+        return redirect('curriculum_list')
+
+    if request.method == "POST":
+        curriculum.delete()
+        return redirect('curriculum_list')
+    return render(request, 'curriculum/curriculum_confirm_delete.html', {'curriculum': curriculum})
+
+
+
+
+from django.db.models.functions import TruncMonth
+from django.utils.dateformat import format
+
+@login_required
+def daily_update_list(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    # Base queryset
+    if user_role in ["admin", "superuser"]:
+        updates = DailySessionUpdate.objects.all().order_by('-date')
+
+        # Prepare months list from existing updates
+        months_qs = updates.annotate(month=TruncMonth('date')).values('month').distinct()
+        month_options = [(m['month'].strftime('%Y-%m'), m['month'].strftime('%B %Y')) for m in months_qs]
+
+        # Filters
+        date_filter = request.GET.get('date')
+        month_filter = request.GET.get('month')  # format: YYYY-MM
+
+        if date_filter:
+            updates = updates.filter(date=date_filter)
+        elif month_filter:
+            year, month = map(int, month_filter.split('-'))
+            updates = updates.filter(date__year=year, date__month=month)
+
+    # Trainer view
+    elif user_role == "trainer":
+        trainer_profile = get_object_or_404(TrainerProfile, user=user)
+        updates = DailySessionUpdate.objects.filter(trainer=trainer_profile).order_by('-date')
+        month_options = []
+
+    # Intern view
+    elif user_role == "intern":
+        try:
+            intern_batch = user.intern_profile.batch
+            updates = DailySessionUpdate.objects.filter(batch=intern_batch).order_by('-date')
+        except AttributeError:
+            updates = DailySessionUpdate.objects.none()
+        month_options = []
+
+    else:
+        updates = DailySessionUpdate.objects.none()
+        month_options = []
+
+    return render(request, 'daily_updates/daily_update_list.html', {
+        'updates': updates,
+        'user_role': user_role,
+        'month_options': month_options,
+        'date_filter': date_filter if 'date_filter' in locals() else '',
+        'month_filter': month_filter if 'month_filter' in locals() else '',
+    })
+
+
+
+@login_required
+def daily_update_create(request):
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    if request.method == "POST":
+        form = DailySessionUpdateForm(request.POST)
+        if form.is_valid():
+            update = form.save(commit=False)
+            update.trainer = trainer_profile
+            update.save()
+            messages.success(request, "Daily session update submitted successfully!")
+            return redirect('daily_update_list')
+    else:
+        form = DailySessionUpdateForm()
+
+    return render(request, 'daily_updates/daily_update_form.html', {'form': form, 'title': 'Add Daily Session Update'})
+
+
+@login_required
+def daily_update_edit(request, pk):
+    update = get_object_or_404(DailySessionUpdate, pk=pk)
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    # Only the trainer who created can edit
+    if update.trainer != trainer_profile:
+        messages.error(request, "You are not authorized to edit this entry.")
+        return redirect('daily_update_list')
+
+    if request.method == "POST":
+        form = DailySessionUpdateForm(request.POST, instance=update)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Session update edited successfully!")
+            return redirect('daily_update_list')
+    else:
+        form = DailySessionUpdateForm(instance=update)
+
+    return render(request, 'daily_updates/daily_update_form.html', {'form': form, 'title': 'Edit Daily Session Update'})
+
+
+@login_required
+def daily_update_delete(request, pk):
+    update = get_object_or_404(DailySessionUpdate, pk=pk)
+    trainer_profile = get_object_or_404(TrainerProfile, user=request.user)
+
+    if update.trainer != trainer_profile:
+        messages.error(request, "You are not authorized to delete this entry.")
+        return redirect('daily_update_list')
+
+    if request.method == "POST":
+        update.delete()
+        messages.success(request, "Session update deleted successfully!")
+        return redirect('daily_update_list')
+
+    return render(request, 'daily_updates/daily_update_confirm_delete.html', {'update': update})
+
+
+@login_required
+def daily_update_dashboard(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    if user_role not in ["admin", "superuser"]:
+        messages.error(request, "You are not authorized to access this page.")
+        return redirect('daily_update_list')
+
+    # Filters from GET request
+    selected_trainer = request.GET.get('trainer')
+    selected_batch = request.GET.get('batch')
+    selected_month = request.GET.get('month')  # format: YYYY-MM
+
+    # Dropdown options
+    trainers = TrainerProfile.objects.all().order_by('user__username')
+    batches = Batch.objects.all().order_by('name')
+
+    # Prepare months from existing updates
+    all_updates = DailySessionUpdate.objects.all()
+    months_qs = all_updates.annotate(month=TruncMonth('date')).values('month').distinct()
+    month_options = [(m['month'].strftime('%Y-%m'), m['month'].strftime('%B %Y')) for m in months_qs]
+
+    # Filtered trainer updates
+    trainer_updates = []
+
+    for trainer in trainers:
+        updates = DailySessionUpdate.objects.filter(trainer=trainer).order_by('-date')
+
+        if selected_trainer and str(trainer.id) != selected_trainer:
+            updates = DailySessionUpdate.objects.none()
+        if selected_batch:
+            updates = updates.filter(batch_id=selected_batch)
+        if selected_month:
+            year, month = map(int, selected_month.split('-'))
+            updates = updates.filter(date__year=year, date__month=month)
+
+        trainer_updates.append({
+            'trainer': trainer,
+            'updates': updates
+        })
+
+    return render(request, 'daily_updates/daily_update_dashboard.html', {
+        'trainer_updates': trainer_updates,
+        'trainers': trainers,
+        'batches': batches,
+        'month_options': month_options,
+        'selected_trainer': selected_trainer,
+        'selected_batch': selected_batch,
+        'selected_month': selected_month
     })

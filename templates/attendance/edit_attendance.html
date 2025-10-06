@@ -1,0 +1,24 @@
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Edit Attendance</h3>
+
+    <form method="post">
+        {% csrf_token %}
+        <p><strong>Intern:</strong> {{ attendance.intern.user.get_full_name }}</p>
+        <p><strong>Unique ID:</strong> {{ attendance.intern.unique_id }}</p>
+        <p><strong>Date:</strong> {{ attendance.date }}</p>
+        <p><strong>Current Status:</strong> {{ attendance.status }}</p>
+
+        <label>Change Status:</label>
+        <select name="status">
+            <option value="Present" {% if attendance.status == 'Present' %}selected{% endif %}>Present</option>
+            <option value="Absent" {% if attendance.status == 'Absent' %}selected{% endif %}>Absent</option>
+        </select>
+
+        <br><br>
+        <button type="submit">Update</button>
+        <a href="{% url 'attendance_list' %}">Cancel</a>
+    </form>
+</div>
+{% endblock %}
