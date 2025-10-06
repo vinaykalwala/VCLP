@@ -4,7 +4,12 @@ from .models import *
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ["name", "description"]
+        fields = ['name', 'description']  # only include the fields you want
+        labels = {
+            'name': 'Course Name',  # optional: change label
+            'description': 'Course Description',
+        }
+        
 
 
 class InternFilterForm(forms.Form):

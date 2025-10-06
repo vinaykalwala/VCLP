@@ -16,6 +16,8 @@ from .forms import *
 def home(request):
     return render(request, 'home.html') 
 
+
+
 # =====================
 # Signup
 # =====================
@@ -646,3 +648,66 @@ def edit_profile_view(request):
 def trainer_profile_view(request, trainer_id):
     trainer_profile = get_object_or_404(TrainerProfile, id=trainer_id)
     return render(request, 'trainer_profile.html', {'trainer': trainer_profile})
+
+
+
+
+
+# =====================
+# Course CRUD (Admin/Trainer/Superuser only)
+# =====================
+from .models import Course
+from .forms import CourseForm
+from .decorators import allowed_roles
+from django.http import JsonResponse
+
+@login_required
+@allowed_roles(roles=["admin", "trainer", "superuser"])
+def course_list(request):
+    courses = Course.objects.all()
+    return render(request, "courses/course_list.html", {"courses": courses})
+
+@login_required
+@allowed_roles(roles=["admin", "trainer", "superuser"])
+def course_create(request):
+    if request.method == "POST":
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Course created successfully.")
+            return redirect("course_list")
+    else:
+        form = CourseForm()
+    return render(request, "courses/course_form.html", {"form": form, "title": "Add Course"})
+
+@login_required
+@allowed_roles(roles=["admin", "trainer", "superuser"])
+def course_update(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+    if request.method == "POST":
+        form = CourseForm(request.POST, instance=course)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✏️ Course updated successfully.")
+            return redirect("course_list")
+    else:
+        form = CourseForm(instance=course)
+    return render(request, "courses/course_form.html", {"form": form, "title": "Edit Course"})
+
+@login_required
+@allowed_roles(roles=["admin", "trainer", "superuser"])
+def course_delete(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+    if request.method == "POST":
+        course.delete()
+        messages.success(request, "🗑️ Course deleted successfully.")
+        return redirect("course_list")
+    return render(request, "courses/course_confirm_delete.html", {"course": course})
+@login_required
+@allowed_roles(roles=["admin", "trainer", "superuser"])
+def course_delete_ajax(request, pk):
+    if request.method == "POST" and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        course = get_object_or_404(Course, pk=pk)
+        course.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
