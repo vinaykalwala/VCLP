@@ -9,10 +9,11 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
-import datetime
+from datetime import date
 import zipfile
 from .models import *
 from .forms import *
+
 
 def home(request):
     return render(request, 'home.html') 
@@ -375,8 +376,8 @@ def generate_intern_pdf(request, mode, identifier=None):
                 "phone": "+914049525396",
                 "website": "www.vindusenvironment.com"
             },
-            "today_date": datetime.date.today().strftime("%d-%m-%Y"),
-            "logo_path": logo_path 
+            "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
+            "logo_path": logo_path
         }
 
         html_content = render_to_string("undertaking_letter.html", context)
@@ -410,7 +411,7 @@ def generate_intern_pdf(request, mode, identifier=None):
                     "phone": "+914049525396",
                     "website": "www.vindusenvironment.com"
                 },
-                "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
                 "logo_path": logo_path
             }
             html_content = render_to_string("undertaking_letter.html", context)
