@@ -1010,3 +1010,89 @@ def edit_attendance(request, attendance_id):
     return render(request, "attendance/edit_attendance.html", {
         "attendance": attendance
     })
+
+
+from .forms import CurriculumForm
+
+# Create Curriculum
+@login_required
+def create_curriculum(request):
+    if request.method == "POST":
+        form = CurriculumForm(request.POST, request.FILES)
+        if form.is_valid():
+            curriculum = form.save(commit=False)
+            curriculum.uploaded_by = request.user.trainer_profile  # assuming trainer logged in
+            curriculum.save()
+            return redirect('curriculum_list')
+    else:
+        form = CurriculumForm()
+    return render(request, 'curriculum/curriculum_form.html', {'form': form, 'title': 'Add Curriculum'})
+
+# List & Filter by Batch
+@login_required
+def curriculum_list(request):
+    user = request.user
+    user_role = getattr(user, 'role', None)
+
+    if user_role == "intern":
+        # Show only curriculums for the intern's batch
+        try:
+            intern_batch = user.intern_profile.batch  # assuming intern_profile has a batch field
+            curriculums = Curriculum.objects.filter(batch=intern_batch)
+        except AttributeError:
+            curriculums = Curriculum.objects.none()  # fallback if batch not set
+        batches = None  # No batch filter for interns
+        selected_batch = None
+    else:
+        # Trainers/Admins see all curriculums, optional batch filter
+        batches = Batch.objects.all()
+        selected_batch = request.GET.get('batch')
+        if selected_batch:
+            curriculums = Curriculum.objects.filter(batch_id=selected_batch)
+        else:
+            curriculums = Curriculum.objects.all()
+
+    return render(request, 'curriculum/curriculum_list.html', {
+        'curriculums': curriculums,
+        'batches': batches,
+        'selected_batch': selected_batch,
+        'user_role': user_role,
+    })
+
+# Update
+@login_required
+def update_curriculum(request, pk):
+    curriculum = get_object_or_404(Curriculum, pk=pk)
+
+    # Restrict interns
+    if request.user.role == "intern":
+        return redirect('curriculum_list')
+
+    # Only allow trainers who uploaded or admins
+    if request.user.role == "trainer" and curriculum.uploaded_by.user != request.user:
+        return redirect('curriculum_list')
+
+    if request.method == "POST":
+        form = CurriculumForm(request.POST, request.FILES, instance=curriculum)
+        if form.is_valid():
+            form.save()
+            return redirect('curriculum_list')
+    else:
+        form = CurriculumForm(instance=curriculum)
+    return render(request, 'curriculum/curriculum_form.html', {'form': form, 'title': 'Edit Curriculum'})
+
+# Delete
+@login_required
+def delete_curriculum(request, pk):
+    curriculum = get_object_or_404(Curriculum, pk=pk)
+
+    if request.user.role == "intern":
+        return redirect('curriculum_list')
+
+    if request.user.role == "trainer" and curriculum.uploaded_by.user != request.user:
+        return redirect('curriculum_list')
+
+    if request.method == "POST":
+        curriculum.delete()
+        return redirect('curriculum_list')
+    return render(request, 'curriculum/curriculum_confirm_delete.html', {'curriculum': curriculum})
