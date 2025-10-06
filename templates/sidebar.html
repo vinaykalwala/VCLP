@@ -10,14 +10,14 @@
 
 <style>
 :root {
-  --primary:gold;         /* pink-purple */
-  --primary-dark: #b000e6;    /* darker shade */
-  --primary-light: #f05fff;   /* lighter glow */
-  --bg: #000000;              /* black sidebar background */
-  --bg-light: #272727;        /* lighter black */
-  --text-light: #ffffff;      /* white text */
-  --text-muted: #b985d6;      /* muted pink-purple */
-  --shadow: 0 4px 12px rgba(0,0,0,0.6);
+  --primary: #5932EA;         /* Blue accent */
+  --primary-dark: #1D4ED8;    /* Darker blue for hover */
+  --primary-light: #60A5FA;   /* Light blue glow */
+  --bg: #ffffff;               /* White sidebar background */
+  --bg-light: #F3F4F6;         /* Light gray for links */
+  --text-light: #111827;       /* Dark text */
+  --text-muted: #6B7280;       /* Muted gray */
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
   --transition: all 0.3s ease;
 }
 
@@ -53,20 +53,23 @@ body {
 .sidebar::-webkit-scrollbar { width: 6px; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
-/* Header */
+/* Header / Dashboard name */
 .sidebar-header {
-  padding: 25px 20px 15px;
-  border-bottom: 1px solid #222;
+  padding: 25px 0px 15px;
+  margin-top: 31px;
   text-align: center;
-  margin-top: 32px;
 }
 .sidebar-header h1 {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  margin: 0;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
+  padding: 20px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+ border-top: 1px solid #E5E7EB;
+ border-bottom: 1px solid #E5E7EB;
+  background: var(--bg-light);
+
 }
 
 /* Sections */
@@ -76,7 +79,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-muted);
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #E5E7EB;
   margin: 5px 0;
 }
 
@@ -85,36 +88,35 @@ body {
   list-style: none;
   padding: 0 10px;
   margin: 0 0 15px;
-  
 }
-
 .sidebar ul li { margin-bottom: 5px; }
 .sidebar ul li a {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  color: var(--text-light);
+  color:#9197B3;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
-  background: var(--bg-light);
   transition: var(--transition);
-  
+   border-bottom: 1px solid #E5E7EB;
+
 }
-.sidebar ul li a i { margin-right: 12px; font-size: 16px; }
+.sidebar ul li a i { margin-right: 12px; font-size: 16px; color: var(--primar); }
 .sidebar ul li a:hover,
 .sidebar ul li a.active {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
-  color: var(--text-light);
-  box-shadow: 0 0 12px rgba(214, 51, 255, 0.7);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
+.sidebar ul li a i:hover { margin-right: 12px; font-size: 16px; color:#fff; }
 
 /* User Section */
 .user-section {
   margin-top: auto;
   padding: 10px 20px;
   position: relative;
-  border-top: 1px solid #222;
+  border-top: 1px solid #E5E7EB;
   background: var(--bg-light);
 }
 .user-btn {
@@ -127,7 +129,7 @@ body {
   border-radius: 8px;
   transition: var(--transition);
 }
-.user-btn:hover { background: var(--bg); }
+.user-btn:hover { background: #ffffff; }
 .user-btn img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
 .user-info { margin-left: 12px; flex-grow: 1; }
 .user-btn strong { display: block; font-size: 15px; font-weight: 700; }
@@ -166,17 +168,17 @@ body {
   color: var(--text-light);
   font-size: 14px;
   text-decoration: none;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #E5E7EB;
 }
 .dropdown a:last-child { border-bottom: none; }
-.dropdown a i { margin-right: 10px; }
-.dropdown a:hover { background: var(--primary); }
+.dropdown a i { margin-right: 10px; color: var(--primary); }
+.dropdown a:hover { background: var(--primary); color: #fff; }
 
 /* Toggle Buttons */
 .sidebar-toggle {
   display: none;
   z-index: 999;
-  background:#111;
+  background:#5932EA;
   border: none;
   color: white;
   padding: 12px 14px;
@@ -191,25 +193,7 @@ body {
 }
 .sidebar-toggle:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-#closeSidebarBtn{
-  display: none;
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 15px;
-  transition: background 0.3s;
-  background: #e53935;
-  color: white;
-  margin-top: 35px;
-}
-#closeSidebarBtn:hover { background: #c62828; }
+
 
 /* Responsive */
 @media (max-width: 992px) {
@@ -229,7 +213,7 @@ body {
     display: flex;
     position: absolute;
     top: -10px;
-    right: 15px;
+    right: 1px;
     width: 32px;
     height: 32px;
     align-items: center;
@@ -243,7 +227,6 @@ body {
   }
   #closeSidebarBtn:hover { background: #c62828; }
 }
-
 </style>
 
 </head>
@@ -253,48 +236,41 @@ body {
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-   
+    <h1>
+      {% if request.user.role == "superuser" %}SuperUser Dashboard{% elif request.user.role == "admin" %}Admin Dashboard{% elif request.user.role == "trainer" %}Trainer Dashboard{% else %}Intern Dashboard{% endif %}
+    </h1>
     <button id="closeSidebarBtn">✕</button>
   </div>
 
   <!-- Sidebar Links -->
   <ul>
     {% if request.user.role == "superuser" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Super User Dashboard</a></li>
-      <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i>Profile</a></li>
-
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
+<<<<<<< HEAD
       <li><a href="{% url 'course_list' %}"><i class="fas fa-book"></i>Courses</a></li>
       
       
 
+=======
+>>>>>>> 7292c6d8eabb07626fd0d2fbb9db27061346c717
     {% elif request.user.role == "admin" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Administrator Dashboard</a></li>
-            <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i>Profile</a></li>
-  <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i> Undertaking Letters</a></li>
-<li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i> Completion Certificates</a></li>
-
-
-            
-            
-            <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
-                     
-
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i>Undertaking Letters</a></li>
+      <li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i>Completion Certificates</a></li>
+      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
     {% elif request.user.role == "trainer" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Trainer Dashboard</a></li>
-            <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i>Profile</a></li>
-
-      <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-check-circle"></i> Mark Attendance</a></li>
-      <li><a href="{% url 'upload_lesson' %}"><i class="fas fa-upload"></i> Upload Lesson</a></li>
-      <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i> Lessons</a></li>
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-check-circle"></i>Mark Attendance</a></li>
+      <li><a href="{% url 'upload_lesson' %}"><i class="fas fa-upload"></i>Upload Lesson</a></li>
+      <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
     {% elif request.user.role == "intern" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Intern Dashboard</a></li>
-            <li><a href="{% url 'profile' %}" class="active"><i class="fas fa-user"></i>Profile</a></li>
-
-      <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i> Lessons</a></li>
-      
-           
-      
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
     {% endif %}
   </ul>
 
@@ -320,68 +296,32 @@ body {
   const userSection = document.getElementById('userSection');
   const sidebarLinks = document.querySelectorAll('.sidebar ul li a');
 
-  // ---------------------------
-  // Sidebar toggle
-  // ---------------------------
-  toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  toggleBtn.addEventListener('click', () => { sidebar.classList.toggle('active'); });
+  closeBtn.addEventListener('click', () => { sidebar.classList.remove('active'); });
 
-  // Close sidebar
-  closeBtn.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-  });
-
-  // Close sidebar when clicking outside
   document.addEventListener('click', (e) => {
     if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && window.innerWidth <= 992) {
       sidebar.classList.remove('active');
     }
   });
 
-  // ---------------------------
-  // User dropdown
-  // ---------------------------
   userSection.addEventListener('click', (e) => {
     e.preventDefault();
     userSection.classList.toggle('active');
   });
+  document.addEventListener('click', (e) => { if (!userSection.contains(e.target)) { userSection.classList.remove('active'); } });
 
-  document.addEventListener('click', (e) => {
-    if (!userSection.contains(e.target)) {
-      userSection.classList.remove('active');
-    }
-  });
-
-  // ---------------------------
-  // Highlight active link
-  // ---------------------------
   const currentUrl = window.location.pathname;
   sidebarLinks.forEach(link => {
     const linkUrl = new URL(link.href).pathname;
-    if (linkUrl === currentUrl) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
+    if (linkUrl === currentUrl) { link.classList.add('active'); } else { link.classList.remove('active'); }
   });
 
-  // ---------------------------
-  // Persist sidebar scroll position
-  // ---------------------------
-  // Restore scroll position on page load
   document.addEventListener('DOMContentLoaded', () => {
     const savedScroll = sessionStorage.getItem('sidebarScroll');
-    if (savedScroll) {
-      sidebar.scrollTop = parseInt(savedScroll, 10);
-    }
+    if (savedScroll) { sidebar.scrollTop = parseInt(savedScroll, 10); }
   });
-
-  // Save scroll position whenever user scrolls sidebar
-  sidebar.addEventListener('scroll', () => {
-    sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
-  });
-
+  sidebar.addEventListener('scroll', () => { sessionStorage.setItem('sidebarScroll', sidebar.scrollTop); });
 </script>
 
 </body>
