@@ -57,8 +57,8 @@
 }
 
 .btn-yellow {
-    background-color: #10B981;
-    color: #fff;
+    background-color: #FBBF24;
+    color: #000;
 }
 
 .btn-yellow:hover {
@@ -85,6 +85,7 @@
     padding: 15px;
 }
 
+/* Full table grid with vertical lines */
 .custom-table {
     width: 100%;
     border-collapse: collapse;
@@ -94,7 +95,7 @@
 .custom-table th,
 .custom-table td {
     padding: 12px 14px;
-    border-bottom: 1px solid #eee;
+    border: 1px solid #eee; /* full grid */
     text-align: left;
     font-size: 14px;
     color: #333;
@@ -108,34 +109,7 @@
     font-size: 13px;
 }
 
-/* Actions Links */
-.custom-table td a {
-    margin-right: 6px;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.custom-table td a:hover {
-    text-decoration: underline;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .filter-box {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .main-content h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2b2b2b;
-    margin-bottom: 25px;
-    border-left:none;
-    padding-left: 10px;
-    text-align: center;
-}
-}
-/* Action Buttons */
+/* Actions Buttons */
 .action-btn {
     display: inline-block;
     padding: 5px 10px;
@@ -145,33 +119,57 @@
     color: #fff;
     text-decoration: none;
     transition: 0.2s ease;
-    margin-right: 4px;
+    margin: 2px 2px 2px 0;
+    white-space: nowrap;
 }
 
-.action-btn.view {
-    background-color: #10B981; /* Green */
+.action-btn.view { background-color: #10B981; }
+.action-btn.view:hover { background-color: #059669; }
+
+.action-btn.edit { background-color: #FBBF24; color: #000; }
+.action-btn.edit:hover { background-color: #f59e0b; }
+
+.action-btn.delete { background-color: #EF4444; }
+.action-btn.delete:hover { background-color: #b91c1c; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-box {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .main-content h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2b2b2b;
+        margin-bottom: 25px;
+        border-left:none;
+        padding-left: 10px;
+        text-align: center;
+    }
+
+    /* Stack action buttons vertically on mobile */
+    .custom-table td .action-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Internship Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    text-transform: capitalize;
+    color: #fff;
 }
 
-.action-btn.view:hover {
-    background-color: #059669;
-}
-
-.action-btn.edit {
-    background-color: #FBBF24; /* Yellow */
-    color: #000; /* dark text for readability */
-}
-
-.action-btn.edit:hover {
-    background-color: #f59e0b;
-}
-
-.action-btn.delete {
-    background-color: #EF4444; /* Red */
-}
-
-.action-btn.delete:hover {
-    background-color: #b91c1c;
-}
+.status-ongoing { color: #10B981; }   /* green */
+.status-completed { color: #FBBF24; color: #000; }  /* yellow */
+.status-dropped { color: #EF4444; }   /* red */
 
 </style>
 
@@ -189,12 +187,14 @@
         <input type="date" name="batch_end" value="{{ request.GET.batch_end }}">
 
         <label>Internship Status:</label>
-        <select name="internship_status">
-            <option value="">All</option>
-            <option value="Ongoing" {% if request.GET.internship_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
-            <option value="Completed" {% if request.GET.internship_status == 'Completed' %}selected{% endif %}>Completed</option>
-            <option value="Dropped" {% if request.GET.internship_status == 'Dropped' %}selected{% endif %}>Dropped</option>
-        </select>
+        <select name="internship_status"
+        class="{% if request.GET.internship_status == 'Ongoing' %}ongoing{% elif request.GET.internship_status == 'Completed' %}completed{% elif request.GET.internship_status == 'Dropped' %}dropped{% endif %}">
+    <option value="">All</option>
+    <option value="Ongoing" {% if request.GET.internship_status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+    <option value="Completed" {% if request.GET.internship_status == 'Completed' %}selected{% endif %}>Completed</option>
+    <option value="Dropped" {% if request.GET.internship_status == 'Dropped' %}selected{% endif %}>Dropped</option>
+</select>
+
 
         <button type="submit" class="btn-yellow">Search</button>
     </form>
@@ -223,13 +223,17 @@
                         <td>{{ intern.undertaking_generated|yesno:"Yes,No" }}</td>
                         <td>{{ intern.completion_certificate_generated|yesno:"Yes,No" }}</td>
                         <td>{{ intern.lor_generated|yesno:"Yes,No" }}</td>
-                        <td>{{ intern.internship_status }}</td>
-                       <td>
-    <a href="{% url 'intern_detail' intern.pk %}" class="action-btn view">View</a>
-    <a href="{% url 'intern_update' intern.pk %}" class="action-btn edit">Edit</a>
-    <a href="{% url 'intern_delete' intern.pk %}" class="action-btn delete">Delete</a>
+<td>
+    <span class="status-badge 
+        {% if intern.internship_status == 'Ongoing' %}status-ongoing{% elif intern.internship_status == 'Completed' %}status-completed{% elif intern.internship_status == 'Dropped' %}status-dropped{% endif %}">
+        {{ intern.internship_status }}
+    </span>
 </td>
-
+                        <td>
+                            <a href="{% url 'intern_detail' intern.pk %}" class="action-btn view">View</a>
+                            <a href="{% url 'intern_update' intern.pk %}" class="action-btn edit">Edit</a>
+                            <a href="{% url 'intern_delete' intern.pk %}" class="action-btn delete">Delete</a>
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>
