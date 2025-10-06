@@ -925,7 +925,7 @@ from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Attendance, Batch
-from datetime import datetime
+from datetime import datetime,date
 import calendar
 import openpyxl
 from xhtml2pdf import pisa
@@ -1029,12 +1029,14 @@ def attendance_report(request):
     # ---------- PDF Export ----------
     if export_type == 'pdf' and attendances.exists():
         template = get_template('attendance/attendance_report_pdf.html')
+        logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
         html = template.render({
             'attendances': attendances,
             'summary': summary,
             'batch': batch,
-            'selected_date': date_input or today,
-            'month_input': month_input
+            'selected_date': (date_input or today).strftime('%d-%m-%Y'),
+            'month_input': month_input,
+            'logo_path': logo_path,
         })
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'
