@@ -748,6 +748,32 @@ def trainer_profile_view(request, trainer_id):
 # LETTER OF RECOMMENDATION (LOR) VIEWS
 # ================================
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.http import HttpResponse
+from django.db.models import Q
+from datetime import date
+import io
+import zipfile
+from .models import InternProfile, Course, Batch
+from .forms import InternFilterForm
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+import io
+
+def render_to_pdf(template_path, context_dict):
+    """
+    Utility function to render HTML template to PDF
+    """
+    html = render_to_string(template_path, context_dict)
+    result = io.BytesIO()
+    pdf = pisa.CreatePDF(html, dest=result)
+    
+    if not pdf.err:
+        return result.getvalue()
+    return None 
+
 @login_required
 def manage_lor_view(request):
     """
@@ -758,13 +784,15 @@ def manage_lor_view(request):
         return redirect('dashboard')
 
     interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
+    courses = Course.objects.all()
+    batches = Batch.objects.all()
     
     filter_form = InternFilterForm(request.GET)
-    selected_batch = None # Initialize selected_batch
+    selected_batch = None
 
     if filter_form.is_valid():
         selected_course = filter_form.cleaned_data.get('course')
-        selected_batch = filter_form.cleaned_data.get('batch') # Get selected_batch from form
+        selected_batch = filter_form.cleaned_data.get('batch')
         query = filter_form.cleaned_data.get('q')
 
         if selected_course:
@@ -779,7 +807,6 @@ def manage_lor_view(request):
             )
 
     if request.method == 'POST':
-        # This POST logic for bulk downloads is now fully supported
         intern_ids = request.POST.getlist('intern_ids')
         if not intern_ids:
             messages.error(request, "Please select at least one intern.")
@@ -794,7 +821,22 @@ def manage_lor_view(request):
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
             for intern in selected_interns:
-                pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+                # Get logo path from settings
+                logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
+                
+                context = {
+                    'intern': intern,
+                    "company": {
+                        "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                        "cin": "U62099TS2023PTC179794",
+                        "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                        "phone": "+914049525396",
+                        "website": "www.vindusenvironment.com"
+                    },
+                    "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                    "logo_path": logo_path 
+                }
+                pdf_bytes = render_to_pdf('lors/lor_template.html', context)
                 if pdf_bytes:
                     filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
                     zf.writestr(filename, pdf_bytes)
@@ -806,28 +848,47 @@ def manage_lor_view(request):
         response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
         return response
 
-    # Add selected_batch to the context
     context = {
         'interns': interns_qs,
+        'courses': courses,
+        'batches': batches,
         'filter_form': filter_form,
-        'selected_batch': selected_batch, 
+        'selected_batch': selected_batch,
     }
     return render(request, 'lors/manage_lors.html', context)
 
+from datetime import datetime
 
 @login_required
 def download_lor_view(request, intern_id):
+    """
+    Download a Letter of Recommendation for a specific intern.
+    """
     intern = get_object_or_404(InternProfile, id=intern_id)
     if intern.internship_status != 'Completed':
         messages.error(request, "LOR not available for this intern yet.")
         return redirect('manage_lor')
-
-    pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+    logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
+    # Context matching the template requirements
+    context = {
+        'intern': intern,
+        'company': {
+            "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                        "cin": "U62099TS2023PTC179794",
+                        "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                        "phone": "+914049525396",
+                        "website": "www.vindusenvironment.com"
+        },
+        "today_date": date.today().strftime("%d-%m-%Y"),
+        "logo_path": logo_path 
+    }
+    
+    pdf_bytes = render_to_pdf('lors/lor_template.html', context)
     if pdf_bytes:
         intern.lor_generated = True
         intern.save()
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
-        filename = f"LOR_{intern.unique_id}.pdf"
+        filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
     messages.error(request, "Error generating LOR PDF.")

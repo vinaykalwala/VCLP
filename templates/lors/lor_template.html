@@ -1,161 +1,115 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Internship Completion Certificate</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        @page {
-            size: A4 portrait;
-            margin: 20mm;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 11pt;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 15px;
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            height: 60px; /* Adjust size as needed */
-            margin-right: 20px;
-        }
-        
-        .header-text {
-            text-align: left;
-        }
-
-        .company-name {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #d9534f; /* A shade of red to match the logo */
-            margin: 0;
-            letter-spacing: 1px;
-        }
-
-        .contact-info {
-            font-size: 8pt;
-            color: #555;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-
-        .certificate-title {
-            font-size: 22pt;
-            font-weight: bold;
-            text-align: left;
-            margin: 50px 0 30px 0;
-        }
-        
-        .date {
-            text-align: left;
-            margin-bottom: 30px;
-            font-size: 11pt;
-        }
-
-        .content {
-            text-align: left;
-        }
-        
-        .content p {
-            margin: 1em 0;
-        }
-
-        .signature-block {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-
-        .signature-block p {
-            margin: 0;
-            line-height: 1.5;
-        }
-        
-        .footer-contact {
-            margin-top: 20px;
-            font-size: 10pt;
-        }
-        .footer-contact a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .footer-contact span {
-            margin-right: 20px;
-        }
-        .footer-contact i {
-            margin-right: 5px;
-        }
-
-    </style>
+  <meta charset="UTF-8">
+  <title>Letter of Recommendation</title>
+  <style>
+    @page { size: A4 portrait; margin: 2cm; }
+    html, body { margin:0; padding:0; font-family: Arial, sans-serif; color:#222; }
+    h1, h2, h3, h4, h5, h6 { margin:0; padding:0; }
+    .paragraph { margin:10px 0; font-size:12.5px; line-height:1.45; }
+    ul.simple, ol.terms { font-size:12.5px; margin:6px 0; padding-left:18px; }
+    table { border-collapse:collapse; }
+    .center { text-align:center; }
+  </style>
 </head>
 <body>
+  <div class="container">
 
-    <div class="header">
-        <img src="https://i.imgur.com/your-logo-image.png" alt="Company Logo" class="logo">
-        <div class="header-text">
-            <p class="company-name">VINDUS ENVIRONMENT PRIVATE LIMITED</p>
-            <p class="contact-info">
-                CIN NO: U62099TS2023PTC179794 | Adress #9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060<br>
-                Phone No: +914049525396 | WebSite: www.vindusenvironment.com
-            </p>
-        </div>
+    <!-- Header with Logo and Company Info -->
+    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:6px;">
+      <tr>
+        <td class="center" style="vertical-align:middle;">
+          <img src="{{ logo_path }}" alt="Company Logo" style="height:60px; vertical-align:middle; margin-right:10px;">
+          <h1 style="font-size:20px; display:inline-block; vertical-align:middle; color:#660B05;">
+            {{ company.name }}
+          </h1>
+        </td>
+      </tr>
+      <tr>
+        <td class="center" style="font-size:11px; padding-top:6px; color:#333;">
+          CIN: {{ company.cin }} | Address: {{ company.address }}
+        </td>
+      </tr>
+      <tr>
+        <td class="center" style="font-size:11px; padding-top:2px; color:#333;">
+          Phone: {{ company.phone }} | Website: {{ company.website }}
+        </td>
+      </tr>
+    </table>
+
+    <!-- Divider Line -->
+    <hr style="border:0; border-top:1px solid #333; margin:8px 0;">
+
+    <!-- Letter Title & Date -->
+    <div class="center" style="margin-bottom:15px;">
+      <p style="font-size:13px; font-weight:bold; margin:0;">Letter of Recommendation</p>
+      <p style="font-size:12px; margin:0;">Date: {{ today_date }}</p>
     </div>
 
-    <h1 class="certificate-title">Internship Completion Certificate</h1>
-    
-    <p class="date"><strong>Date:</strong> {{ today_date|date:"F d, Y" }}</p>
+    <!-- Greeting -->
+    <p style="font-size:13px;">To Whom It May Concern,</p>
 
-    <div class="content">
-        <p>
-            This is to certify that <strong>{{ intern.user.get_full_name }}</strong>, 
-            son/daughter of <strong>{{ intern.guardian_name }}</strong>, has successfully completed
-            the Vindus Career Launch Paid Internship Program conducted by Vindus Environment Private
-            Limited.
-        </p>
-        
-        <p>
-            The internship was held online from <strong>{{ intern.batch.start_date|date:"F d, Y" }}</strong> 
-            to <strong>{{ intern.batch.end_date|date:"F d, Y" }}</strong>, under the guidance
-            of <strong>{{ intern.batch.trainer.user.get_full_name }}</strong>.
-        </p>
+    <!-- Introduction -->
+    <p class="paragraph">
+      This is to certify that <strong>{{ intern.user.get_full_name }}</strong> (Intern ID: <strong>{{ intern.unique_id }}</strong>) 
+      has successfully completed the <strong>{{ intern.batch.course.name }}</strong> Internship Program 
+      at <strong>{{ company.name }}</strong> in the batch <strong>{{ intern.batch.name }}</strong>.
+    </p>
 
-        <p>
-            During this period, {{ intern.user.get_full_name }} has demonstrated dedication, discipline, and a keen interest in
-            learning {{ intern.batch.course.name }}. {% if intern.gender == 'Male' %}He{% else %}She{% endif %} has actively participated in live sessions, completed assignments,
-            and contributed to real-time projects assigned as part of the internship.
-        </p>
+    <!-- Internship Details -->
+    <h4 style="font-size:14px; margin-top:12px;">Internship Details</h4>
+    <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-size:12.5px;">
+      <tr><td style="width:25%;"><strong>Mode:</strong></td><td style="width:75%;">Online</td></tr>
+      <tr><td><strong>Duration:</strong></td><td>3 months</td></tr>
+      <tr><td><strong>Start Date:</strong></td><td>{{ intern.batch.start_date|date:"Y-m-d" }}</td></tr>
+      <tr><td><strong>End Date:</strong></td><td>{{ intern.batch.end_date|date:"Y-m-d" }}</td></tr>
+      <tr><td><strong>Role:</strong></td><td>Intern</td></tr>
+      <tr><td><strong>Course:</strong></td><td>{{ intern.batch.course.name }}</td></tr>
+      <tr><td><strong>Batch:</strong></td><td>{{ intern.batch.name }}</td></tr>
+      <tr><td><strong>Trainer:</strong></td><td>{{ intern.batch.trainer_name }}</td></tr>
+      <tr><td><strong>Working Days:</strong></td><td>Monday to Friday</td></tr>
+      <tr><td><strong>Timings:</strong></td><td>{{ intern.batch.timings }}</td></tr>
+    </table>
 
-        <p>
-            We hereby acknowledge the successful completion of the internship and appreciate {{ intern.user.get_full_name }}'s
-            efforts and performance throughout the program.
-        </p>
+    <!-- Performance & Feedback -->
+    <h4 style="font-size:14px; margin-top:12px;">Performance Summary</h4>
+    <p class="paragraph">
+      During the internship, {{ intern.user.get_full_name }} displayed exceptional dedication, professionalism, and a strong willingness to learn. 
+      They effectively contributed to projects involving <strong>{{ intern.batch.course.description }}</strong>, 
+      showing great enthusiasm and a proactive approach in completing assigned tasks.
+    </p>
 
-        <p>
-            We wish {% if intern.gender == 'Male' %}him{% else %}her{% endif %} all the best in future professional endeavors.
-        </p>
-    </div>
+    <!-- Recommendation -->
+    <p class="paragraph">
+      Based on their performance and commitment, we confidently recommend {{ intern.user.get_full_name }} 
+      for any future roles or opportunities that align with their skills and career goals.
+    </p>
 
-    <div class="signature-block">
-        <p><strong>Authorized Signatory</strong></p>
-        <p>Vinay Kalvala</p>
-        <p>Managing Director</p>
-        <p>Vindus Environment Private Limited</p>
-        
-        <div class="footer-contact">
-            <span><i class="fas fa-phone-alt"></i> +914049525396</span>
-            <span><i class="fas fa-globe"></i> <a href="http://www.vindusenvironment.com">www.vindusenvironment.com</a></span>
-        </div>
-    </div>
+    <!-- Closing -->
+    <p class="paragraph">
+      We wish {{ intern.user.get_full_name }} all the very best for their future endeavors.
+    </p>
+    <p style="font-size:13px;">Regards,</p>
 
+    <!-- Signatures -->
+    <table width="100%" style="margin-top:20px;">
+      <tr>
+        <td style="width:50%; text-align:left;">
+          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>{{ intern.batch.trainer_name }}</strong></div>
+          <div style="font-size:11px; color:#444;">Trainer, {{ intern.batch.course.name }}</div>
+          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+        </td>
+        <td style="width:50%; text-align:right;">
+          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>Authorized Signatory</strong></div>
+          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+        </td>
+      </tr>
+    </table>
+
+  </div>
 </body>
 </html>
