@@ -1,12 +1,216 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% block title %}Curriculum Form{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ title }}</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{% url 'curriculum_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+{% load static %}
+
+<style>
+/* === Global Reset & Base === */
+* { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; padding: 0; }
+
+/* === Form Container === */
+.curriculum-form-container {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* === Card === */
+.curriculum-card {
+    width: 100%;
+    max-width: 800px; /* Increased width */
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 45px 35px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.curriculum-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.12);
+}
+
+/* === Header with Background === */
+.curriculum-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    background-color: #5932EA; /* Header background */
+    padding: 15px 20px;
+    border-radius: 12px;
+    color: white;
+}
+.curriculum-card-header i {
+    font-size: 32px;
+}
+.curriculum-card-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* === Form Fields === */
+.curriculum-card form p {
+    position: relative;
+    margin-bottom: 22px;
+    width: 100%;
+}
+
+/* Inputs, Selects, Textareas */
+.curriculum-card form input,
+.curriculum-card form select,
+.curriculum-card form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fafafa;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.curriculum-card form input:focus,
+.curriculum-card form select:focus,
+.curriculum-card form textarea:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 12px rgba(89,50,234,0.15);
+    outline: none;
+}
+
+/* Labels */
+.curriculum-card form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* File Input Wrapper */
+.file-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: #f3f4f6;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+.file-wrapper span {
+    flex: 1 1 auto;
+    word-break: break-word;
+    font-size: 14px;
+    color: #555;
+}
+
+/* === Buttons === */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+.btn-save {
+    background: #5932EA;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 130px;
+}
+.btn-save:hover {
+    background: #4c28d1;
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 130px;
+}
+.btn-cancel:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 480px) {
+    .curriculum-card {
+        padding: 30px 20px;
+    }
+    .curriculum-card-header h2 {
+        font-size: 22px;
+    }
+    .curriculum-card-header i {
+        font-size: 28px;
+    }
+    .curriculum-card form p {
+        margin-bottom: 16px;
+    }
+    .form-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .btn-save, .btn-cancel {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="curriculum-form-container">
+        <div class="curriculum-card">
+            <div class="curriculum-card-header">
+                <i class="fas fa-book-open"></i>
+                <h2>{{ title }}</h2>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <p>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                    {% if field|slice:"-4" == "file" %}
+                        <div class="file-wrapper">
+                            {{ field }}
+                            <span>
+                                {% if field.value %}{{ field.value.name|slice:"-30:" }}{% else %}No file chosen{% endif %}
+                            </span>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <span style="color:red; font-size:12px;">{{ field.errors }}</span>
+                    {% endif %}
+                </p>
+                {% endfor %}
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save">Save</button>
+                    <a href="{% url 'curriculum_list' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

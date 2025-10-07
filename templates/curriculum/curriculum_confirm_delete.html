@@ -1,11 +1,173 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% block title %}Delete Confirmation{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h3>Are you sure you want to delete <strong>{{ curriculum.title }}</strong>?</h3>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'curriculum_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+{% load static %}
+
+<style>
+/* === Elegant Modern Delete Box === */
+.unique-delete-wrapper {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Main container */
+.unique-delete-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 50px 35px 40px;
+    width: 90%;
+    max-width: 430px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.unique-delete-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.12);
+}
+
+/* Warning Icon Circle */
+.delete-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg, #ffe1e1, #ffd0d0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -90px auto 20px;
+    box-shadow: 0 5px 15px rgba(255, 80, 80, 0.25);
+    position: relative;
+}
+.delete-icon-circle::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 0, 0, 0.15);
+}
+.delete-icon {
+    color: #ff3b3b;
+    font-size: 36px;
+}
+
+/* Heading */
+.unique-delete-box h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+/* Description */
+.unique-delete-box p {
+    color: #444;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+.unique-delete-box strong {
+    color: #ff3b3b;
+    font-weight: 600;
+}
+
+/* Buttons container */
+.unique-delete-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+/* Delete button */
+.unique-delete-btn {
+    background: linear-gradient(135deg, #ff4b4b, #e60023);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(255, 77, 77, 0.3);
+}
+.unique-delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(255, 77, 77, 0.45);
+}
+
+/* Cancel button */
+.unique-cancel-btn {
+    background: #f7f7f7;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+.unique-cancel-btn:hover {
+    background: #eee;
+    transform: translateY(-2px);
+}
+
+/* Subtle animation for icon */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 80, 80, 0.3); }
+    70% { box-shadow: 0 0 0 12px rgba(255, 80, 80, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 80, 80, 0); }
+}
+.delete-icon-circle {
+    animation: pulseGlow 2s infinite;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .unique-delete-box {
+        padding: 40px 25px;
+    }
+    .unique-delete-box h2 {
+        font-size: 20px;
+    }
+    .unique-delete-box p {
+        font-size: 14px;
+    }
+    .unique-delete-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="unique-delete-wrapper">
+        <div class="unique-delete-box">
+            <div class="delete-icon-circle">
+                <i class="delete-icon fas fa-exclamation-triangle"></i>
+            </div>
+
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete the curriculum:  
+                <strong>{{ curriculum.title }}</strong>?</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="unique-delete-buttons">
+                    <button type="submit" class="unique-delete-btn">Yes, Delete</button>
+                    <a href="{% url 'curriculum_list' %}" class="unique-cancel-btn">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Font Awesome for icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 {% endblock %}
