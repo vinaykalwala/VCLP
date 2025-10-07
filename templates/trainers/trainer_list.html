@@ -9,9 +9,9 @@
         <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
         <select name="availability">
             <option value="">All Availability</option>
-            <option value="Full-time" {% if request.GET.availability=='Full-time' %}selected{% endif %}>Full-time</option>
-            <option value="Part-time" {% if request.GET.availability=='Part-time' %}selected{% endif %}>Part-time</option>
-            <option value="Guest" {% if request.GET.availability=='Guest' %}selected{% endif %}>Guest</option>
+            <option value="Full-time" {% if request.GET.availability == 'Full-time' %}selected{% endif %}>Full-time</option>
+            <option value="Part-time" {% if request.GET.availability == 'Part-time' %}selected{% endif %}>Part-time</option>
+            <option value="Guest" {% if request.GET.availability == 'Guest' %}selected{% endif %}>Guest</option>
         </select>
         <button class="btn btn-secondary" type="submit">Filter</button>
     </form>
