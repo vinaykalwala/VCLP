@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Resolve Doubt</h2>
+
+    <div class="card p-4 mb-4 shadow-sm">
+        <h5><strong>Question:</strong></h5>
+        <p style="white-space: pre-wrap;">{{ doubt.question }}</p>
+        <p><strong>Intern:</strong> {{ doubt.intern.user.username }} | <strong>Batch:</strong> {{ doubt.batch.name }}</p>
+        <p><strong>Assigned Trainer:</strong> {{ doubt.trainer.user.username }}</p>
+        <p><strong>Created At:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <h5 class="mb-3">Write Your Resolution</h5>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Submit Resolution</button>
+            <a href="{% url 'doubt_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

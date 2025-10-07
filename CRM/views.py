@@ -1431,6 +1431,8 @@ def doubt_create(request):
         form = DoubtForm(trainers_qs=trainers)
 
     return render(request, 'doubts/doubt_form.html', {'form': form, 'title': 'Ask Doubt'})
+
+
 @login_required
 def resolve_doubt(request, pk):
     """Trainer resolves a doubt"""
