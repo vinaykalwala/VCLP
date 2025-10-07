@@ -1,56 +1,227 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">All Doubts Overview</h2>
 
-    {% if doubts %}
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Intern</th>
-                    <th>Batch</th>
-                    <th>Trainer</th>
-                    <th>Question</th>
-                    <th>Created On</th>
-                    <th>Status</th>
-                    <th>Resolution</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for doubt in doubts %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ doubt.intern.user.username }}</td>
-                        <td>{{ doubt.batch.name }}</td>
-                        <td>{{ doubt.trainer.user.username }}</td>
-                        <td style="white-space: pre-wrap;">{{ doubt.question }}</td>
-                        <td>{{ doubt.created_at|date:"d M Y, H:i" }}</td>
-                        <td>
-                            {% if doubt.resolved %}
-                                <span class="badge bg-success">Resolved</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if doubt.resolved %}
-                                <div class="alert alert-success p-2 mb-0">
-                                    <strong>{{ doubt.resolution.answer }}</strong><br>
-                                    <small>Resolved at: {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
-                                </div>
-                            {% else %}
-                                <em>No resolution yet</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="alert alert-info text-center">
-            No doubts found in the system.
+<style>
+
+.page-title-wrapper {
+    display: flex;
+    justify-content: center; /* centers horizontally */
+    margin-bottom: 20px;
+}
+
+/* The title itself */
+.page-title {
+    background-color: #5932EA;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: fit-content;
+    font-size: 25px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .page-title {
+        padding: 10px 15px;
+        font-size: 1.1rem;
+    }
+} 
+.table thead th {
+    background-color: #5932EA !important;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.95rem;
+    padding: 10px 8px;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 8px;
+    word-wrap: break-word;
+}
+
+/* Alignments */
+.table tbody td:first-child,
+.table tbody td:nth-child(6),
+.table tbody td:nth-child(7) {
+    text-align: center; /* counter, date, status */
+}
+
+.table tbody td:nth-child(2),
+.table tbody td:nth-child(3),
+.table tbody td:nth-child(4),
+.table tbody td:nth-child(5) {
+    text-align: left; /* intern, batch, trainer, question */
+}
+
+/* Striped Rows */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+/* Table Borders */
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+/* Status Badges */
+.badge-success, .badge-warning {
+    font-weight: 500;
+    padding: 0.4em 0.6em;
+    font-size: 0.85rem;
+}
+
+/* Resolution Box */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    font-size: 0.85rem;
+    padding: 6px 8px;
+    margin-bottom: 0;
+    border-radius: 5px;
+}
+
+/* Responsive Table */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Page Header */
+h2 {
+    color: #5932EA;
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ===== Media Queries for Smaller Screens ===== */
+@media (max-width: 1200px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.85rem;
+        padding: 6px 5px;
+    }
+
+    h2 {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.8rem;
+        padding: 5px 4px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.75rem;
+        padding: 4px 3px;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .table thead th,
+    .table tbody td {
+        font-size: 0.7rem;
+        padding: 3px 2px;
+    }
+
+    h2 {
+        font-size: 1.1rem;
+    }
+
+    /* On very small screens, align all text left except counter, status, and date */
+    .table tbody td {
+        text-align: left;
+    }
+
+    .table tbody td:first-child,
+    .table tbody td:nth-child(6),
+    .table tbody td:nth-child(7) {
+        text-align: center;
+    }
+}
+</style>
+<div class="main-content">
+    <div class="container">
+        <div class="page-title-wrapper">
+            <h2 class="page-title">All Doubts Overview</h2>
         </div>
-    {% endif %}
+
+        {% if doubts %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Intern</th>
+                            <th>Batch</th>
+                            <th>Trainer</th>
+                            <th>Question</th>
+                            <th>Created On</th>
+                            <th>Status</th>
+                            <th>Resolution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doubt in doubts %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ doubt.intern.user.username }}</td>
+                                <td>{{ doubt.batch.name }}</td>
+                                <td>{{ doubt.trainer.user.username }}</td>
+                                <td style="white-space: pre-wrap;">{{ doubt.question }}</td>
+                                <td>{{ doubt.created_at|date:"d M Y, H:i" }}</td>
+                                <td>
+                                    {% if doubt.resolved %}
+                                        <span class="badge bg-success">Resolved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if doubt.resolved %}
+                                        <div class="alert alert-success p-2 mb-0">
+                                            <strong>{{ doubt.resolution.answer }}</strong><br>
+                                            <small>Resolved at: {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+                                        </div>
+                                    {% else %}
+                                        <em>No resolution yet</em>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                No doubts found in the system.
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
