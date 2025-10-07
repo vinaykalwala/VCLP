@@ -1,143 +1,1663 @@
-
 {% extends 'base.html' %}
-{% block title %}Home{% endblock %}
+{% block title %}Home - Vindus Career Launch Program{% endblock %}
 {% block content %}
 {% load static %}
-    <h1>Welcome to VCLPCrm</h1>
-    <p>This is the home page.</p>
-    <p>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <h1 class="hero-title" style="color:white;">Empowering Tomorrow's Professionals Today</h1>
+      <p class="hero-description">The Vindus Career Launch Program provides structured, mentor-led learning designed to help students and graduates gain real-world skills, project experience, and career confidence.</p>
+      <div class="hero-buttons">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0Q9aBoHLdwAkpaCH1RNdo3DQKOQzfxGVGKChm4PjLMHtzUw/viewform?usp=preview" target="_blank" class="btn-primary">Apply Now</a>
+        <a href="mailto:info.vindus@gmail.com" class="btn-secondary">Know More</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll Down</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- About Section with Corporate Design -->
+<section id="about" class="corporate-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">About Us</div>
+      <h2 class="section-title">Vindus Career Launch Program</h2>
+      <div class="section-subtitle">
+        Bridging the gap between education and employability through industry-aligned training
+      </div>
+    </div>
+    <div class="about-content">
+      <div class="about-text">
+        <p>
+          The Vindus Career Launch Program is a professional training and internship initiative focused on bridging the gap between education and employability. 
+          We deliver a blended model of learning that combines academic foundations with practical exposure to industry projects, ensuring every participant is ready for the demands of modern workplaces.
+        </p>
+        <div class="value-propositions">
+          <div class="value-item">
+            <div class="value-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 15L12 18M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="value-content">
+              <h4>Industry-Ready Curriculum</h4>
+              <p>Courses designed with direct input from industry leaders</p>
+            </div>
+          </div>
+          <div class="value-item">
+            <div class="value-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88M13 7C13 9.20914 11.2091 11 9 11C6.79086 11 5 9.20914 5 7C5 4.79086 6.79086 3 9 3C11.2091 3 13 4.79086 13 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="value-content">
+              <h4>Expert Mentorship</h4>
+              <p>Learn from professionals with 10+ years of industry experience</p>
+            </div>
+          </div>
+        </div>
+      </div>
+<div class="about-visual">
+  <div class="floating-cards-container">
+    <div class="floating-card card-1">
+      <div class="card-icon">📘</div>
+      <h4>Comprehensive Learning</h4>
+      <p>Structured curriculum with practical applications</p>
+    </div>
+    <div class="floating-card card-2">
+      <div class="card-icon">🛠️</div>
+      <h4>Hands-on Projects</h4>
+      <p>Real-world project experience</p>
+    </div>
+    <div class="floating-card card-3">
+      <div class="card-icon">📜</div>
+      <h4>Certification</h4>
+      <p>Industry-recognized credentials</p>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- Programs Section -->
+<section id="programs" class="corporate-section programs-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Our Programs</div>
+      <h2 class="section-title">Specialized Career Tracks</h2>
+      <div class="section-subtitle">
+        Choose from our industry-focused programs designed for high-demand roles
+      </div>
+    </div>
+    <div class="programs-grid">
+      <div class="program-card">
+        <div class="program-header">
+          <div class="program-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="program-duration">3 Months</div>
+        </div>
+        <h3>Full Stack Web Development</h3>
+        <p>Master end-to-end application development with modern frameworks and technologies including Python, Java, and MERN stack.</p>
+        <div class="program-features">
+          <span class="feature-tag">Frontend Development</span>
+          <span class="feature-tag">Backend Systems</span>
+          <span class="feature-tag">Database Design</span>
+          <span class="feature-tag">Deployment</span>
+        </div>
+        <div class="program-cta">
+          <a href="mailto:info.vindus@gmail.com" class="program-link">
+            <span>Know more</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      
+      <div class="program-card">
+        <div class="program-header">
+          <div class="program-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M21 16V8.00002C20.9996 7.6493 20.9071 7.30483 20.7315 7.00119C20.556 6.69754 20.3037 6.44539 20 6.27002L13 2.27002C12.696 2.09449 12.3511 2.00208 12 2.00208C11.6489 2.00208 11.304 2.09449 11 2.27002L4 6.27002C3.69626 6.44539 3.44398 6.69754 3.26846 7.00119C3.09294 7.30483 3.00036 7.6493 3 8.00002V16C3.00036 16.3508 3.09294 16.6952 3.26846 16.9989C3.44398 17.3025 3.69626 17.5547 4 17.73L11 21.73C11.304 21.9056 11.6489 21.998 12 21.998C12.3511 21.998 12.696 21.9056 13 21.73L20 17.73C20.3037 17.5547 20.556 17.3025 20.7315 16.9989C20.9071 16.6952 20.9996 16.3508 21 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3.27002 6.96002L12 12L20.73 6.96002" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 22.08V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="program-duration">3 Months</div>
+        </div>
+        <h3>Data Science & Machine Learning</h3>
+        <p>Develop expertise in data analysis, visualization, and predictive modeling using Python, R, and advanced ML algorithms.</p>
+        <div class="program-features">
+          <span class="feature-tag">Data Analysis</span>
+          <span class="feature-tag">Machine Learning</span>
+          <span class="feature-tag">Statistical Modeling</span>
+          <span class="feature-tag">Data Visualization</span>
+        </div>
+        <div class="program-cta">
+          <a href="mailto:info.vindus@gmail.com" class="program-link">
+            <span>Know more</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Internship Section -->
+<section class="corporate-section internship-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Internship Program</div>
+      <h2 class="section-title">Real-World Experience</h2>
+      <div class="section-subtitle">
+        Integrated internship component with industry projects and professional mentorship
+      </div>
+    </div>
+    <div class="internship-features">
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-number">01</div>
+          <h4>Client Projects</h4>
+          <p>Work on real-time projects with actual business requirements and deliverables</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-number">02</div>
+          <h4>Progress Tracking</h4>
+          <p>Daily monitoring and evaluation through our advanced Learning Management System</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-number">03</div>
+          <h4>Learning Resources</h4>
+          <p>Access to recorded sessions, study materials, and industry case studies</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-number">04</div>
+          <h4>Expert Mentorship</h4>
+          <p>One-on-one guidance from industry professionals with specialized expertise</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-number">05</div>
+          <h4>Certification</h4>
+          <p>Receive internship certificates and professional recommendation letters</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LMS Section -->
+<section class="corporate-section lms-section">
+  <div class="container">
+    <div class="lms-content">
+      <div class="lms-text">
+        <div class="section-label">Learning Platform</div>
+        <h2 class="section-title">Advanced Learning Management System</h2>
+        <p>Our proprietary LMS provides a seamless learning experience with enterprise-grade features designed for professional development.</p>
+        <div class="lms-features">
+          <div class="lms-feature">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Streamlined course management</span>
+          </div>
+          <div class="lms-feature">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Attendance and performance tracking</span>
+          </div>
+          <div class="lms-feature">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Assignment and assessment submissions</span>
+          </div>
+          <div class="lms-feature">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Integrated doubt resolution system</span>
+          </div>
+        </div>
+      </div>
+      <div class="lms-visual">
+        <div class="dashboard-preview">
+          <div class="dashboard-header">
+            <div class="window-controls">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="dashboard-content">
+            <div class="sidebar">
+              <div class="menu-item active">Dashboard</div>
+              <div class="menu-item">Courses</div>
+              <div class="menu-item">Assignments</div>
+              <div class="menu-item">Progress</div>
+            </div>
+            <div class="main-content">
+              <div class="content-header">My Learning Dashboard</div>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-value">85%</div>
+                  <div class="stat-label">Completion</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">12</div>
+                  <div class="stat-label">Assignments</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Career Development Section -->
+<section class="corporate-section career-section">
+  <div class="container career-container">
+    
+    <!-- Left: Image -->
+    <div class="career-image">
+      <img src="{% static 'images/career.png' %}" alt="Career Growth" />
+    </div>
+    
+    <!-- Right: Content -->
+    <div class="career-content">
+      <div class="section-header">
+        <div class="section-label">Career Support</div>
+        <h2 class="section-title">Comprehensive Career Development</h2>
+        <div class="section-subtitle">
+          We provide end-to-end career support to ensure your professional success
+        </div>
+      </div>
+
+      <div class="career-path">
+        <div class="path-step">
+          <div class="step-indicator">
+            <div class="step-number">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h4>Portfolio Development</h4>
+            <p>Build an impressive portfolio with real-world projects that showcase your skills to employers</p>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="step-indicator">
+            <div class="step-number">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h4>Resume Building</h4>
+            <p>Create professional resumes optimized for applicant tracking systems and recruiter attention</p>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="step-indicator">
+            <div class="step-number">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h4>Interview Preparation</h4>
+            <p>Master technical interviews with mock sessions, coding challenges, and behavioral questions</p>
+          </div>
+        </div>
+        <div class="path-step">
+          <div class="step-indicator">
+            <div class="step-number">4</div>
+          </div>
+          <div class="step-content">
+            <h4>Placement Assistance</h4>
+            <p>Get referral opportunities and direct introductions to our hiring partner network</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- CTA Section -->
+<section class="corporate-cta">
+  <div class="container">
+    <div class="cta-content">
+      <h2>Ready to Launch Your Career?</h2>
+      <p>Join hundreds of successful professionals who transformed their careers with Vindus</p>
+      <div class="cta-buttons">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0Q9aBoHLdwAkpaCH1RNdo3DQKOQzfxGVGKChm4PjLMHtzUw/viewform?usp=preview" target="_blank" class="cta-button primary">
+          <span>Apply Now</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="mailto:info.vindus@gmail.com" class="cta-button secondary">
+          <span>Contact Admissions</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* CSS Variables for consistent theming */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --secondary: #0f172a;
+  --accent: #06b6d4;
+  --accent-dark: #0891b2;
+  --light: #f8fafc;
+  --dark: white;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  color: var(--gray-700);
+  line-height: 1.6;
+  background: white;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--gray-900);
+}
+
+/* Hero Section */
+.hero {
+  height: 80vh;
+  background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(94, 77, 85, 0.8)), 
+              url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 900px;
+  padding: 0 20px;
+  z-index: 2;
+  position: relative;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  line-height: 1.2;
+  animation: fadeInUp 1s ease;
+}
+
+.hero-description {
+  {% comment %} font-size: 1.3rem; {% endcomment %}
+  margin-bottom: 40px;
+  opacity: 0.9;
+  animation: fadeInUp 1s ease 0.2s both;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  animation: fadeInUp 1s ease 0.4s both;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 15px 35px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #f72585;
+  color: white;
+  box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+  border: 2px solid #e11570;
+}
+
+.btn-primary:hover {
+  background: #e11570;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(247, 37, 133, 0.5);
+}
+
+.btn-secondary {
+  background: #4361ee;
+  color: white;
+  border: 2px solid #3a56d4;
+}
+
+.btn-secondary:hover {
+  background: #3a56d4;
+  transform: translateY(-3px);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: bounce 2s infinite;
+}
+
+.scroll-arrow {
+  width: 20px;
+  height: 20px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(45deg);
+}
+
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  40% {
+    transform: translateY(-10px) translateX(-50%);
+  }
+  60% {
+    transform: translateY(-5px) translateX(-50%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 768px) {
+  .scroll-indicator {
+    display: none;
+  }
+}
+
+/* Section Styles */
+.corporate-section {
+  padding: 30px 0;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 20px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: var(--gray-900);
+}
+
+.section-subtitle {
+  font-size: 1.125rem;
+  color: var(--gray-600);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* About Section */
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.about-text p {
+  font-size: 1.125rem;
+  margin-bottom: 40px;
+  color: var(--gray-600);
+}
+
+.value-propositions {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.value-item {
+  display: flex;
+  gap: 16px;
+}
+
+.value-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.value-content h4 {
+  font-size: 1.125rem;
+  margin-bottom: 8px;
+}
+
+.value-content p {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--gray-600);
+}
+
+.about-visual {
+  position: relative;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.floating-card {
+  position: absolute;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  width: 240px;
+  transition: transform 0.3s ease;
+  border: 1px solid var(--gray-200);
+}
+
+.floating-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-1 {
+  top: 0;
+  left: 0;
+  z-index: 3;
+}
+
+.card-2 {
+  top: 120px;
+  right: 0;
+  z-index: 2;
+}
+
+.card-3 {
+  bottom: 0;
+  left: 60px;
+  z-index: 1;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.floating-card h4 {
+  font-size: 1.125rem;
+  margin-bottom: 8px;
+}
+
+.floating-card p {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Responsive Design for About Visual */
+@media (max-width: 1024px) {
+  .about-visual {
+    height: 350px;
+  }
+  
+  .floating-card {
+    width: 220px;
+    padding: 20px;
+  }
+  
+  .card-2 {
+    top: 100px;
+  }
+  
+  .card-3 {
+    left: 325px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-visual {
+    height: 300px;
+    margin: 0 auto;
+    max-width: 500px;
+  }
+  
+  .floating-card {
+    width: 200px;
+    padding: 16px;
+    position: relative;
+    margin: 10px;
+  }
+  
+  /* Reset absolute positioning for tablet */
+  .card-1,
+  .card-2,
+  .card-3 {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    z-index: 1;
+  }
+  
+  .card-icon {
+    font-size: 1.75rem;
+  }
+  
+  .floating-card h4 {
+    font-size: 1rem;
+  }
+  
+  .floating-card p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-visual {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+  }
+  
+  .floating-card {
+    width: 100%;
+    max-width: 280px;
+    position: relative;
+    transform: none !important;
+    text-align: center;
+  }
+  
+  .floating-card:hover {
+    transform: translateY(-3px) !important;
+  }
+  
+  /* Remove all absolute positioning for mobile */
+  .card-1,
+  .card-2,
+  .card-3 {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 0 auto;
+  }
+}
+
+/* Alternative Stack Layout for Smaller Screens */
+@media (max-width: 375px) {
+  .about-visual {
+    gap: 15px;
+  }
+  
+  .floating-card {
+    padding: 20px 16px;
+    width: 100%;
+  }
+  
+  .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .floating-card h4 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+  
+  .floating-card p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Ensure smooth transitions */
+.floating-card {
+  transition: all 0.3s ease;
+}
+
+/* Add animation for mobile layout change */
+@media (max-width: 768px) {
+  .about-visual {
+    transition: all 0.3s ease;
+  }
+}
+.floating-cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .floating-cards-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .about-visual {
+    height: auto;
+  }
+}
+
+/* Programs Section */
+.programs-section {
+  background: var(--gray-100);
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 30px;
+}
+
+.program-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  border: 1px solid var(--gray-200);
+}
+
+.program-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+
+.program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.program-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.program-duration {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(37, 99, 235, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.program-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+}
+
+.program-card p {
+  color: var(--gray-600);
+  margin-bottom: 24px;
+}
+
+.program-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.feature-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border-radius: 20px;
+}
+
+.program-cta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.program-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.program-link:hover {
+  gap: 12px;
+  color: var(--primary-dark);
+}
+
+/* Internship Section */
+.internship-section {
+  background: white;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.feature-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--gray-200);
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.feature-card h4 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.feature-card p {
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* LMS Section */
+.lms-section {
+  background: var(--gray-100);
+}
+
+.lms-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.lms-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.lms-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lms-feature svg {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.lms-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-preview {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.dashboard-header {
+  background: var(--gray-800);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gray-500);
+}
+
+.dashboard-content {
+  display: flex;
+  height: 250px;
+}
+
+.sidebar {
+  width: 120px;
+  background: var(--gray-100);
+  padding: 16px 0;
+}
+
+.menu-item {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  border-left: 3px solid transparent;
+}
+
+.menu-item.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.main-content {
+  flex: 1;
+  padding: 16px;
+}
+
+.content-header {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--gray-800);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--gray-600);
+}
+/* LMS Section Responsive for < 370px */
+@media (max-width: 370px) {
+  .lms-section {
+    padding: 40px 0;
+  }
+  
+  .lms-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .lms-visual {
+    justify-content: flex-start;
+    margin: 0 -16px;
+  }
+  
+  .dashboard-preview {
+    max-width: 100%;
+    width: 100%;
+    border-radius: var(--radius);
+    margin: 0;
+    transform: scale(0.95);
+  }
+  
+  .dashboard-header {
+    padding: 10px 12px;
+  }
+  
+  .window-controls span {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .dashboard-content {
+    height: 200px;
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .menu-item {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    text-align: center;
+    flex: 1;
+  }
+  
+  .menu-item.active {
+    border-left: none;
+    border-bottom-color: var(--primary);
+    background: transparent;
+  }
+  
+  .main-content {
+    padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .content-header {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  
+  .stat-card {
+    padding: 10px;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* Additional adjustments for very small screens */
+@media (max-width: 320px) {
+  .dashboard-preview {
+    transform: scale(0.9);
+  }
+  
+  .dashboard-content {
+    height: 180px;
+  }
+  
+  .menu-item {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+  }
+  
+  .main-content {
+    padding: 8px;
+  }
+  
+  .content-header {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .stats-grid {
+    max-width: 180px;
+  }
+  
+  .stat-card {
+    padding: 8px;
+  }
+  
+  .stat-value {
+    font-size: 1.125rem;
+  }
+}
+
+/* Ensure smooth transitions */
+.dashboard-preview {
+  transition: all 0.3s ease;
+}
+
+/* Fix for text content in LMS section on small screens */
+@media (max-width: 370px) {
+  .lms-text .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .lms-text p {
+    font-size: 0.9rem;
+  }
+  
+  .lms-features {
+    gap: 12px;
+  }
+  
+  .lms-feature {
+    font-size: 0.9rem;
+  }
+  
+  .lms-feature svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+/* Career Section */
+        .corporate-section {
+            padding: 40px 0; /* Reduced top padding */
+            position: relative;
+        }
+
+        .career-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex-wrap: wrap; /* makes it responsive */
+        }
+
+        /* Left Image */
+        .career-image {
+            flex: 1;
+            text-align: center;
+            margin-top: 0; /* Ensure no extra margin */
+        }
+
+        .career-image img {
+            width: 100%;
+            max-width: 580px;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Right Content */
+        .career-content {
+            flex: 1.2;
+            margin-top: 0; /* Remove any top margin */
+        }
+
+        .section-header {
+            text-align: left;
+            margin-bottom: 30px; /* Reduced margin */
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 12px;
+            padding: 6px 12px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 20px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            color: var(--gray-900);
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+           
+            line-height: 1.5;
+        }
+
+        /* Step Styling */
+        .career-path {
+          
+            padding-left: 24px;
+            margin-top: 0; /* Ensure no margin */
+        }
+
+        .path-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            flex-direction: column;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: #fff;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .step-line {
+            width: 2px;
+            height: 50px;
+            background: var(--primary);
+            margin-top: 8px;
+        }
+
+        .path-step:last-child .step-line {
+            display: none;
+        }
+
+        .step-content h4 {
+            margin: 0 0 6px;
+            color: var(--gray-800);
+            font-size: 1.2rem;
+        }
+
+        .step-content p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .corporate-section {
+                padding: 30px 0; /* Further reduce padding on mobile */
+            }
+            
+            .career-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .section-header {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+            .career-path {
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .step-line {
+                display: none;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
         
-# 🏛️ **Vindus Career Launch Program**
+        @media (max-width: 768px) {
+            .corporate-section {
+                padding: 20px 0; /* Minimal padding on small screens */
+            }
+            
+            .career-container {
+                padding: 0 15px;
+                gap: 30px;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            .path-step {
+                margin-bottom: 25px;
+            }
+        }
 
-## **1. Hero Section**
+/* CTA Section */
+.corporate-cta {
+  background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(36, 36, 193, 0.8));
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
 
-**Headline:**
-**Empowering Tomorrow’s Professionals Today**
+.cta-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: white;
+}
 
-**Subheadline:**
-The Vindus Career Launch Program provides structured, mentor-led learning designed to help students and graduates gain real-world skills, project experience, and career confidence.
+.cta-content p {
+  font-size: 1.125rem;
+  margin-bottom: 40px;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
----
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
-## **2. About the Program**
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
 
-**Title:**
-**About Vindus Career Launch Program**
+.cta-button.primary {
+  background: #FBBF24;
+  color: white;
+  box-shadow: var(--shadow-lg);
+}
 
-**Content:**
-The Vindus Career Launch Program is a professional training and internship initiative focused on bridging the gap between education and employability.
-We deliver a blended model of learning that combines academic foundations with practical exposure to industry projects, ensuring every participant is ready for the demands of modern workplaces.
+.cta-button.primary:hover {
+  background: #ffbe1aff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
 
-**Key Highlights:**
+.cta-button.secondary {
+  background: white;
+  backdrop-filter: blur(10px);
+  color: #5932EA;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-* Comprehensive mentor-led sessions
-* Hands-on project assignments
-* Internship completion and recommendation certificates
-* Structured feedback and progress tracking
+.cta-button.secondary:hover {
+  background: whitesmoke;
+  transform: translateY(-2px);
+}
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .lms-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
----
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .corporate-section {
+    padding: 60px 0;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-button {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+  
+  .path-step {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .step-indicator {
+    flex-direction: row;
+    gap: 16px;
+  }
+  
+  .step-line {
+    width: 100%;
+    height: 2px;
+  }
+}
 
-## **3. Programs and Courses**
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.1rem;
+  }
+  
+  .hero-description {
+    font-size: 12px;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+  }
+  
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 
-**Title:**
-**Our Programs**
+<script>
+// Enhanced JavaScript for animations
+document.addEventListener('DOMContentLoaded', function() {
+  // Add scroll animations
+  const animatedElements = document.querySelectorAll('.program-card, .feature-card, .path-step, .floating-card, .lms-card');
+  
+  const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  // Set initial state and observe
+  animatedElements.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    scrollObserver.observe(el);
+  });
+  
+  // Add staggered animation for feature cards
+  const featureCards = document.querySelectorAll('.feature-card');
+  featureCards.forEach((card, index) => {
+    card.style.transitionDelay = `${index * 0.1}s`;
+  });
+});
+</script>
 
-**Content:**
-We offer specialized learning paths aligned with current industry needs. Each course is developed and delivered by experienced trainers with a focus on practical application.
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-**Programs Include:**
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-* **Full Stack Web Development (Python / Java / MERN)**
-  Gain end-to-end application development skills from front-end to back-end.
-* **Data Science and Machine Learning**
-  Learn data analysis, visualization, and predictive modeling.
-
-
----
-
-## **4. Internship and Mentorship**
-
-**Title:**
-**Internship-Integrated Learning**
-
-**Content:**
-Every course at Vindus includes a structured internship that allows participants to apply theoretical knowledge in a practical setting.
-Through continuous mentorship, performance reviews, and project evaluations, we ensure each intern gains the experience needed to grow into a confident professional.
-
-**Features:**
-
-* Real-time client projects
-* Daily progress tracking through LMS
-* Recorded sessions and study materials
-* Personalized mentorship from expert trainers
-* Internship certificates and letters of recommendation
-
-**CTA:**
-*Join the Internship Program*(button add mail link)
-
----
-
-## **5. Key Features of Vindus LMS**
-
-**Title:**
-**Why Choose Our LMS**
-
-**Content:**
-Our Learning Management System is designed to provide an organized, efficient, and outcome-driven learning experience for both trainers and interns.
-
-**Core Features:**
-
-* Streamlined course management
-* Attendance and performance tracking
-* Assignment and assessment submissions
-* Integrated doubt resolution system
-* Secure document uploads and certifications
-* Trainer dashboards with daily updates
-* Recorded session access anytime
-
----
-
-## **6. Our Trainers**
-
-**Title:**
-**Learn from Experienced Professionals**
-
-**Content:**
-Our trainers are industry experts who bring real-world insights into every session. With years of professional experience, they focus on ensuring every student develops both technical and soft skills needed for success.
-
-
-## **7. Career Development Support**
-
-**Title:**
-**Your Pathway to Professional Success**
-
-**Content:**
-Vindus not only focuses on learning but also helps every intern prepare for the professional world through:
-
-* Portfolio and resume building
-* Mock interviews and skill assessments
-* Continuous performance evaluation
-* Placement referrals for top performers
-
--
-## **8. Contact and Enrollment**
-
-**Title:**
-**Get Started Today**
-
-**Subtext:**
-Join the Vindus Career Launch Program and take the next step toward a successful career. Our team is here to support you through every stage of your learning journey.
-
-**Contact Details:**
-📍 Vindus Career Launch Program, Hyderabad, India
-📧 [info.vindus@gmail.com](mailto:info.vindus@gmail.com)
-
-
-**Buttons:**
-
-
-* *Contact for More Info*
-
-    </p>
 {% endblock %}

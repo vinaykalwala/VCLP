@@ -1,3 +1,8 @@
+{% extends 'login_base.html' %}
+{% block title %}Intern Details{% endblock %}
+{% block content %}
+{% load static %}
+<div class="main-content">
 <h1>Intern Details</h1>
 
 <h2>Basic Info</h2>
@@ -71,3 +76,5 @@
 
 <a href="{% url 'intern_update' intern.pk %}">Edit</a> |
 <a href="{% url 'intern_list' %}">Back to List</a>
+</div>
+{% endblock %}

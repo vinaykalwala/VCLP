@@ -1,94 +1,313 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Internship Undertaking Certificates</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            text-align: center;
-        }
-        form {
-            margin: 20px 0;
-        }
-        label {
-            margin-right: 10px;
-        }
-        input, select, button {
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
+{% extends 'login_base.html' %}
+{% load static %}
 
-<h2>Internship Undertaking Certificates</h2>
+{% block content %}
+<style>
+  .undertaking-container {
+    padding: 30px 40px;
+    background-color: #f7f9fc;
+    min-height: 100vh;
+  }
 
-<!-- Single Intern -->
-<form method="get" action="{% url 'undertaking_single' identifier=0 %}" id="singleForm">
-    <label for="single_id">Enter Intern ID:</label>
-    <input type="number" id="single_id" name="intern_id" required>
-    <button type="submit">Generate Single Certificate</button>
-</form>
+  .undertaking-header {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    border-left: 5px solid #5932EA;
+    padding-left: 10px;
+  }
 
-<!-- Multiple Interns -->
-<form method="post" action="{% url 'undertaking_multiple' %}" id="multipleForm">
-    {% csrf_token %}
-    <label for="multiple_ids">Enter Intern IDs (comma separated):</label>
-    <input type="text" id="multiple_ids" name="intern_ids" placeholder="e.g. 1,2,3" required>
-    <button type="submit">Generate Multiple Certificates</button>
-</form>
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+  }
 
-<!-- Batch -->
-<form method="get" action="{% url 'undertaking_batch' identifier=0 %}" id="batchForm">
-    <label for="batch_id">Select Batch:</label>
-    <select id="batch_id" name="batch_id" required>
+  .filter-bar select,
+  .filter-bar input {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-btns,
+  .btns {
+    background: #5932EA;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btns:hover,
+  .filter-btn:hover {
+    background: #4523c9;
+    transform: translateY(-1px);
+  }
+
+  .btns:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .table-wrapper {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+
+  th, td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  th {
+    background: #f3f4f8;
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+
+  tr:hover td {
+    background: #fafafa;
+  }
+
+  .status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+  }
+
+  .ongoing { background: #fff3cd; color: #856404; }
+  .completed { background: #d4edda; color: #155724; }
+  .dropped { background: #f8d7da; color: #721c24; }
+  .generated { background: #cce5ff; color: #004085; }
+
+  .actions a {
+    color: #5932EA;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .actions a:hover {
+    text-decoration: underline;
+  }
+
+  .no-data {
+    text-align: center;
+    color: #777;
+    padding: 25px 0;
+    font-style: italic;
+  }
+
+  /* RESPONSIVE STYLES */
+  @media (max-width: 1024px) {
+    .undertaking-container {
+      padding: 25px 30px;
+    }
+
+    .undertaking-header {
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .filter-bar {
+      flex-direction: column;
+    }
+
+    .filter-bar select,
+    .filter-bar input,
+    .filter-btns,
+    .btns {
+      flex: unset;
+      width: 100%;
+    }
+
+    table {
+      min-width: unset;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      font-size: 13px;
+    }
+
+    .undertaking-header {
+      font-size: 22px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .undertaking-container {
+      padding: 20px 15px;
+    }
+
+    .undertaking-header {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .filter-bar {
+      padding: 10px 10px;
+      gap: 8px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      font-size: 12px;
+    }
+
+    .filter-btns,
+    .btns {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+</style>
+
+<div class="main-content">
+  <div class="undertaking-container">
+    <h2 class="undertaking-header">Manage Undertaking Certificates</h2>
+
+    <form method="get" id="batchFilterForm" class="filter-bar">
+      <select id="batch_id" name="batch_id" required>
         <option value="">-- Select Batch --</option>
         {% for batch in batches %}
-            <option value="{{ batch.id }}">{{ batch.name }} ({{ batch.course.name }})</option>
+          <option value="{{ batch.id }}" {% if request.GET.batch_id == batch.id|stringformat:"s" %}selected{% endif %}>
+            {{ batch.name }} ({{ batch.course.name }})
+          </option>
         {% endfor %}
-    </select>
-    <button type="submit">Generate Batch Certificates</button>
-</form>
+      </select>
+
+      <input type="text" name="search" placeholder="Search by Name or ID" value="{{ request.GET.search }}">
+
+      <button type="submit" class="filter-btns" name="action" value="filter">Search</button>
+      <button type="button" class="btns" id="generateSingleBtn">Generate Single Certificate</button>
+      <button type="button" class="btns" id="generateSelectedBtn">Generate Selected</button>
+      <button type="submit" class="btns" name="action" value="generate_batch">Generate Batch</button>
+    </form>
+
+    <form method="post" action="{% url 'undertaking_multiple' %}" id="internsForm">
+      {% csrf_token %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="selectAll"></th>
+              <th>Intern</th>
+              <th>Course</th>
+              <th>Batch</th>
+              <th>Status</th>
+              <th>Certificate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if interns %}
+              {% for intern in interns %}
+              <tr>
+                <td>
+                  {% if not intern.undertaking_generated and intern.internship_status == "Ongoing" %}
+                    <input type="checkbox" name="intern_ids" value="{{ intern.id }}">
+                  {% endif %}
+                </td>
+                <td>{{ intern.user.get_full_name }}<br><small style="color:#888;">{{ intern.unique_id }}</small></td>
+                <td>{{ intern.batch.course.name }}</td>
+                <td>{{ intern.batch.name }}</td>
+                <td>
+                  {% if intern.internship_status == "Ongoing" %}
+                    <span class="status ongoing">Ongoing</span>
+                  {% elif intern.internship_status == "Completed" %}
+                    <span class="status completed">Completed</span>
+                  {% elif intern.internship_status == "Dropped" %}
+                    <span class="status dropped">Dropped</span>
+                  {% endif %}
+                  {% if intern.undertaking_generated %}
+                    <span class="status generated">Generated</span>
+                  {% endif %}
+                </td>
+                <td class="actions">
+                  {% if not intern.undertaking_generated and intern.internship_status == "Ongoing" %}
+                    <a href="{% url 'undertaking_single' identifier=intern.id %}">Generate</a>
+                  {% else %}
+                    <span style="color:#999;">Not Available</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+            <tr>
+              <td colspan="6" class="no-data">
+                {% if request.GET.search %}
+                  {% if request.GET.search|length > 0 and request.GET.search.isdigit %}
+                    🚫 No interns found with <strong>ID "{{ request.GET.search }}"</strong>.
+                  {% else %}
+                    🚫 No interns found with <strong>Name "{{ request.GET.search }}"</strong>.
+                  {% endif %}
+                {% elif request.GET.batch_id %}
+                  📌 No interns available in the selected batch.
+                {% else %}
+                  📌 No interns available for the selected filters.
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
-    // Single intern: dynamically update action with entered intern ID
-    document.getElementById("singleForm").addEventListener("submit", function(e){
-        const internId = document.getElementById("single_id").value;
-        if(internId){
-            this.action = `/undertaking/single/${internId}/`;
-        }
-    });
+  document.getElementById("selectAll").addEventListener("change", function() {
+    document.querySelectorAll("input[name='intern_ids']").forEach(cb => cb.checked = this.checked);
+  });
 
-    // Batch: dynamically update action with selected batch ID
-    document.getElementById("batchForm").addEventListener("submit", function(e){
-        const batchId = document.getElementById("batch_id").value;
-        if(batchId){
-            this.action = `/undertaking/batch/${batchId}/`;
-        }
-    });
+  document.getElementById("batchFilterForm").addEventListener("submit", function(e){
+    const batchId = document.getElementById("batch_id").value;
+    const action = e.submitter.value; 
+    if(action === "generate_batch" && batchId){
+      e.preventDefault();
+      window.location.href = `/undertaking/batch/${batchId}/`;
+    }
+  });
 
-    // Multiple interns: transform comma-separated IDs into multiple hidden inputs
-    document.getElementById("multipleForm").addEventListener("submit", function(e){
-        const ids = document.getElementById("multiple_ids").value;
-        if(!ids){
-            e.preventDefault();
-            alert("Please enter at least one intern ID");
-        } else {
-            const form = e.target;
-            const oldInput = document.querySelector("input[name='intern_ids']");
-            oldInput.remove(); // remove original text input
-            ids.split(",").forEach(id => {
-                const input = document.createElement("input");
-                input.type = "hidden";
-                input.name = "intern_ids";
-                input.value = id.trim();
-                form.appendChild(input);
-            });
-        }
-    });
+  document.getElementById("generateSelectedBtn").addEventListener("click", function(){
+    document.getElementById("internsForm").submit();
+  });
+
+  document.getElementById("generateSingleBtn").addEventListener("click", function(){
+    const checked = document.querySelectorAll("input[name='intern_ids']:checked");
+    if(checked.length === 1){
+      const internId = checked[0].value;
+      window.location.href = `/undertaking/single/${internId}/`;
+    } else {
+      alert("⚠️ Please select exactly ONE intern to generate a single certificate.");
+    }
+  });
 </script>
-
-</body>
-</html>
+{% endblock %}

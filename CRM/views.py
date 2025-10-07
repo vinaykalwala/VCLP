@@ -9,10 +9,11 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
-import datetime
+from datetime import date
 import zipfile
 from .models import *
 from .forms import *
+
 
 def home(request):
     return render(request, 'home.html') 
@@ -94,7 +95,7 @@ def signup_view(request):
             SuperUserProfile.objects.create(user=user)
 
         messages.success(request, "Account created successfully! Please log in.")
-        return redirect('login')
+        return redirect('signup')
 
     return render(request, 'signup.html', {'role_choices': User.ROLE_CHOICES})
 
@@ -375,8 +376,8 @@ def generate_intern_pdf(request, mode, identifier=None):
                 "phone": "+914049525396",
                 "website": "www.vindusenvironment.com"
             },
-            "today_date": datetime.date.today().strftime("%d-%m-%Y"),
-            "logo_path": logo_path 
+            "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
+            "logo_path": logo_path
         }
 
         html_content = render_to_string("undertaking_letter.html", context)
@@ -410,7 +411,7 @@ def generate_intern_pdf(request, mode, identifier=None):
                     "phone": "+914049525396",
                     "website": "www.vindusenvironment.com"
                 },
-                "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
                 "logo_path": logo_path
             }
             html_content = render_to_string("undertaking_letter.html", context)
@@ -924,11 +925,13 @@ from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .models import Attendance, Batch
-from datetime import datetime
+from datetime import datetime,date
 import calendar
 import openpyxl
 from xhtml2pdf import pisa
 from django.template.loader import get_template
+import os
+from django.conf import settings
 
 @login_required
 def attendance_report(request):
@@ -1028,12 +1031,17 @@ def attendance_report(request):
     # ---------- PDF Export ----------
     if export_type == 'pdf' and attendances.exists():
         template = get_template('attendance/attendance_report_pdf.html')
+        logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        today_date = datetime.now().strftime('%d-%m-%Y')
+        
         html = template.render({
             'attendances': attendances,
             'summary': summary,
             'batch': batch,
-            'selected_date': date_input or today,
-            'month_input': month_input
+            'selected_date': (datetime.strptime(date_input, "%Y-%m-%d").strftime('%d-%m-%Y') if date_input else today.strftime('%d-%m-%Y')),
+            'month_input': month_input,
+            'logo_path': logo_path,
+            'today_date': today_date,
         })
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'

@@ -1,46 +1,203 @@
-<h1>Attendance Report - {{ batch.name }}</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Report - {{ batch.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
 
-<table border="1" cellspacing="0" cellpadding="5" width="100%">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Intern</th>
-            <th>Unique ID</th>
-            <th>Status</th>
-            <th>Trainer</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for att in attendances %}
+        /* Header */
+        .pdf-header {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .pdf-header img {
+            height: 60px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .pdf-header h1 {
+            font-size: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            color: #660B05;
+            margin: 0;
+        }
+
+        .pdf-header-date {
+            font-size: 12px;
+            text-align: right;
+            margin-top: 5px;
+            margin-right: 20px;
+        }
+
+        /* Divider */
+        .divider {
+            border: 0;
+            border-top: 1px solid #333;
+            margin: 8px 0;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        /* Status badges */
+        .status-present {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 3px 7px;
+            border-radius: 10px;
+            display: inline-block;
+            font-size: 11px;
+        }
+
+        .status-absent {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 3px 7px;
+            border-radius: 10px;
+            display: inline-block;
+            font-size: 11px;
+        }
+
+        /* Footer */
+        .pdf-footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header (Logo + Company Name) -->
+    <div class="pdf-header" style="display:flex; align-items:center; justify-content:center; text-align:center; width:100%; padding:10px 0;">
+    <!-- Left spacer (optional) -->
+    <div style="flex:1;"></div>
+
+    <!-- Centered logo and company name -->
+    <div style="display:flex; align-items:center; justify-content:center; flex:2;">
+        <img src="{{ logo_path }}" alt="Vindus Environment Logo" 
+             style="height:60px; width:auto; object-fit:contain; margin-right:10px;">
+        <h1 style="font-size:22px; color:#660B05; margin:0;">
+            VINDUS ENVIRONMENT PVT.LTD
+        </h1>
+    </div>
+
+    <!-- Right spacer (optional) -->
+    <div style="flex:1;"></div>
+</div>
+
+    <!-- Date on top-right -->
+    <div class="pdf-header-date">
+        Date: {{ today_date }}
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider">
+
+    <!-- Report Title -->
+    <h2 style="text-align:center; margin-bottom:15px;">Attendance Report Of {{ batch.name }}</h2>
+
+    <!-- Attendance Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Intern</th>
+                <th>Unique ID</th>
+                <th>Status</th>
+                <th>Trainer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for att in attendances %}
             <tr>
                 <td>{{ att.date }}</td>
                 <td>{{ att.intern.user.get_full_name }}</td>
                 <td>{{ att.intern.unique_id }}</td>
-                <td>{{ att.status }}</td>
+                <td>
+                    {% if att.status == 'Present' %}
+                        <span class="status-present">{{ att.status }}</span>
+                    {% else %}
+                        <span class="status-absent">{{ att.status }}</span>
+                    {% endif %}
+                </td>
                 <td>{{ att.trainer.user.get_full_name }}</td>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; font-style:italic;">No attendance records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h2>Summary</h2>
-<table border="1" cellspacing="0" cellpadding="5" width="100%">
-    <thead>
-        <tr>
-            <th>Intern</th>
-            <th>Unique ID</th>
-            <th>Present</th>
-            <th>Absent</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for s in summary %}
+    <!-- Summary Table -->
+    <h2>Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Intern</th>
+                <th>Unique ID</th>
+                <th>Present</th>
+                <th>Absent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in summary %}
             <tr>
                 <td>{{ s.intern__user__first_name }} {{ s.intern__user__last_name }}</td>
                 <td>{{ s.intern__unique_id }}</td>
                 <td>{{ s.present_count }}</td>
                 <td>{{ s.absent_count }}</td>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center; font-style:italic;">No summary available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="pdf-footer">
+        Generated by Vindus Environment Pvt Ltd
+    </div>
+
+</body>
+</html>
