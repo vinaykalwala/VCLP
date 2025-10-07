@@ -7,259 +7,157 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --accent: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
-            --gradient-light: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #22d3ee 100%);
-            --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            --hover-shadow: 0 30px 60px rgba(0,0,0,0.15);
-            --glow: 0 0 40px rgba(99, 102, 241, 0.2);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background-color: #f8f9fa;
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-            color: #1e293b;
-            min-height: 100vh;
-            padding: 0;
         }
         
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles matching batch_list */
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             padding: 30px;
-        }
-        
-        /* Header Styles */
-        .hero-section {
-            background: var(--gradient);
-            border-radius: 24px;
-            padding: 40px;
             color: white;
-            margin-bottom: 40px;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.8s ease-out;
-        }
-        
-        .hero-section::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .hero-section::after {
-            content: "";
-            position: absolute;
-            bottom: -100px;
-            right: -100px;
-            width: 300px;
-            height: 300px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
         .batch-title {
-            font-weight: 800;
-            font-size: 3rem;
+            font-weight: 700;
+            font-size: 2.2rem;
             margin-bottom: 8px;
-            line-height: 1.1;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .batch-subtitle {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             opacity: 0.9;
-            font-weight: 500;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 2;
+            margin-bottom: 20px;
         }
         
         .action-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 2;
         }
         
         .btn-modern {
-            padding: 14px 28px;
-            border-radius: 16px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             border: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-modern::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-modern:hover::before {
-            left: 100%;
-        }
-        
-        .btn-primary-modern {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        
-        .btn-primary-modern:hover {
-            background: rgba(255,255,255,0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            color: white;
         }
         
         .btn-warning-modern {
-            background: rgba(245, 158, 11, 0.9);
-            color: white;
+            background: #ffc107;
+            color: #000;
         }
         
         .btn-warning-modern:hover {
-            background: rgba(245, 158, 11, 1);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
-            color: white;
+            background: #e0a800;
+            transform: translateY(-2px);
+            color: #000;
         }
         
         .btn-danger-modern {
-            background: rgba(239, 68, 68, 0.9);
+            background: #dc3545;
             color: white;
         }
         
         .btn-danger-modern:hover {
-            background: rgba(239, 68, 68, 1);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+            background: #c82333;
+            transform: translateY(-2px);
             color: white;
         }
         
-        /* Card Styles */
+        .btn-primary-modern {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        /* Card Styles matching batch_list */
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
         }
         
         .modern-card {
             background: white;
-            border-radius: 20px;
-            padding: 0;
-            box-shadow: var(--card-shadow);
-            border: none;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             overflow: hidden;
-            position: relative;
-        }
-        
-        .modern-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient);
         }
         
         .modern-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--hover-shadow);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
         }
         
         .card-header-modern {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 25px 30px;
-            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
         }
         
         .card-title-modern {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1e293b;
+            font-size: 1.3rem;
+            font-weight: 600;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-        
-        .card-title-modern i {
-            color: var(--primary);
-            font-size: 1.3rem;
+            gap: 10px;
         }
         
         .card-body-modern {
-            padding: 30px;
+            padding: 25px;
         }
         
         .info-item-modern {
             display: flex;
             align-items: flex-start;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            background: #f8fafc;
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary);
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 0;
         }
         
-        .info-item-modern:hover {
-            background: #f1f5f9;
-            transform: translateX(5px);
+        .info-item-modern:last-child {
+            border-bottom: none;
         }
         
         .info-icon-modern {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient);
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 18px;
+            margin-right: 15px;
             flex-shrink: 0;
             color: white;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            font-size: 1.1rem;
         }
         
         .info-content-modern {
@@ -268,194 +166,37 @@
         
         .info-label-modern {
             font-weight: 600;
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .info-value-modern {
-            font-size: 1.2rem;
-            color: #1e293b;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        /* Interns Section */
-        .interns-section {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 40px;
-            transition: all 0.4s ease;
-        }
-        
-        .interns-section:hover {
-            box-shadow: var(--hover-shadow);
-        }
-        
-        .interns-header {
-            background: var(--gradient);
-            color: white;
-            padding: 25px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .interns-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .intern-count {
-            background: rgba(255,255,255,0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .interns-grid {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .intern-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .intern-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-light);
-        }
-        
-        .intern-card:hover {
-            background: white;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #e2e8f0;
-        }
-        
-        .intern-avatar-modern {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            color: white;
-            font-weight: 700;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-        
-        .intern-name-modern {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #1e293b;
-            margin-bottom: 5px;
-        }
-        
-        .intern-id-modern {
-            color: #64748b;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            color: #212529;
             font-weight: 500;
-        }
-        
-        .empty-state-modern {
-            text-align: center;
-            padding: 60px 30px;
-            grid-column: 1 / -1;
-        }
-        
-        .empty-icon {
-            font-size: 5rem;
-            color: #cbd5e1;
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-        
-        .empty-title {
-            color: #64748b;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .empty-text {
-            color: #94a3b8;
-            font-size: 1.1rem;
-        }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
-        }
-        
-        .stagger-item {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
+            margin: 0;
         }
         
         /* Responsive Design */
         @media (max-width: 768px) {
             .main-container {
+                padding: 15px;
+            }
+            
+            .page-header {
                 padding: 20px;
             }
             
-            .hero-section {
-                padding: 30px 25px;
-            }
-            
             .batch-title {
-                font-size: 2.2rem;
+                font-size: 1.8rem;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
-            }
-            
-            .interns-grid {
-                grid-template-columns: 1fr;
             }
             
             .action-buttons {
@@ -467,220 +208,143 @@
                 justify-content: center;
             }
         }
-        
-        /* Utility Classes */
-        .text-gradient {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h1 class="batch-title">{{ batch.name }}</h1>
-                    <p class="batch-subtitle">{{ batch.course.name }}</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="action-buttons">
-                        <a href="{% url 'batch_update' batch.pk %}" class="btn-modern btn-warning-modern">
-                            <i class="fas fa-edit"></i>
-                            Edit Batch
-                        </a>
-                        <a href="{% url 'batch_delete' batch.pk %}" class="btn-modern btn-danger-modern">
-                            <i class="fas fa-trash-alt"></i>
-                            Delete Batch
-                        </a>
-                        <a href="{% url 'batch_list' %}" class="btn-modern btn-primary-modern">
-                            <i class="fas fa-arrow-left"></i>
-                            Back to List
-                        </a>
+    {% include 'sidebar.html' %}
+    
+    <div class="main-content">
+        <div class="main-container">
+            <!-- Header Section -->
+            <section class="page-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1 class="batch-title">{{ batch.name }}</h1>
+                        <p class="batch-subtitle">{{ batch.course.name }}</p>
                     </div>
-                </div>
-            </div>
-        </section>
+                    <div class="col-lg-4">
+                        <div class="action-buttons">
+                            <a href="{% url 'batch_update' batch.pk %}" class="btn-modern btn-warning-modern">
+                                <i class="fas fa-edit"></i>
+                                Edit Batch
+                            </a>
 
-        <!-- Information Grid -->
-        <div class="info-grid">
-            <!-- Batch Information Card -->
-            <div class="modern-card stagger-item" style="animation-delay: 0.1s">
-                <div class="card-header-modern">
-                    <h3 class="card-title-modern">
-                        <i class="fas fa-info-circle"></i>
-                        Batch Information
-                    </h3>
-                </div>
-                <div class="card-body-modern">
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">Course</div>
-                            <p class="info-value-modern">{{ batch.course.name }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">Trainer</div>
-                            <p class="info-value-modern">{{ batch.trainer.user.get_full_name|default:batch.trainer.user.username }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-calendar-day"></i>
-                        </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">Start Date</div>
-                            <p class="info-value-modern">{{ batch.start_date|default:"Not set" }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">End Date</div>
-                            <p class="info-value-modern">{{ batch.end_date|default:"Not set" }}</p>
+                            <a href="{% url 'batch_delete' batch.pk %}" class="btn-modern btn-danger-modern">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete Batch
+                            </a>
+                            <a href="{% url 'batch_list' %}" class="btn-modern btn-primary-modern">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to List
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Description & Details Card -->
-            <div class="modern-card stagger-item" style="animation-delay: 0.2s">
-                <div class="card-header-modern">
-                    <h3 class="card-title-modern">
-                        <i class="fas fa-align-left"></i>
-                        Description & Details
-                    </h3>
-                </div>
-                <div class="card-body-modern">
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
+            <!-- Information Grid -->
+            <div class="info-grid">
+                <!-- Batch Information Card -->
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h3 class="card-title-modern">
                             <i class="fas fa-info-circle"></i>
+                            Batch Information
+                        </h3>
+                    </div>
+                    <div class="card-body-modern">
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Course</div>
+                                <p class="info-value-modern">{{ batch.course.name }}</p>
+                            </div>
                         </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">About this Batch</div>
-                            <p class="info-value-modern">{{ batch.description|default:"No description provided." }}</p>
+                        
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Trainer</div>
+                                <p class="info-value-modern">{{ batch.trainer.user.get_full_name|default:batch.trainer.user.username }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Start Date</div>
+                                <p class="info-value-modern">{{ batch.start_date|default:"Not set" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">End Date</div>
+                                <p class="info-value-modern">{{ batch.end_date|default:"Not set" }}</p>
+                            </div>
                         </div>
                     </div>
-                    
-                    {% if batch.start_date and batch.end_date %}
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">Duration</div>
-                            <p class="info-value-modern">
-                                {% with duration=batch.end_date|timeuntil:batch.start_date %}
-                                    {{ duration }}
-                                {% endwith %}
-                            </p>
-                        </div>
+                </div>
+
+                <!-- Description & Details Card -->
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h3 class="card-title-modern">
+                            <i class="fas fa-align-left"></i>
+                            Description & Details
+                        </h3>
                     </div>
-                    {% endif %}
-                    
-                    <div class="info-item-modern">
-                        <div class="info-icon-modern">
-                            <i class="fas fa-users"></i>
+                    <div class="card-body-modern">
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">About this Batch</div>
+                                <p class="info-value-modern">{{ batch.description|default:"No description provided." }}</p>
+                            </div>
                         </div>
-                        <div class="info-content-modern">
-                            <div class="info-label-modern">Total Interns</div>
-                            <p class="info-value-modern">{{ batch.interns.count }}</p>
+                        
+                        {% if batch.start_date and batch.end_date %}
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Duration</div>
+                                <p class="info-value-modern">
+                                    {% with duration=batch.end_date|timeuntil:batch.start_date %}
+                                        {{ duration }}
+                                    {% endwith %}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Total Interns</div>
+                                <p class="info-value-modern">{{ batch.interns.count }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Interns Section -->
-        <section class="interns-section stagger-item" style="animation-delay: 0.3s">
-            <div class="interns-header">
-                <h3 class="interns-title">
-                    <i class="fas fa-user-graduate"></i>
-                    Interns in this Batch
-                </h3>
-                {% if batch.interns.all %}
-                <div class="intern-count">
-                    {{ batch.interns.count }} Intern{{ batch.interns.count|pluralize }}
-                </div>
-                {% endif %}
-            </div>
-            
-            <div class="interns-grid">
-                {% if batch.interns.all %}
-                    {% for intern in batch.interns.all %}
-                    <div class="intern-card">
-                        <div class="intern-avatar-modern">
-                            {{ intern.user.first_name|first|upper }}{{ intern.user.last_name|first|upper }}
-                        </div>
-                        <div class="intern-details">
-                            <div class="intern-name-modern">{{ intern.user.get_full_name }}</div>
-                            <p class="intern-id-modern">{{ intern.unique_id }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state-modern">
-                        <i class="fas fa-user-friends empty-icon"></i>
-                        <h4 class="empty-title">No Interns Assigned</h4>
-                        <p class="empty-text">There are no interns assigned to this batch yet.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Add staggered animation to elements
-        document.addEventListener('DOMContentLoaded', function() {
-            const staggerItems = document.querySelectorAll('.stagger-item');
-            staggerItems.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.1}s`;
-            });
-            
-            // Add hover effects to cards
-            const cards = document.querySelectorAll('.modern-card, .intern-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        });
-    </script>
 </body>
 </html>

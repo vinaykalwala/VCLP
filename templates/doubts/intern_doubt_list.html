@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Doubts</h2>
+<a href="{% url 'doubt_create' %}" class="btn btn-primary">Ask a Doubt</a>
+
+{% for doubt in doubts %}
+  <div class="card mt-3 p-3">
+    <h5>{{ doubt.question }}</h5>
+    <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
+    <p><strong>Created:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
+    <p><strong>Status:</strong> {% if doubt.resolved %}✅ Resolved{% else %}⏳ Pending{% endif %}</p>
+
+    {% if doubt.resolved %}
+      <div class="alert alert-success mt-2">
+        <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
+        <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+      </div>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>No doubts raised yet.</p>
+{% endfor %}
+{% endblock %}
