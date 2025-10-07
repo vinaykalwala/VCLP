@@ -3,16 +3,25 @@
 <div class="container mt-4">
     <h2>User List</h2>
 
+    <!-- Summary Counts -->
+    <div class="mb-3">
+        <span class="badge bg-primary">Total Users: {{ total_users }}</span>
+        <span class="badge bg-success">Active: {{ active_users }}</span>
+        <span class="badge bg-danger">Inactive: {{ inactive_users }}</span>
+        {% for role in role_counts %}
+            <span class="badge bg-info text-dark">{{ role.role|title }}: {{ role.count }}</span>
+        {% endfor %}
+    </div>
+
     <form method="get" class="mb-3">
         <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
         <select name="role">
-    <option value="">All Roles</option>
-    <option value="superuser" {% if request.GET.role|default:'' == 'superuser' %}selected{% endif %}>SuperUser</option>
-    <option value="admin" {% if request.GET.role|default:'' == 'admin' %}selected{% endif %}>Administrator</option>
-    <option value="trainer" {% if request.GET.role|default:'' == 'trainer' %}selected{% endif %}>Trainer</option>
-    <option value="intern" {% if request.GET.role|default:'' == 'intern' %}selected{% endif %}>Intern</option>
-</select>
-
+            <option value="">All Roles</option>
+            <option value="superuser" {% if request.GET.role|default:'' == 'superuser' %}selected{% endif %}>SuperUser</option>
+            <option value="admin" {% if request.GET.role|default:'' == 'admin' %}selected{% endif %}>Administrator</option>
+            <option value="trainer" {% if request.GET.role|default:'' == 'trainer' %}selected{% endif %}>Trainer</option>
+            <option value="intern" {% if request.GET.role|default:'' == 'intern' %}selected{% endif %}>Intern</option>
+        </select>
         <button class="btn btn-secondary" type="submit">Filter</button>
     </form>
 
@@ -53,11 +62,7 @@
 <script>
 function togglePassword(id) {
     var input = document.getElementById('pwd-' + id);
-    if (input.type === "password") {
-        input.type = "text";
-    } else {
-        input.type = "password";
-    }
+    input.type = (input.type === "password") ? "text" : "password";
 }
 </script>
 {% endblock %}

@@ -108,13 +108,17 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        
         if user:
-            login(request, user)
-            return redirect('dashboard')
+            if user.is_active:  # check if user is active
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                messages.error(request, "Your account is inactive. Please contact admin.")
         else:
             messages.error(request, "Invalid credentials.")
+    
     return render(request, 'login.html')
-
 
 def logout_view(request):
     logout(request)
@@ -1742,6 +1746,8 @@ from django.contrib.auth.decorators import user_passes_test
 def superuser_required(view_func):
     return user_passes_test(lambda u: u.is_superuser)(view_func)
 
+from django.db.models import Q, Count
+
 @login_required
 def user_list(request):
     if not request.user.is_superuser:
@@ -1762,7 +1768,19 @@ def user_list(request):
     if role_filter:
         users = users.filter(role=role_filter)
 
-    return render(request, "users/user_list.html", {"users": users})
+    # Summary counts
+    total_users = users.count()
+    active_users = users.filter(is_active=True).count()
+    inactive_users = users.filter(is_active=False).count()
+    role_counts = users.values('role').annotate(count=Count('role'))
+
+    return render(request, "users/user_list.html", {
+        "users": users,
+        "total_users": total_users,
+        "active_users": active_users,
+        "inactive_users": inactive_users,
+        "role_counts": role_counts,
+    })
 
 # =======================
 # User Detail/Edit View
