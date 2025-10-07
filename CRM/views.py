@@ -1415,3 +1415,8 @@ def daily_update_dashboard(request):
         'selected_batch': selected_batch,
         'selected_month': selected_month
     })
+
+
+
+
+
