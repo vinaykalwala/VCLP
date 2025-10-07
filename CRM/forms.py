@@ -138,6 +138,25 @@ class InternProfileForm(forms.ModelForm):
         model = InternProfile
         exclude = ('created_at',)
 
+class TrainerProfileForm(forms.ModelForm):
+    class Meta:
+        model = TrainerProfile
+        fields = [
+            'user',
+            'profile_photo',
+            'bio',
+            'expertise',
+            'years_of_experience',
+            'designation',
+            'highest_qualification',
+            'availability',
+            'linkedin_profile',
+            'portfolio_link',
+        ]
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3}),
+            'availability': forms.Select(),
+        }
 class CurriculumForm(forms.ModelForm):
     class Meta:
         model = Curriculum
@@ -152,3 +171,45 @@ class DailySessionUpdateForm(forms.ModelForm):
             'summary': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Summary of session'}),
             'challenges': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Challenges (if any)'}),
         }
+
+
+
+class DoubtForm(forms.ModelForm):
+    class Meta:
+        model = Doubt
+        fields = ['trainer', 'question']  # don't let intern pick batch/intern/resolved
+
+    def __init__(self, *args, trainers_qs=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if trainers_qs is not None:
+            self.fields['trainer'].queryset = trainers_qs
+
+
+class DoubtResolutionForm(forms.ModelForm):
+    class Meta:
+        model = DoubtResolution
+        fields = ['answer']
+        widgets = {'answer': forms.Textarea(attrs={'rows': 3})}
+
+
+
+class RecordedSessionForm(forms.ModelForm):
+    class Meta:
+        model = RecordedSession
+        fields = ['batch', 'trainer', 'title', 'video', 'description']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user and getattr(user, 'role', None) == "trainer":
+            # Trainer can only upload for batches they handle
+            self.fields['batch'].queryset = user.trainer_profile.assigned_batches.all()
+            # Remove trainer field entirely from the form
+            self.fields.pop('trainer')
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone','is_active']

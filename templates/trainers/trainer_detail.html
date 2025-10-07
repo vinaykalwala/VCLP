@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Trainer Profile: {{ trainer.user.username }}</h2>
+    <p><strong>Name:</strong> {{ trainer.user.first_name }} {{ trainer.user.last_name }}</p>
+    <p><strong>Email:</strong> {{ trainer.user.email }}</p>
+    <p><strong>Expertise:</strong> {{ trainer.expertise }}</p>
+    <p><strong>Designation:</strong> {{ trainer.designation }}</p>
+    <p><strong>Qualification:</strong> {{ trainer.highest_qualification }}</p>
+    <p><strong>Experience:</strong> {{ trainer.years_of_experience }} years</p>
+    <p><strong>Availability:</strong> {{ trainer.availability }}</p>
+    <p><strong>LinkedIn:</strong> <a href="{{ trainer.linkedin_profile }}">{{ trainer.linkedin_profile }}</a></p>
+    <p><strong>Portfolio:</strong> <a href="{{ trainer.portfolio_link }}">{{ trainer.portfolio_link }}</a></p>
+    {% if trainer.profile_photo %}
+    <p><img src="{{ trainer.profile_photo.url }}" alt="Profile Photo" width="150"></p>
+    {% endif %}
+    <a href="{% url 'trainer_update' trainer.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'trainer_delete' trainer.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'trainer_list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

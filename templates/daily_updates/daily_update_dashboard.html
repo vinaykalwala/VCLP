@@ -1,57 +1,215 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3 class="mb-3">Trainer-wise Daily Session Dashboard</h3>
+<style>
+/* ====== Page Styling ====== */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0 15px;
+}
 
-    <!-- Filters -->
-    <form method="get" class="mb-3 d-flex gap-2">
-        <!-- Trainer Filter -->
-        <select name="trainer" class="form-control">
-            <option value="">-- Select Trainer --</option>
-            {% for t in trainers %}
-                <option value="{{ t.id }}" {% if selected_trainer == t.id|stringformat:"s" %}selected{% endif %}>
-                    {{ t.user.username }}
-                </option>
-            {% endfor %}
-        </select>
+.dashboard-container h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 30px;
+    border-left: 6px solid #5932EA;
+    padding-left: 12px;
+}
 
-        <!-- Batch Filter -->
-        <select name="batch" class="form-control">
-            <option value="">-- Select Batch --</option>
-            {% for b in batches %}
-                <option value="{{ b.id }}" {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>
-                    {{ b.name }}
-                </option>
-            {% endfor %}
-        </select>
+/* ===== Filter Card Styling ===== */
+.filter-card {
+    background: #f5f6ff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
 
-        <!-- Month Filter -->
-        <select name="month" class="form-control">
-            <option value="">-- Select Month --</option>
-            {% for value, name in month_options %}
-                <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-        </select>
+.filter-card form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
 
-        <button type="submit" class="btn btn-secondary">Filter</button>
-        <a href="{% url 'daily_update_dashboard' %}" class="btn btn-light">Reset</a>
-    </form>
+.filter-card select {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.filter-card select:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.2);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.button-group button, .button-group a {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.button-group button {
+    background-color: #5932EA;
+    color: #fff;
+}
+
+.button-group button:hover {
+    background-color: #4523C9;
+}
+
+.button-group a {
+    background-color: #FBBF24;
+    color: #222;
+}
+
+.button-group a:hover {
+    background-color: #e0a815;
+}
+
+/* ===== Trainer Card Styling ===== */
+.trainer-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+    overflow: hidden;
+    border-left: 6px solid #5932EA;
+}
+
+.trainer-card-header {
+    background-color: #5932EA;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.trainer-card-header span.accent {
+    font-weight: 700;
+    color: #fff;
+}
+
+/* Table inside trainer card */
+.trainer-card table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    background: #fff;
+}
+
+.trainer-card th, .trainer-card td {
+    border: 1px solid #e0e0e0;
+    padding: 10px 12px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.trainer-card th {
+    background-color: #f0f0ff;
+    color: #333;
+    font-weight: 600;
+}
+
+.trainer-card tbody tr:nth-child(even) {
+    background-color: #f9f9ff;
+}
+
+.trainer-card tbody tr:hover {
+    background-color: #eef0ff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+    .trainer-card table { min-width: 500px; }
+}
+
+@media (max-width: 992px) {
+    .dashboard-container h3 { font-size: 24px; }
+    .trainer-card th, .trainer-card td { font-size: 13px; padding: 8px 10px; }
+}
+
+@media (max-width: 768px) {
+    .filter-card form { flex-direction: column; gap: 15px; }
+}
+
+@media (max-width: 576px) {
+    .dashboard-container h3 { font-size: 20px; }
+    .trainer-card th, .trainer-card td { font-size: 12px; padding: 6px 8px; }
+    .button-group button, .button-group a { font-size: 12px; padding: 8px 12px; }
+}
+</style>
+
+<div class="main-content">
+<div class="dashboard-container">
+    <h3>Trainer-wise Daily Session Dashboard</h3>
+
+    <!-- Filter Section as Card -->
+    <div class="filter-card">
+        <form method="get">
+            <select name="trainer">
+                <option value="">-- Select Trainer --</option>
+                {% for t in trainers %}
+                    <option value="{{ t.id }}" {% if selected_trainer == t.id|stringformat:"s" %}selected{% endif %}>
+                        {{ t.user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="batch">
+                <option value="">-- Select Batch --</option>
+                {% for b in batches %}
+                    <option value="{{ b.id }}" {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>
+                        {{ b.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="month">
+                <option value="">-- Select Month --</option>
+                {% for value, name in month_options %}
+                    <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <div class="button-group">
+                <button type="submit">Filter</button>
+                <a href="{% url 'daily_update_dashboard' %}">Reset</a>
+            </div>
+        </form>
+    </div>
 
     <!-- Trainer Cards -->
     {% for item in trainer_updates %}
         {% if item.updates.exists %}
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <strong>{{ item.trainer.user.username }}</strong> - 
+            <div class="trainer-card">
+                <div class="trainer-card-header">
+                    <strong>{{ item.trainer.user.username }}</strong>
                     {% if item.trainer.batch %}
-                        {{ item.trainer.batch.name }}
+                        <span class="accent">{{ item.trainer.batch.name }}</span>
                     {% else %}
-                        All Batches
+                        <span class="accent">All Batches</span>
                     {% endif %}
                 </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-hover mb-0">
-                        <thead class="table-dark">
+                <div style="overflow-x:auto; padding:15px;">
+                    <table>
+                        <thead>
                             <tr>
                                 <th>Date</th>
                                 <th>Batch</th>
@@ -76,5 +234,6 @@
             </div>
         {% endif %}
     {% endfor %}
+</div>
 </div>
 {% endblock %}

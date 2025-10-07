@@ -64,6 +64,27 @@ urlpatterns = [
     path('daily_update_edit/<int:pk>/', views.daily_update_edit, name='daily_update_edit'),
     path('daily_update_delete/<int:pk>/', views.daily_update_delete, name='daily_update_delete'),
     path('daily_update_dashboard/', views.daily_update_dashboard, name='daily_update_dashboard'),
+
+
+    path('doubts/', views.doubt_list, name='doubt_list'),
+    path('doubts/create/', views.doubt_create, name='doubt_create'),
+    path('doubts/<int:pk>/resolve/', views.resolve_doubt, name='resolve_doubt'),
+
+    path('sessions/', views.recorded_session_list, name='recorded_session_list'),
+    path('sessions/create/', views.recorded_session_create, name='recorded_session_create'),
+    path('sessions/<int:pk>/edit/', views.recorded_session_update, name='recorded_session_update'),
+    path('sessions/<int:pk>/delete/', views.recorded_session_delete, name='recorded_session_delete'),
+
+    path('trainers/', views.trainer_list, name='trainer_list'),
+    path('trainers/create/', views.trainer_create, name='trainer_create'),
+    path('trainers/<int:pk>/', views.trainer_detail, name='trainer_detail'),
+    path('trainers/<int:pk>/update/', views.trainer_update, name='trainer_update'),
+    path('trainers/<int:pk>/delete/', views.trainer_delete, name='trainer_delete'),
+
+    path('users/', views.user_list, name='user_list'),
+    path('users/<int:pk>/edit/', views.user_update, name='user_update'),
+    path('users/<int:pk>/delete/', views.user_delete, name='user_delete'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

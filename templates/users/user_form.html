@@ -1,0 +1,226 @@
+{% extends 'login_base.html' %}
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<style>
+/* --- Container --- */
+.edit-user-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden; /* ensures header and body connect neatly */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.edit-user-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(89, 50, 234, 0.15);
+}
+
+/* --- Header Bar --- */
+.edit-user-header {
+    background: linear-gradient(135deg, #5932EA, #3A0CA3);
+    color: #fff;
+    padding: 20px 25px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+}
+.edit-user-header i {
+    font-size: 22px;
+}
+
+/* --- Body --- */
+.edit-user-body {
+    padding: 40px 35px;
+}
+
+/* --- Form Layout --- */
+.edit-user-body form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* --- Floating Label Group --- */
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+.form-group input:not([type="checkbox"]),
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    background: transparent;
+    transition: all 0.25s ease;
+}
+.form-group label {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    color: #6c757d;
+    font-size: 15px;
+    background: #fff;
+    padding: 0 4px;
+    pointer-events: none;
+    transition: 0.2s ease;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 6px rgba(89, 50, 234, 0.3);
+    outline: none;
+}
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label,
+.form-group select:focus + label,
+.form-group select:not([value=""]) + label {
+    top: -10px;
+    left: 10px;
+    font-size: 13px;
+    color: #5932EA;
+}
+
+/* --- Checkbox Group --- */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+.checkbox-group:hover {
+    background-color: #f4f2ff;
+    border-color: #d4c9ff;
+}
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #5932EA;
+    cursor: pointer;
+}
+.checkbox-group label {
+    position: static;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* --- Buttons --- */
+.edit-user-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+}
+.save-btn {
+    background: linear-gradient(135deg, #5932EA, #3A0CA3);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 35px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(89, 50, 234, 0.3);
+    transition: all 0.3s ease;
+}
+.save-btn:hover {
+    background: linear-gradient(135deg, #3A0CA3, #24046A);
+    transform: translateY(-2px);
+}
+.cancel-btn {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px 35px;
+    font-size: 16px;
+    color: #444;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.cancel-btn:hover {
+    background-color: #ebebeb;
+    transform: translateY(-2px);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 600px) {
+    .edit-user-body {
+        padding: 30px 20px;
+    }
+    .edit-user-header {
+        font-size: 20px;
+        padding: 18px;
+    }
+    .save-btn,
+    .cancel-btn {
+        width: 100%;
+        font-size: 15px;
+        padding: 12px;
+    }
+    .edit-user-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+
+<div class="main-content">
+  <div class="edit-user-container">
+      <!-- Header Bar -->
+      <div class="edit-user-header">
+          <i class="fas fa-user-edit"></i>
+          Edit User
+      </div>
+
+      <!-- Body -->
+      <div class="edit-user-body">
+          <form method="post">
+              {% csrf_token %}
+              {% for field in form %}
+                  {% if field.field.widget.input_type == "checkbox" %}
+                      <div class="checkbox-group">
+                          {{ field }}
+                          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                          {% if field.errors %}
+                              <small style="color: #d9534f;">{{ field.errors|striptags }}</small>
+                          {% endif %}
+                      </div>
+                  {% else %}
+                      <div class="form-group">
+                          {{ field }}
+                          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                          {% if field.errors %}
+                              <small style="color: #d9534f;">{{ field.errors|striptags }}</small>
+                          {% endif %}
+                      </div>
+                  {% endif %}
+              {% endfor %}
+
+              <div class="edit-user-buttons">
+                  <button type="submit" class="save-btn"><i class="fas fa-save"></i> Save</button>
+                  <a href="{% url 'user_list' %}" class="cancel-btn"><i class="fas fa-times"></i> Cancel</a>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+{% endblock %}

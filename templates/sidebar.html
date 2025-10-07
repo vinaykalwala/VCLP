@@ -30,7 +30,7 @@ body {
 }
 .main-content {
     margin-left: 260px;
-    padding: 0px 20px;
+    padding: 10px 20px;
     transition: var(--transition);
 }
 
@@ -50,8 +50,9 @@ body {
   z-index: 1000;
   overflow-y: auto;
 }
-.sidebar::-webkit-scrollbar { width: 6px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+.sidebar::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, Edge */
+}
 
 /* Header / Dashboard name */
 .sidebar-header {
@@ -245,15 +246,6 @@ body {
   <!-- Sidebar Links -->
   <ul>
     {% if request.user.role == "superuser" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
-      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
-<li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
-<li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
-           <!-- <li>
-  <a href="{% url 'daily_update_dashboard' %}">
-    <i class="fas fa-clipboard-list"></i> Session Portfolio's
-  </a>
-</li>
 
 <li>
   <a href="{% url 'daily_update_list' %}">
@@ -289,15 +281,62 @@ body {
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
       <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
+      <li><a href="{% url 'daily_update_dashboard' %}"><i class="fas fa-clipboard-list"></i> Session Portfolio's</a></li>
+      <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
+      <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
+      <li><a href="{% url 'batch_list' %}" class="{% if request.path == '/batches/' or 'batch' in request.path %}active{% endif %}"><i class="fas fa-layer-group"></i>Batch Management</a></li>
+      <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
+      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
+      <li><a href="{% url 'trainer_list' %}"><i class="fas fa-chalkboard-teacher"></i></i>Trainer Profiles</a></li>
+      <li><a href="{% url 'user_list' %}"><i class="fas fa-user-cog"></i> User Management</a></li>
+      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
 
 
+    {% elif request.user.role == "admin" %}
+
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
+      <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
+      <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i>Undertaking Letters</a></li>
+      <li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i>Completion Certificates</a></li>
+      <li><a href="{% url 'daily_update_dashboard' %}"><i class="fas fa-clipboard-list"></i> Session Portfolio's</a></li>
+      <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
+      <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
+      <li><a href="{% url 'batch_list' %}" class="{% if request.path == '/batches/' or 'batch' in request.path %}active{% endif %}"><i class="fas fa-layer-group"></i>Batch Management</a></li>
+      <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
+      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
+      <li><a href="{% url 'trainer_list' %}"><i class="fas fa-chalkboard-teacher"></i></i>Trainer Profiles</a></li>
+      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
+      
+
+
+    {% elif request.user.role == "trainer" %}
+
+      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
+      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
+      <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
+      <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
       <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-check-circle"></i>Mark Attendance</a></li>
       <li><a href="{% url 'upload_lesson' %}"><i class="fas fa-upload"></i>Upload Lesson</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
+      <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
+      <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
+      <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
+      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
+
+
+
     {% elif request.user.role == "intern" %}
+
       <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
+      <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
+      <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
+      <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
+      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
+
     {% endif %}
   </ul>
 

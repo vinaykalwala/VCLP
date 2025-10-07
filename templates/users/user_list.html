@@ -1,0 +1,350 @@
+{% extends 'login_base.html' %}
+{% block content %}
+<style>
+/* ===== User Stats Banner / Cards like Employee Stats ===== */
+.employee-stats {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 10px 0;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-card:not(:last-child) {
+  border-right: 1px solid #e0e0e0; /* Divider line between cards */
+}
+
+.stat-card .icon {
+  font-size: 20px;
+  color: #4caf50;
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 50%;
+  background-color: #e0f7e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card.total .icon { background-color: #e2f6fc; color: #0b5e6f; }
+.stat-card.active .icon { background-color: #7bedd3; color: #00614f; }
+.stat-card.inactive .icon { background-color: #ffc5c5; color: #a10000; }
+.stat-card.role .icon { background-color: #f0e5ff; color: #5a2dbf; }
+
+.stat-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.stat-card h2 {
+  margin: 5px 0 0 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .employee-stats {
+    flex-direction: column;
+  }
+  .stat-card:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .stat-card h2 {
+    font-size: 24px;
+  }
+  .stat-card .icon {
+    font-size: 24px;
+    padding: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .stat-card {
+    padding: 10px;
+  }
+  .stat-card h2 {
+    font-size: 22px;
+  }
+  .stat-card .icon {
+    font-size: 20px;
+    padding: 10px;
+  }
+}
+.userlist-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.userlist-filter input[type="text"],
+.userlist-filter select {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  flex: 1;
+  min-width: 150px;
+  background: #f5f7ff;
+}
+
+.btn-filter {
+  padding: 8px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-filter:hover {
+  background: #3730a3;
+}
+
+/* ===== TABLE ===== */
+.userlist-table-wrapper {
+  overflow-x: auto;
+}
+
+.userlist-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 0.95rem;
+}
+
+.userlist-table thead th {
+  text-align: left;
+  padding: 12px;
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+
+.userlist-table tbody tr.user-row {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+}
+
+.userlist-table tbody tr.user-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.userlist-table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.password-wrapper input {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 6px 10px;
+  background: #f5f7ff;
+  flex: 1;
+}
+
+.toggle-pwd {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.toggle-pwd:hover { background: #3730a3; }
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-badge.active { background: #d1fae5; color: #065f46; }
+.status-badge.inactive { background: #fee2e2; color: #991b1b; }
+
+/* Action Buttons */
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+.action-btn.edit { background: #fbbf24; color: #000; }
+.action-btn.edit:hover { background: #f59e0b; }
+
+.action-btn.delete { background: #ef4444; color: #fff; }
+.action-btn.delete:hover { background: #b91c1c; }
+
+/* No users */
+.no-users {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .userlist-filter {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .user-stats-banner {
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px;
+  }
+  .user-stats-banner .stat-item .value {
+    font-size: 1.2rem;
+  }
+  .userlist-table thead th {
+    font-size: 0.85rem;
+  }
+  .userlist-table td {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+  .password-wrapper input { font-size: 0.85rem; }
+  .toggle-pwd { font-size: 0.75rem; padding: 5px 8px; }
+  .action-btn { font-size: 0.75rem; padding: 5px 8px; margin-right: 4px; }
+}
+</style>
+<div class="main-content">
+  <div class="container">
+
+   <!-- ===== User Stats Banner ===== -->
+<div class="user-stats-banner employee-stats">
+  <div class="stat-card total">
+    <div class="icon"><i class="fas fa-users"></i></div>
+    <p>Total Users</p>
+    <h2>{{ total_users }}</h2>
+  </div>
+  <div class="stat-card active">
+    <div class="icon"><i class="fas fa-user-check"></i></div>
+    <p>Active Users</p>
+    <h2>{{ active_users }}</h2>
+  </div>
+  <div class="stat-card inactive">
+    <div class="icon"><i class="fas fa-user-times"></i></div>
+    <p>Inactive Users</p>
+    <h2>{{ inactive_users }}</h2>
+  </div>
+  {% for role in role_counts %}
+  <div class="stat-card role">
+    <div class="icon"><i class="fas fa-user-tie"></i></div>
+    <p>{{ role.role|title }}</p>
+    <h2>{{ role.count }}</h2>
+  </div>
+  {% endfor %}
+</div>
+
+
+
+<!-- Add Font Awesome CDN for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <!-- ===== Filters ===== -->
+    <form method="get" class="userlist-filter">
+      <input type="text" name="q" placeholder="Search users..." value="{{ request.GET.q }}">
+      <select name="role">
+        <option value="">All Roles</option>
+        <option value="superuser" {% if request.GET.role|default:'' == 'superuser' %}selected{% endif %}>SuperUser</option>
+        <option value="admin" {% if request.GET.role|default:'' == 'admin' %}selected{% endif %}>Administrator</option>
+        <option value="trainer" {% if request.GET.role|default:'' == 'trainer' %}selected{% endif %}>Trainer</option>
+        <option value="intern" {% if request.GET.role|default:'' == 'intern' %}selected{% endif %}>Intern</option>
+      </select>
+      <button type="submit" class="btn-filter">Filter</button>
+    </form>
+
+    <!-- ===== Users Table ===== -->
+    <div class="userlist-table-wrapper">
+      <table class="userlist-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Password</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr class="user-row">
+            <td>{{ user.username }}</td>
+            <td>{{ user.get_role_display }}</td>
+            <td>{{ user.phone }}</td>
+            <td>
+              <div class="password-wrapper">
+                <input type="password" id="pwd-{{ user.id }}" value="{{ user.plain_password }}" readonly>
+                <button type="button" class="toggle-pwd" onclick="togglePassword({{ user.id }})">Show</button>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
+                {% if user.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'user_update' user.pk %}" class="action-btn edit">Edit</a>
+              <a href="{% url 'user_delete' user.pk %}" class="action-btn delete">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="no-users">No users found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+
+<script>
+function togglePassword(id) {
+    var input = document.getElementById('pwd-' + id);
+    input.type = (input.type === "password") ? "text" : "password";
+}
+</script>
+{% endblock %}

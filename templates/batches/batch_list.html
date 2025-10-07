@@ -1,408 +1,544 @@
+{% extends 'login_base.html' %}
+{% block title %}Batch Management{% endblock %}
+{% block content %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batch Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --info: #4895ef;
-            --warning: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            --hover-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            --primary: #00c3ff;
+            --primary-dark: #0099cc;
+            --primary-light: #66d9ff;
+            --bg: #0a1525;
+            --bg-light: #0f1c2d;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
         }
-        
+
         body {
-            background-color: #f5f7fb;
+            background: linear-gradient(135deg, var(--bg), #0f1c2d);
+            color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            padding-top: 20px;
+            min-height: 100vh;
         }
-        
-        .header-container {
-            background: var(--gradient);
-            border-radius: 15px;
-            padding: 25px 30px;
-            color: white;
-            margin-bottom: 30px;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            transition: var(--transition);
         }
-        
-        .header-container::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: rgba(255,255,255,0.1);
-            transform: rotate(30deg);
+
+        @media (max-width: 992px) {
+            .main-content {
+                margin-left: 0;
+            }
         }
-        
-        .page-title {
-            font-weight: 700;
-            margin-bottom: 5px;
-            font-size: 2.2rem;
-        }
-        
-        .page-subtitle {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-        
-        .btn-primary-custom {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            font-weight: 600;
-            padding: 12px 25px;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .btn-primary-custom:hover {
-            background: rgba(255,255,255,0.3);
-            border-color: rgba(255,255,255,0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            color: white;
-        }
-        
-        .btn-primary-custom i {
-            margin-right: 8px;
-        }
-        
-        .batch-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .batch-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--hover-shadow);
-        }
-        
-        .batch-card-header {
-            background: var(--gradient);
-            color: white;
-            padding: 20px;
-            position: relative;
-        }
-        
-        .batch-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .batch-course {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        .batch-card-body {
-            padding: 25px;
-        }
-        
-        .batch-info-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .batch-info-item i {
-            width: 30px;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-        
-        .batch-actions {
+
+        .page-header {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            border-radius: 50px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .action-btn i {
-            margin-right: 7px;
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0;
         }
-        
-        .btn-view {
-            background: #e9ecef;
-            color: #495057;
-            border: 2px solid #e9ecef;
+
+        .create-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 195, 255, 0.2);
         }
-        
-        .btn-view:hover {
-            background: #dee2e6;
-            border-color: #dee2e6;
-            color: #495057;
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 195, 255, 0.3);
         }
-        
-        .btn-edit {
-            background: #fff3cd;
-            color: #856404;
-            border: 2px solid #fff3cd;
-        }
-        
-        .btn-edit:hover {
-            background: #ffeaa7;
-            border-color: #ffeaa7;
-            color: #856404;
-        }
-        
-        .btn-delete {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f8d7da;
-        }
-        
-        .btn-delete:hover {
-            background: #f1b0b7;
-            border-color: #f1b0b7;
-            color: #721c24;
-        }
-        
+
+.batch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.batch-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #dee2e6;
+}
+
+.batch-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.batch-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 8px;
+}
+
+.batch-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    margin-right: 15px;
+    color: white;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.status-inactive {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.status-upcoming {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.status-draft {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.batch-course {
+    font-size: 14px;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+    color: white;
+}
+
+.batch-body {
+    padding: 20px;
+}
+
+.batch-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+
+.info-item i {
+    color: #667eea;
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.info-label {
+    font-weight: 600;
+    min-width: 100px;
+    color: #495057;
+    font-size: 14px;
+}
+
+.info-value {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.divider {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+}
+
+.intern-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.batch-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.batch-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+    max-width: 80px;
+}
+
+.view-btn {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.view-btn:hover {
+    background: #2196F3;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.edit-btn {
+    background: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.edit-btn:hover {
+    background: #FF9800;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: rgba(244, 67, 54, 0.1);
+    color: #F44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.delete-btn:hover {
+    background: #F44336;
+    color: white;
+    transform: translateY(-2px);
+}
+/* Optional: Add a little shadow on hover for better button feel */
+.action-btn:hover {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: var(--card-shadow);
+            background: var(--bg-light);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
         }
-        
-        .empty-state i {
-            font-size: 5rem;
-            color: #dee2e6;
+
+        .empty-icon {
+            font-size: 64px;
             margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
-        .empty-state h3 {
-            color: #6c757d;
-            margin-bottom: 15px;
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
-        
+
+        .empty-text {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .alert-custom {
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            padding: 15px 20px;
-            margin-bottom: 25px;
+            box-shadow: var(--shadow);
         }
-        
-        .stats-card {
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-info {
+            background: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border-left: 4px solid #ffc107;
+        }
+
+        .intern-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 195, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
+            color: #28a745;
         }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--hover-shadow);
+
+        .status-upcoming {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
         }
-        
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .stats-label {
+
+        .status-completed {
+            background: rgba(108, 117, 125, 0.2);
             color: #6c757d;
-            font-size: 0.9rem;
         }
-        
+
         @media (max-width: 768px) {
-            .batch-actions {
+            .batch-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .batch-footer {
                 flex-direction: column;
                 gap: 10px;
             }
             
-            .action-btn {
-                width: 100%;
+            .batch-actions {
+                justify-content: space-between;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <div class="header-container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="page-title">Batch Management</h1>
-                    <p class="page-subtitle">Manage all your training batches in one place</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a href="{% url 'batch_create' %}" class="btn btn-primary-custom">
-                        <i class="fas fa-plus-circle"></i> Create New Batch
-                    </a>
-                </div>
+    {% include 'sidebar.html' %}
+    
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1 class="page-title">Batch Management</h1>
+                <a href="{% url 'batch_create' %}" class="btn create-btn" style="color:white;'">
+                    <i class="fas fa-plus"></i> Create New Batch
+                </a>
             </div>
-        </div>
-        
-        <!-- Stats Section - Only shown if there are batches -->
-        {% if batches %}
-        <div class="row">
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-number">{{ batches.count }}</div>
-                    <div class="stats-label">Total Batches</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-number">
-                        {% with active_batches=batches|length %}
-                            {{ active_batches }}
-                        {% endwith %}
-                    </div>
-                    <div class="stats-label">Active Batches</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-number">
-                        {% with completed_batches_count=0 %}
-                            {% for batch in batches %}
-                                {% if batch.end_date and batch.end_date < now %}
-                                    {% widthratio 1 1 1 as completed_count %}
-                                    {{ completed_batches_count|add:completed_count }}
-                                {% endif %}
-                            {% endfor %}
-                            {{ completed_batches_count }}
-                        {% endwith %}
-                    </div>
-                    <div class="stats-label">Completed Batches</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-number">
-                        {% with total_interns=0 %}
-                            {% for batch in batches %}
-                                {% with batch_interns=batch.interns.count %}
-                                    {% widthratio batch_interns 1 1 as intern_count %}
-                                    {{ total_interns|add:intern_count }}
-                                {% endwith %}
-                            {% endfor %}
-                            {{ total_interns }}
-                        {% endwith %}
-                    </div>
-                    <div class="stats-label">Total Interns</div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Messages/Alerts -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        <!-- Batches Listing -->
-        {% if batches %}
-        <div class="row">
-            {% for batch in batches %}
-            <div class="col-lg-6">
-                <div class="batch-card">
-                    <div class="batch-card-header">
-                        <div class="batch-name">{{ batch.name }}</div>
-                        <div class="batch-course">{{ batch.course.name }}</div>
-                    </div>
-                    <div class="batch-card-body">
-                        <div class="batch-info-item">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <div>
-                                <strong>Trainer:</strong> {{ batch.trainer.user.get_full_name|default:batch.trainer.user.username }}
-                            </div>
-                        </div>
-                        <div class="batch-info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div>
-                                <strong>Duration:</strong> 
-                                {{ batch.start_date|default:"TBD" }} to {{ batch.end_date|default:"TBD" }}
-                            </div>
-                        </div>
-                        <div class="batch-info-item">
-                            <i class="fas fa-users"></i>
-                            <div>
-                                <strong>Interns:</strong> {{ batch.interns.count }} enrolled
-                            </div>
-                        </div>
-                        {% if batch.description %}
-                        <div class="batch-info-item">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <strong>Description:</strong> {{ batch.description|truncatewords:15 }}
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="batch-actions">
-                            <a href="{% url 'batch_detail' batch.pk %}" class="btn btn-view action-btn">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            <a href="{% url 'batch_update' batch.pk %}" class="btn btn-edit action-btn">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a href="{% url 'batch_delete' batch.pk %}" class="btn btn-delete action-btn">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <!-- Empty State -->
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h3>No batches found</h3>
-            <p class="text-muted">You haven't created any batches yet. Get started by creating your first batch.</p>
-            <a href="{% url 'batch_create' %}" class="btn btn-primary mt-3" style="padding: 12px 30px; border-radius: 50px;">
-                <i class="fas fa-plus-circle me-2"></i> Create Your First Batch
-            </a>
-        </div>
-        {% endif %}
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-custom alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+{% load tz %}
+
+{% if batches %}
+<div class="batch-grid">
+    {% for batch in batches %}
+    <div class="batch-card">
+        <div class="batch-header">
+            <div class="header-top">
+                <h3 class="batch-title" style="color:white;">{{ batch.name }}</h3>
+                
+                {# Get current date #}
+                {% now "Y-m-d" as today %}
+                
+                {# Determine batch status based on dates #}
+                {% if batch.start_date and batch.end_date %}
+                    {% if today >= batch.start_date|date:"Y-m-d" and today <= batch.end_date|date:"Y-m-d" %}
+                        <span class="status-badge status-active">Active</span>
+                    {% elif today < batch.start_date|date:"Y-m-d" %}
+                        <span class="status-badge status-upcoming">Upcoming</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Completed</span>
+                    {% endif %}
+                {% elif batch.start_date %}
+                    {# Only start date is set #}
+                    {% if today >= batch.start_date|date:"Y-m-d" %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-upcoming">Upcoming</span>
+                    {% endif %}
+                {% elif batch.end_date %}
+                    {# Only end date is set #}
+                    {% if today <= batch.end_date|date:"Y-m-d" %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Completed</span>
+                    {% endif %}
+                {% else %}
+                    {# No dates set #}
+                    <span class="status-badge status-draft">Draft</span>
+                {% endif %}
+            </div>
+            <div class="batch-course">{{ batch.course.name }}</div>
+        </div>
+
+        <div class="batch-body">
+            <div class="batch-info">
+                <div class="info-item divider">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span class="info-label">Trainer:</span>
+                    <span class="info-value">
+                        {% if batch.trainer.user.get_full_name %}
+                            {{ batch.trainer.user.get_full_name }}
+                        {% else %}
+                            {{ batch.trainer.user.username }}
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if batch.start_date %}
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="info-label">Start Date:</span>
+                    <span class="info-value">{{ batch.start_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+
+                {% if batch.end_date %}
+                <div class="info-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="info-label">End Date:</span>
+                    <span class="info-value">{{ batch.end_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+
+                <div class="info-item divider">
+                    <i class="fas fa-users"></i>
+                    <span class="info-label">Interns:</span>
+                    <span class="info-value">
+                        <span class="intern-count">
+                            <i class="fas fa-user-graduate"></i>
+                            {{ batch.interns.count }} enrolled
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="batch-footer">
+            <div class="batch-actions">
+                <a href="{% url 'batch_detail' batch.pk %}" class="action-btn view-btn">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <a href="{% url 'batch_update' batch.pk %}" class="action-btn edit-btn">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'batch_delete' batch.pk %}" class="action-btn delete-btn">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="empty-title">No batches found</h3>
+                <p class="empty-text">Get started by creating your first batch to organize and manage your training programs efficiently.</p>
+                <a href="{% url 'batch_create' %}" class="btn create-btn">
+                    <i class="fas fa-plus"></i> Create First Batch
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% comment %} 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> {% endcomment %}
 </body>
 </html>
+{% endblock %}

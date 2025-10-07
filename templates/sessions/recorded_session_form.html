@@ -1,16 +1,20 @@
 {% extends 'login_base.html' %}
-{% block title %}Curriculum Form{% endblock %}
 {% block content %}
 {% load static %}
 
 <style>
-/* === Global Reset & Base === */
-* { box-sizing: border-box; }
-body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; padding: 0; }
+{% comment %} .main-content {
+    padding: 40px 20px;
+    background-color: #f5f6fa;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} {% endcomment %}
 
 /* === Form Container === */
-.curriculum-form-container {
-    min-height: 90vh;
+.recorded-session-form-container {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,50 +22,49 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
 }
 
 /* === Card === */
-.curriculum-card {
+.recorded-session-card {
     width: 100%;
-    max-width: 800px; /* Increased width */
+    max-width: 800px;
     background: #ffffff;
     border-radius: 16px;
     padding: 45px 35px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.curriculum-card:hover {
+.recorded-session-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 25px 70px rgba(0,0,0,0.12);
 }
 
-/* === Header with Background === */
-.curriculum-card-header {
+/* === Header === */
+.recorded-session-card-header {
     display: flex;
     align-items: center;
     gap: 15px;
     margin-bottom: 35px;
-    background-color: #5932EA; /* Header background */
+    background-color: #5932EA;
     padding: 15px 20px;
     border-radius: 12px;
     color: white;
 }
-.curriculum-card-header i {
+.recorded-session-card-header i {
     font-size: 32px;
 }
-.curriculum-card-header h2 {
+.recorded-session-card-header h2 {
     font-size: 26px;
     font-weight: 700;
+    margin: 0;
 }
 
 /* === Form Fields === */
-.curriculum-card form p {
+.recorded-session-card form p {
     position: relative;
     margin-bottom: 22px;
     width: 100%;
 }
-
-/* Inputs, Selects, Textareas */
-.curriculum-card form input,
-.curriculum-card form select,
-.curriculum-card form textarea {
+.recorded-session-card form input,
+.recorded-session-card form select,
+.recorded-session-card form textarea {
     width: 100%;
     padding: 14px 16px;
     font-size: 15px;
@@ -70,16 +73,16 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
     background: #fafafa;
     transition: border 0.3s ease, box-shadow 0.3s ease;
 }
-.curriculum-card form input:focus,
-.curriculum-card form select:focus,
-.curriculum-card form textarea:focus {
+.recorded-session-card form input:focus,
+.recorded-session-card form select:focus,
+.recorded-session-card form textarea:focus {
     border-color: #5932EA;
     box-shadow: 0 0 12px rgba(89,50,234,0.15);
     outline: none;
 }
 
-/* Labels */
-.curriculum-card form label {
+/* === Labels === */
+.recorded-session-card form label {
     display: block;
     margin-bottom: 6px;
     font-size: 14px;
@@ -87,23 +90,61 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
     color: #555;
 }
 
-/* File Input Wrapper */
+/* === File Input === */
+/* === File Input === */
 .file-wrapper {
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
-    background: #f3f4f6;
-    padding: 8px 10px;
-    border-radius: 8px;
+    justify-content: space-between;
+    background: #f9f9fb;
     border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+.file-wrapper:hover {
+    border-color: #5932EA;
+    box-shadow: 0 0 10px rgba(89, 50, 234, 0.1);
+}
+
+.file-wrapper input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    left: 0;
+    top: 0;
+}
+
+.file-wrapper::before {
+    content: "Choose File";
+    background-color: #5932EA;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.file-wrapper:hover::before {
+    background-color: #4c28d1;
+}
+
 .file-wrapper span {
-    flex: 1 1 auto;
-    word-break: break-word;
+    flex: 1;
     font-size: 14px;
     color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 /* === Buttons === */
 .form-buttons {
@@ -123,8 +164,6 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    flex: 1 1 auto;
-    min-width: 130px;
 }
 .btn-save:hover {
     background: #4c28d1;
@@ -140,27 +179,22 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
     font-weight: 500;
     text-decoration: none;
     transition: all 0.3s ease;
-    flex: 1 1 auto;
-    min-width: 130px;
 }
 .btn-cancel:hover {
     background: #e5e7eb;
     transform: translateY(-2px);
 }
 
-/* === Responsive Adjustments === */
+/* === Responsive === */
 @media (max-width: 480px) {
-    .curriculum-card {
+    .recorded-session-card {
         padding: 30px 20px;
     }
-    .curriculum-card-header h2 {
+    .recorded-session-card-header h2 {
         font-size: 22px;
     }
-    .curriculum-card-header i {
+    .recorded-session-card-header i {
         font-size: 28px;
-    }
-    .curriculum-card form p {
-        margin-bottom: 16px;
     }
     .form-buttons {
         flex-direction: column;
@@ -174,20 +208,20 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
 </style>
 
 <div class="main-content">
-    <div class="curriculum-form-container">
-        <div class="curriculum-card">
-            <div class="curriculum-card-header">
-                <i class="fas fa-book-open"></i>
+    <div class="recorded-session-form-container">
+        <div class="recorded-session-card">
+            <div class="recorded-session-card-header">
+                <i class="fas fa-video"></i>
                 <h2>{{ title }}</h2>
             </div>
+
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                
                 {% for field in form %}
                 <p>
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-                    {% if field|slice:"-4" == "file" %}
+                    {% if field.field.widget.input_type == 'file' %}
                         <div class="file-wrapper">
                             {{ field }}
                             <span>
@@ -206,7 +240,7 @@ body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; paddin
 
                 <div class="form-buttons">
                     <button type="submit" class="btn-save">Save</button>
-                    <a href="{% url 'curriculum_list' %}" class="btn-cancel">Cancel</a>
+                    <a href="{% url 'recorded_session_list' %}" class="btn-cancel">Cancel</a>
                 </div>
             </form>
         </div>

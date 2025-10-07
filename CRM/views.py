@@ -110,13 +110,17 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        
         if user:
-            login(request, user)
-            return redirect('dashboard')
+            if user.is_active:  # check if user is active
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                messages.error(request, "Your account is inactive. Please contact admin.")
         else:
             messages.error(request, "Invalid credentials.")
+    
     return render(request, 'login.html')
-
 
 def logout_view(request):
     logout(request)
@@ -525,8 +529,17 @@ def generate_pdf_for_intern(intern):
     """
     Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
     """
-
-    context = {'intern': intern}
+    from datetime import date
+    
+    # ✅ Get absolute path to logo
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'vinduslogo.jpg')
+    
+    context = {
+        'intern': intern,
+        'today_date': date.today().strftime("%d-%m-%Y"),
+        'logo_path': logo_path  # ✅ Add logo path here inside the context dict
+    }
+    
     html_string = render_to_string('certificates/certificate_template.html', context)
 
     # Create a BytesIO buffer to hold PDF
@@ -813,29 +826,60 @@ def course_delete_ajax(request, pk):
 # LETTER OF RECOMMENDATION (LOR) VIEWS
 # ================================
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.http import HttpResponse
+from django.db.models import Q
+from datetime import date
+import io
+import zipfile
+from .models import InternProfile, Course, Batch
+from .forms import InternFilterForm
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+import io
+
+def render_to_pdf(template_path, context_dict):
+    """
+    Utility function to render HTML template to PDF
+    """
+    html = render_to_string(template_path, context_dict)
+    result = io.BytesIO()
+    pdf = pisa.CreatePDF(html, dest=result)
+    
+    if not pdf.err:
+        return result.getvalue()
+    return None 
+
 @login_required
 def manage_lor_view(request):
     """
-    Allows an admin to filter, search, and bulk-download Letters of Recommendation.
+    Allows an admin to filter by course/batch, search, and download Letters of Recommendation (LORs).
     """
     if not (request.user.is_superuser or request.user.role == 'admin'):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('dashboard')
 
     interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
-    
+
+    # Using the same filter form as certificates view
     filter_form = InternFilterForm(request.GET)
-    selected_batch = None # Initialize selected_batch
+    selected_batch = None
 
     if filter_form.is_valid():
         selected_course = filter_form.cleaned_data.get('course')
-        selected_batch = filter_form.cleaned_data.get('batch') # Get selected_batch from form
+        selected_batch = filter_form.cleaned_data.get('batch')
         query = filter_form.cleaned_data.get('q')
 
         if selected_course:
             interns_qs = interns_qs.filter(batch__course=selected_course)
+            # Dynamically update the batch dropdown to show only batches from the selected course
+            filter_form.fields['batch'].queryset = Batch.objects.filter(course=selected_course)
+
         if selected_batch:
             interns_qs = interns_qs.filter(batch=selected_batch)
+
         if query:
             interns_qs = interns_qs.filter(
                 Q(unique_id__icontains=query) |
@@ -843,62 +887,119 @@ def manage_lor_view(request):
                 Q(user__last_name__icontains=query)
             )
 
+    # POST: Handle LOR downloads
     if request.method == 'POST':
-        # This POST logic for bulk downloads is now fully supported
-        intern_ids = request.POST.getlist('intern_ids')
-        if not intern_ids:
-            messages.error(request, "Please select at least one intern.")
-            return redirect('manage_lor')
+        action = request.POST.get('action')
+        selected_interns = None
 
-        selected_interns = InternProfile.objects.filter(id__in=intern_ids, internship_status='Completed')
+        if action == 'download_selected':
+            intern_ids = request.POST.getlist('intern_ids')
+            if not intern_ids:
+                messages.error(request, "Please select at least one intern.")
+                return redirect(request.get_full_path())
+            selected_interns = InternProfile.objects.filter(
+                id__in=intern_ids, internship_status='Completed'
+            )
 
-        if not selected_interns.exists():
-            messages.warning(request, "No completed interns were selected for LOR generation.")
-            return redirect('manage_lor')
+        elif action == 'download_batch':
+            batch_id = request.POST.get('batch_id')
+            if not batch_id:
+                messages.error(request, "Please filter by a batch first.")
+                return redirect(request.get_full_path())
+            selected_interns = InternProfile.objects.filter(
+                batch_id=batch_id, internship_status='Completed'
+            )
 
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for intern in selected_interns:
-                pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
-                if pdf_bytes:
-                    filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
-                    zf.writestr(filename, pdf_bytes)
-        
-        selected_interns.update(lor_generated=True)
+        # Generate ZIP of LOR PDFs
+        if selected_interns and selected_interns.exists():
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+                logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
 
-        zip_buffer.seek(0)
-        response = HttpResponse(zip_buffer, content_type='application/zip')
-        response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
-        return response
+                for intern in selected_interns:
+                    context = {
+                        'intern': intern,
+                        "company": {
+                            "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+                            "cin": "U62099TS2023PTC179794",
+                            "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060",
+                            "phone": "+914049525396",
+                            "website": "www.vindusenvironment.com"
+                        },
+                        "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                        "logo_path": logo_path
+                    }
 
-    # Add selected_batch to the context
+                    pdf_bytes = render_to_pdf('lors/lor_template.html', context)
+                    if pdf_bytes:
+                        filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
+                        zf.writestr(filename, pdf_bytes)
+
+            selected_interns.update(lor_generated=True)
+
+            zip_buffer.seek(0)
+            response = HttpResponse(zip_buffer, content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
+            messages.success(request, f"Successfully generated {selected_interns.count()} LORs.")
+            return response
+        else:
+            messages.warning(request, "No completed interns were found for the selected action.")
+            return redirect(request.get_full_path())
+
     context = {
         'interns': interns_qs,
         'filter_form': filter_form,
-        'selected_batch': selected_batch, 
+        'selected_batch': selected_batch,
     }
     return render(request, 'lors/manage_lors.html', context)
 
+from datetime import datetime
 
 @login_required
 def download_lor_view(request, intern_id):
+    """
+    Download a Letter of Recommendation for a specific intern,
+    only if internship is completed and project_title is filled.
+    """
     intern = get_object_or_404(InternProfile, id=intern_id)
+
+    # Check internship completion
     if intern.internship_status != 'Completed':
         messages.error(request, "LOR not available for this intern yet.")
         return redirect('manage_lor')
 
-    pdf_bytes = render_to_pdf('lors/lor_template.html', {'intern': intern})
+    # Check if project_title is filled
+    if not intern.project_title or intern.project_title.strip() == "":
+        messages.error(request, "The student hasn't completed the project yet.")
+        return redirect('manage_lor')
+
+    # Generate PDF only when both conditions are met
+    logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
+    context = {
+        'intern': intern,
+        'company': {
+            "name": "VINDUS ENVIRONMENT PRIVATE LIMITED",
+            "cin": "U62099TS2023PTC179794",
+            "address": "#9-110, Shanti Nagar, Dilsukhnagar, Hyderabad-500060",
+            "phone": "+91 40 49525396",
+            "website": "www.vindusenvironment.com"
+        },
+        "today_date": date.today().strftime("%d-%m-%Y"),
+        "logo_path": logo_path
+    }
+
+    pdf_bytes = render_to_pdf('lors/lor_template.html', context)
     if pdf_bytes:
         intern.lor_generated = True
         intern.save()
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
-        filename = f"LOR_{intern.unique_id}.pdf"
+        filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
+
     messages.error(request, "Error generating LOR PDF.")
     return redirect('manage_lor')
-from django.db.models import Q
-from .models import InternProfile
+
 
 @login_required
 def intern_list(request):
@@ -994,6 +1095,8 @@ import calendar
 import openpyxl
 from xhtml2pdf import pisa
 from django.template.loader import get_template
+import os
+from django.conf import settings
 
 @login_required
 def attendance_report(request):
@@ -1094,13 +1197,16 @@ def attendance_report(request):
     if export_type == 'pdf' and attendances.exists():
         template = get_template('attendance/attendance_report_pdf.html')
         logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        today_date = datetime.now().strftime('%d-%m-%Y')
+        
         html = template.render({
             'attendances': attendances,
             'summary': summary,
             'batch': batch,
-            'selected_date': (date_input or today).strftime('%d-%m-%Y'),
+            'selected_date': (datetime.strptime(date_input, "%Y-%m-%d").strftime('%d-%m-%Y') if date_input else today.strftime('%d-%m-%Y')),
             'month_input': month_input,
             'logo_path': logo_path,
+            'today_date': today_date,
         })
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'
@@ -1420,3 +1526,354 @@ def daily_update_dashboard(request):
 
 
 
+@login_required
+def doubt_list(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    # ============= INTERN =============
+    if role == "intern":
+        intern_profile = getattr(user, 'intern_profile', None)
+        doubts = Doubt.objects.filter(intern=intern_profile).order_by('-created_at')
+        return render(request, 'doubts/intern_doubt_list.html', {'doubts': doubts})
+
+    # ============= TRAINER =============
+    elif role == "trainer":
+        trainer_profile = getattr(user, 'trainer_profile', None)
+        unresolved_doubts = Doubt.objects.filter(trainer=trainer_profile, resolved=False).order_by('-created_at')
+        resolved_doubts = Doubt.objects.filter(trainer=trainer_profile, resolved=True).order_by('-created_at')
+
+        return render(request, 'doubts/trainer_doubt_list.html', {
+            'unresolved_doubts': unresolved_doubts,
+            'resolved_doubts': resolved_doubts
+        })
+
+    # ============= ADMIN / SUPERUSER =============
+    else:
+        doubts = Doubt.objects.all().order_by('-created_at')
+        return render(request, 'doubts/admin_doubt_list.html', {'doubts': doubts})
+
+
+@login_required
+def doubt_create(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+    if role != "intern":
+        messages.error(request, "Only interns can create doubts.")
+        return redirect('doubt_list')
+
+    intern_profile = getattr(user, 'intern_profile', None)
+    if not intern_profile:
+        messages.error(request, "Intern profile missing.")
+        return redirect('doubt_list')
+
+    # get intern's batch (adjust attribute name if different)
+    batch = getattr(intern_profile, 'batch', None)
+    if batch is None:
+        messages.error(request, "Your batch is not set. Contact admin.")
+        return redirect('doubt_list')
+
+    # -------------------------
+    # Robust trainer lookup:
+    # TrainerProfile might use 'assigned_batches' (ManyToMany) or 'batch' (FK).
+    # Check model fields and choose the correct lookup.
+    # -------------------------
+    field_names = [f.name for f in TrainerProfile._meta.get_fields()]
+    if 'assigned_batches' in field_names:
+        trainers = TrainerProfile.objects.filter(assigned_batches=batch)
+    elif 'batch' in field_names:
+        trainers = TrainerProfile.objects.filter(batch=batch)
+    else:
+        # fall back to empty queryset if no relationship found
+        trainers = TrainerProfile.objects.none()
+
+    if request.method == 'POST':
+        form = DoubtForm(request.POST, trainers_qs=trainers)
+        if form.is_valid():
+            doubt = form.save(commit=False)
+            doubt.intern = intern_profile
+            doubt.batch = batch
+            doubt.save()
+            messages.success(request, "Your doubt has been submitted successfully!")
+            return redirect('doubt_list')
+    else:
+        form = DoubtForm(trainers_qs=trainers)
+
+    return render(request, 'doubts/doubt_form.html', {'form': form, 'title': 'Ask Doubt'})
+
+
+@login_required
+def resolve_doubt(request, pk):
+    """Trainer resolves a doubt"""
+    doubt = get_object_or_404(Doubt, pk=pk)
+    user = request.user
+
+    if getattr(user, 'role', None) != "trainer":
+        messages.error(request, "Only trainers can resolve doubts.")
+        return redirect('doubt_list')
+
+    trainer_profile = user.trainer_profile
+    if doubt.trainer != trainer_profile:
+        messages.error(request, "This doubt is not assigned to you.")
+        return redirect('doubt_list')
+
+    # If already resolved, redirect
+    if hasattr(doubt, 'resolution'):
+        messages.info(request, "This doubt is already resolved.")
+        return redirect('doubt_list')
+
+    if request.method == 'POST':
+        form = DoubtResolutionForm(request.POST)
+        if form.is_valid():
+            resolution = form.save(commit=False)
+            resolution.doubt = doubt
+            doubt.resolved = True
+            doubt.save()
+            resolution.save()
+            messages.success(request, "Doubt resolved successfully!")
+            return redirect('doubt_list')
+    else:
+        form = DoubtResolutionForm()
+
+    return render(request, 'doubts/resolve_doubt.html', {'form': form, 'doubt': doubt})
+
+@login_required
+def recorded_session_list(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer":
+        sessions = RecordedSession.objects.filter(trainer=user.trainer_profile).order_by('-uploaded_at')
+    elif role == "intern":
+        sessions = RecordedSession.objects.filter(batch=request.user.intern_profile.batch).order_by('-uploaded_at')
+    else:  # Admin / Superuser
+        sessions = RecordedSession.objects.all().order_by('-uploaded_at')
+
+    return render(request, 'sessions/recorded_session_list.html', {'sessions': sessions})
+
+# ----------------------
+# CREATE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_create(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to upload sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        form = RecordedSessionForm(request.POST, request.FILES, user=user)
+        if form.is_valid():
+            session = form.save(commit=False)
+            if role == "trainer":
+                session.trainer = user.trainer_profile
+            elif role in ["admin", "superuser"]:
+                # Admin/Superuser must select trainer manually (optional: assign default trainer)
+                session.trainer = form.cleaned_data.get('trainer') if 'trainer' in form.cleaned_data else None
+            session.save()
+            messages.success(request, "Recorded session uploaded successfully!")
+            return redirect('recorded_session_list')
+    else:
+        form = RecordedSessionForm(user=user)
+
+    return render(request, 'sessions/recorded_session_form.html', {'form': form, 'title': 'Upload Recorded Session'})
+
+# ----------------------
+# UPDATE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_update(request, pk):
+    session = get_object_or_404(RecordedSession, pk=pk)
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer" and session.trainer != user.trainer_profile:
+        messages.error(request, "You are not authorized to edit this session.")
+        return redirect('recorded_session_list')
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to edit sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        form = RecordedSessionForm(request.POST, request.FILES, instance=session, user=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Recorded session updated successfully!")
+            return redirect('recorded_session_list')
+    else:
+        form = RecordedSessionForm(instance=session, user=user)
+
+    return render(request, 'sessions/recorded_session_form.html', {'form': form, 'title': 'Edit Recorded Session'})
+
+# ----------------------
+# DELETE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_delete(request, pk):
+    session = get_object_or_404(RecordedSession, pk=pk)
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer" and session.trainer != user.trainer_profile:
+        messages.error(request, "You are not authorized to delete this session.")
+        return redirect('recorded_session_list')
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to delete sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        session.delete()
+        messages.success(request, "Recorded session deleted successfully!")
+        return redirect('recorded_session_list')
+
+    return render(request, 'sessions/recorded_session_confirm_delete.html', {'session': session})
+
+
+
+@login_required
+def trainer_list(request):
+    trainers = TrainerProfile.objects.all()
+    query = request.GET.get('q')
+    availability = request.GET.get('availability')
+
+    if query:
+        trainers = trainers.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(expertise__icontains=query) |
+            Q(designation__icontains=query) |
+            Q(highest_qualification__icontains=query)
+        )
+
+    if availability:
+        trainers = trainers.filter(availability=availability)
+
+    return render(request, "trainers/trainer_list.html", {"trainers": trainers})
+
+
+# =======================
+# Trainer Detail
+# =======================
+@login_required
+def trainer_detail(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    return render(request, "trainers/trainer_detail.html", {"trainer": trainer})
+
+
+# =======================
+# Trainer Create
+# =======================
+@login_required
+def trainer_create(request):
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Trainer profile created successfully.")
+            return redirect("trainer_list")
+    else:
+        form = TrainerProfileForm()
+    return render(request, "trainers/trainer_form.html", {"form": form})
+
+
+# =======================
+# Trainer Update
+# =======================
+@login_required
+def trainer_update(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES, instance=trainer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Trainer profile updated successfully.")
+            return redirect("trainer_list")
+    else:
+        form = TrainerProfileForm(instance=trainer)
+    return render(request, "trainers/trainer_form.html", {"form": form})
+
+
+# =======================
+# Trainer Delete
+# =======================
+@login_required
+def trainer_delete(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    if request.method == "POST":
+        trainer.delete()
+        messages.success(request, "Trainer profile deleted successfully.")
+        return redirect("trainer_list")
+    return render(request, "trainers/trainer_confirm_delete.html", {"trainer": trainer})
+
+from django.contrib.auth.decorators import user_passes_test
+def superuser_required(view_func):
+    return user_passes_test(lambda u: u.is_superuser)(view_func)
+
+from django.db.models import Q, Count
+
+@login_required
+def user_list(request):
+    if not request.user.is_superuser:
+        return render(request, "users/no_access.html")
+    
+    users = User.objects.all()
+    query = request.GET.get('q')
+    role_filter = request.GET.get('role')
+    
+    if query:
+        users = users.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone__icontains=query)
+        )
+    if role_filter:
+        users = users.filter(role=role_filter)
+
+    # Summary counts
+    total_users = users.count()
+    active_users = users.filter(is_active=True).count()
+    inactive_users = users.filter(is_active=False).count()
+    role_counts = users.values('role').annotate(count=Count('role'))
+
+    return render(request, "users/user_list.html", {
+        "users": users,
+        "total_users": total_users,
+        "active_users": active_users,
+        "inactive_users": inactive_users,
+        "role_counts": role_counts,
+    })
+
+# =======================
+# User Detail/Edit View
+# =======================
+@superuser_required
+def user_update(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User updated successfully.")
+            return redirect("user_list")
+    else:
+        form = UserForm(instance=user)
+    return render(request, "users/user_form.html", {"form": form})
+
+# =======================
+# Delete User
+# =======================
+@superuser_required
+def user_delete(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        user.delete()
+        messages.success(request, "User deleted successfully.")
+        return redirect("user_list")
+    return render(request, "users/user_confirm_delete.html", {"user": user})

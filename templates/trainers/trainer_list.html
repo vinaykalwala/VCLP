@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Trainer Profiles</h2>
+
+    <a href="{% url 'trainer_create' %}" class="btn btn-primary mb-3">Add New Trainer</a>
+
+    <form method="get" class="mb-3">
+        <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
+        <select name="availability">
+            <option value="">All Availability</option>
+            <option value="Full-time" {% if request.GET.availability == 'Full-time' %}selected{% endif %}>Full-time</option>
+            <option value="Part-time" {% if request.GET.availability == 'Part-time' %}selected{% endif %}>Part-time</option>
+            <option value="Guest" {% if request.GET.availability == 'Guest' %}selected{% endif %}>Guest</option>
+        </select>
+        <button class="btn btn-secondary" type="submit">Filter</button>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Expertise</th>
+                <th>Designation</th>
+                <th>Availability</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trainer in trainers %}
+            <tr>
+                <td>{{ trainer.user.username }}</td>
+                <td>{{ trainer.expertise }}</td>
+                <td>{{ trainer.designation }}</td>
+                <td>{{ trainer.availability }}</td>
+                <td>
+                    <a href="{% url 'trainer_detail' trainer.pk %}" class="btn btn-info btn-sm">View</a>
+                    <a href="{% url 'trainer_update' trainer.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'trainer_delete' trainer.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No trainers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

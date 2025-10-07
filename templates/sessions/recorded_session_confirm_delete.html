@@ -1,0 +1,140 @@
+{% extends 'login_base.html' %}
+{% block title %}Delete Session{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<style>
+/* Main container */
+.delete-session-container {
+    max-width: 500px;
+    margin: 80px auto;
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    border-left: 6px solid #ff4d4f;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.delete-session-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 35px rgba(0,0,0,0.15);
+}
+
+/* Heading */
+.delete-session-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #d60000;
+    margin-bottom: 20px;
+}
+
+/* Icon */
+.delete-session-icon {
+    font-size: 50px;
+    color: #ff4d4f;
+    margin-bottom: 20px;
+}
+
+/* Message */
+.delete-session-message {
+    font-size: 17px;
+    color: #333;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.delete-session-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.delete-btn-session {
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: white;
+    background: linear-gradient(135deg, #ff4d4f, #d60000);
+    box-shadow: 0 4px 12px rgba(255,77,79,0.4);
+    transition: all 0.3s ease;
+}
+.delete-btn-session:hover {
+    background: linear-gradient(135deg, #d60000, #a30000);
+    transform: translateY(-2px);
+}
+
+.cancel-btn-session {
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-weight: 500;
+    color: #555;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.cancel-btn-session:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media only screen and (max-width: 400px) {
+    .delete-session-container {
+        padding: 25px 20px;
+    }
+
+    .delete-session-title {
+        font-size: 22px;
+    }
+
+    .delete-session-message {
+        font-size: 15px;
+    }
+
+    .delete-btn-session, .cancel-btn-session {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .delete-session-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="delete-session-container">
+        <!-- Icon -->
+        <div class="delete-session-icon">⚠️</div>
+
+        <!-- Heading -->
+        <h2 class="delete-session-title">Confirm Delete</h2>
+
+        <!-- Message -->
+        <p class="delete-session-message">
+            Are you sure you want to delete the session: <strong>{{ session.title }}</strong>?
+        </p>
+
+        <!-- Buttons -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-session-buttons">
+                <button type="submit" class="delete-btn-session">Yes, Delete</button>
+                <a href="{% url 'recorded_session_list' %}" class="cancel-btn-session">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

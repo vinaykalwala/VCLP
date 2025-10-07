@@ -1,74 +1,242 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% block title %}Curriculum{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-3">Curriculum List</h2>
+{% load static %}
 
-    {% if user_role != "intern" %}
-<form method="get" class="mb-3">
-    <label for="batch">Filter by Batch:</label>
-    <select name="batch" id="batch" onchange="this.form.submit()">
-        <option value="">-- All Batches --</option>
-        {% for batch in batches %}
-            <option value="{{ batch.id }}" {% if selected_batch == batch.id|stringformat:'s' %}selected{% endif %}>
-                {{ batch.name }}
-            </option>
-        {% endfor %}
-    </select>
-</form>
-{% endif %}
+<style>
+/* ====== Main Content ====== */
+.main-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    border-left: 5px solid #5932EA;
+    padding-left: 10px;
+    margin-top: 10px;
+}
 
-    <a href="{% url 'create_curriculum' %}" class="btn btn-primary mb-3">Add Curriculum</a>
+/* ====== Top Section (Filter + Button) ====== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+}
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Course</th>
-                <th>Batch</th>
-                <th>File</th>
-                <th>Uploaded By</th>
-                <th>Uploaded At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for c in curriculums %}
-    <tr>
-        <td>{{ c.title }}</td>
-        <td>{{ c.course.name }}</td>
-        <td>
-            {% if c.batch %}
-                {{ c.batch.name }}
-            {% else %}
-                All Batches
-            {% endif %}
-        </td>
-        <td><a href="{{ c.file.url }}" target="_blank">View</a></td>
-        <td>
-            {% if c.uploaded_by %}
-                {{ c.uploaded_by.user.username }}
-            {% else %}
-                -
-            {% endif %}
-        </td>
-        <td>{{ c.uploaded_at|date:"M d, Y" }}</td>
+.filter-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    align-items: center;
+}
 
-        <td>
-            {% if user_role == "trainer" or user_role == "admin" or user_role == "superuser" %}
-                {% if c.uploaded_by and c.uploaded_by.user == request.user or user_role in "admin superuser" %}
-                    <a href="{% url 'update_curriculum' c.id %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'delete_curriculum' c.id %}" class="btn btn-sm btn-danger">Delete</a>
-                {% endif %}
-            {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="7" class="text-center">No curriculum found.</td>
-    </tr>
-    {% endfor %}
-</tbody>
+.filter-box label {
+    font-weight: 500;
+    color: #333;
+}
 
-    </table>
+.filter-box select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: 0.2s ease;
+}
+
+.filter-box select:focus {
+    border-color: #5932EA;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.15);
+}
+
+/* ====== Buttons ====== */
+.btn1 {
+    display: inline-block;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #5932EA;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #4c28d1;
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background-color: #FBBF24;
+    color: #000;
+}
+
+.btn-warning:hover {
+    background-color: #f59e0b;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: #EF4444;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    transform: translateY(-2px);
+}
+
+/* ====== Table Section ====== */
+.table-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    padding: 15px;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px 14px;
+    border: 1px solid #eee;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+}
+
+.custom-table th {
+    background: #5932EA;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+/* ====== Responsive Design ====== */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-box {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .main-content h1 {
+        text-align: center;
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .custom-table td .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+}
+</style>
+
+<div class="main-content">
+    <h1>Curriculum</h1>
+
+    <div class="top-bar">
+        {% if user_role != "intern" %}
+        <form method="get" class="filter-box">
+            <label for="batch">Filter by Batch:</label>
+            <select name="batch" id="batch" onchange="this.form.submit()">
+                <option value="">-- All Batches --</option>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}" {% if selected_batch == batch.id|stringformat:'s' %}selected{% endif %}>
+                        {{ batch.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+
+        <!-- Add Curriculum Button -->
+        <a href="{% url 'create_curriculum' %}" class="btn btn-primary">+ Add Curriculum</a>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-box">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Course</th>
+                    <th>Batch</th>
+                    <th>File</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in curriculums %}
+                <tr>
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.course.name }}</td>
+                    <td>
+                        {% if c.batch %}
+                            {{ c.batch.name }}
+                        {% else %}
+                            All Batches
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ c.file.url }}" target="_blank" style="background-color:#10B981; font-weight:500;text-decoration: none;color: #fff;border-radius: 5px;padding:6px 8px;">View</a></td>
+                    <td>
+                        {% if c.uploaded_by %}
+                            {{ c.uploaded_by.user.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ c.uploaded_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if user_role == "trainer" or user_role == "admin" or user_role == "superuser" %}
+                            {% if c.uploaded_by and c.uploaded_by.user == request.user or user_role in "admin superuser" %}
+                                <a href="{% url 'update_curriculum' c.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="{% url 'delete_curriculum' c.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center; color:#777; font-style:italic;">No curriculum found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
 {% endblock %}
