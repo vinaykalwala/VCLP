@@ -1,11 +1,320 @@
 {% extends 'login_base.html' %}
-{% block title %}Intern Dashboard{% endblock %}
+{% block title %} Dashboard{% endblock %}
 {% block content %}
 {% load static %}
-<div class="main-content">
-<h2>Welcome Intern: {{ request.user.username }}</h2>
-<p>Your Intern ID: {{ request.user.intern_profile.unique_id }}</p>
-<a href="{% url 'view_lessons' %}">View Lessons</a>
-<a href="{% url 'logout' %}">Logout</a>
-{% endblock %}
+<style>
+:root {
+  --primary: #5932EA;
+  --primary-dark: #1D4ED8;
+  --primary-light: #60A5FA;
+  --bg: #ffffff;
+  --bg-light: #F3F4F6;
+  --text-light: #111827;
+  --text-muted: #6B7280;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
+}
+
+/* Page Layout */
+.dashboard-page {
+  margin-left: 260px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--bg-light) 0%, #f8f9fa 100%);
+  min-height: 100vh;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-light);
+  transition: var(--transition);
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Welcome Section */
+.welcome-section {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 40px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.welcome-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+  z-index: 0;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.welcome-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.welcome-section h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-section p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.motivational-quote {
+  font-style: italic;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.quote-author {
+  display: block;
+  text-align: right;
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.welcome-visual {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.learning-icon {
+  font-size: 80px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 10px;
+}
+
+.stats-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Cards Layout */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 25px 20px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(89, 50, 234, 0.15);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.card-icon {
+  font-size: 28px;
+  color: var(--primary);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
+  border-radius: 12px;
+}
+
+.card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.card p {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+.card .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.card .btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Responsive Styles */
+@media (max-width: 1280px) {
+  .dashboard-page { padding: 30px 20px; }
+  .welcome-section { padding: 35px; }
+}
+
+@media (max-width: 1024px) {
+  .welcome-section h1 { font-size: 32px; }
+  .welcome-section p { font-size: 16px; }
+  .learning-icon { font-size: 70px; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-page { margin-left: 0; padding: 25px 15px; }
+  .welcome-section { padding: 30px 20px; border-radius: 16px; }
+  .welcome-content { flex-direction: column; text-align: center; gap: 25px; }
+  .welcome-visual { order: -1; }
+  .welcome-section h1 { font-size: 28px; }
+  .welcome-section p { font-size: 15px; }
+  .learning-icon { font-size: 60px; }
+  .dashboard-cards { gap: 20px; grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page { padding: 20px 10px; }
+  .welcome-section { padding: 25px 15px; }
+  .welcome-section h1 { font-size: 24px; }
+  .welcome-section p { font-size: 14px; }
+  .learning-icon { font-size: 50px; }
+  .motivational-quote { font-size: 14px; padding: 12px 16px; }
+  .card { padding: 20px 15px; }
+  .card h3 { font-size: 18px; }
+  .card p { font-size: 14px; }
+  .card .btn { font-size: 13px; padding: 10px 16px; }
+}
+</style>
+
+
+<div class="dashboard-page">
+  <div class="dashboard-container">
+    <!-- Enhanced Welcome Section -->
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <div class="welcome-text">
+          <h1><i class="fas fa-graduation-cap"></i> Welcome back, {{ request.user.first_name }}!</h1>
+          <p>Ready to continue your learning journey? Explore your lessons and track your progress.</p>
+          
+          <div class="motivational-quote">
+"It's not a bug – it's an undocumented feature."
+
+          </div>
+        </div>
+        
+        <div class="welcome-visual">
+          <div class="learning-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+      <div class="stats-badge">
+  <i class="fas fa-calendar-day"></i>
+  <span id="current-date">{{ current_date }}</span>
 </div>
+      </div>
+    </section>
+
+    <!-- Cards -->
+    <div class="dashboard-cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-book-open"></i></div>
+          <h3>My Learning Hub</h3>
+        </div>
+        <p>Access all your assigned lessons and course materials.</p>
+        <a href="{% url 'view_lessons' %}" class="btn"><i class="fas fa-arrow-right"></i> Explore Lessons</a>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Progress Tracker</h3>
+        </div>
+        <p>Track your achievements and completion rates across modules.</p>
+        <a href="{% url 'profile' %}" class="btn"><i class="fas fa-chart-bar"></i> View Progress</a>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-user-cog"></i></div>
+          <h3>Profile Management</h3>
+        </div>
+        <p>Update personal details and manage your account settings.</p>
+        <a href="{% url 'profile' %}" class="btn"><i class="fas fa-user-edit"></i> Edit Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Get current date and time
+const now = new Date();
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+// For Option 1
+document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+
+// For Option 2
+const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+document.getElementById('day-message').textContent = `Great ${dayName} for learning!`;
+
+// For Option 4
+const hour = now.getHours();
+let timeOfDay = 'Morning';
+if (hour >= 12 && hour < 17) timeOfDay = 'Afternoon';
+if (hour >= 17) timeOfDay = 'Evening';
+document.getElementById('time-greeting').textContent = `Good ${timeOfDay}!`;
+</script>
+{% endblock %}

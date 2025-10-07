@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+{% load static %}
+<style>
+:root {
+  --primary: #5932EA;
+  --primary-dark: #1D4ED8;
+  --primary-light: #60A5FA;
+  --bg: #ffffff;
+  --bg-light: #F3F4F6;
+  --text-light: #111827;
+  --text-muted: #6B7280;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
+}
+
+/* Dashboard Wrapper */
+.intern-dashboard {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  overflow: hidden;
+  margin-left: 250px;
+  transition: var(--transition);
+  background: var(--bg-light);
+}
+
+/* Gradient Background Blobs */
+.intern-dashboard::before,
+.intern-dashboard::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.intern-dashboard::before {
+  width: 450px;
+  height: 450px;
+  background: var(--primary);
+  top: -150px;
+  left: -100px;
+}
+
+.intern-dashboard::after {
+  width: 400px;
+  height: 400px;
+  background: var(--primary-light);
+  bottom: -120px;
+  right: -100px;
+}
+
+/* Glass Card */
+.intern-card {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  backdrop-filter: blur(15px);
+  border-radius: 28px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 850px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Header */
+.intern-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.intern-header h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.intern-header h1 span {
+  color: var(--primary);
+}
+
+.intern-header p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+/* Grid */
+.intern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Card Styles */
+.intern-box {
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  background: var(--bg);
+  border: 1px solid rgba(89, 50, 234, 0.1);
+}
+
+.intern-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(89, 50, 234, 0.15);
+  border-color: var(--primary-light);
+}
+
+.intern-box i {
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.intern-box h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+.intern-box p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Buttons */
+.intern-box a {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.intern-box a:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(89, 50, 234, 0.3);
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .intern-dashboard { 
+    margin-left: 0; 
+    padding: 1rem; 
+  }
+  .intern-header h1 { font-size: 2rem; }
+  .intern-card { 
+    padding: 1rem 1rem; 
+    margin: 0; 
+  }
+  .intern-grid { 
+    grid-template-columns: 1fr; 
+    gap: 1rem; 
+  }
+  .intern-box { 
+    width: 100%; 
+    margin: 0; 
+  }
+}
+</style>
+
+<div class="main-content">
+  <div class="intern-dashboard">
+    <div class="intern-card">
+      
+      <div class="intern-header">
+        <h1>Welcome <span>{{ request.user.first_name }}</span> 👋</h1>
+        <p>Manage your account — login, register, or logout from here.</p>
+      </div>
+
+      <div class="intern-grid">
+
+        <div class="intern-box">
+          <i class="fas fa-user-plus"></i>
+          <h3>Sign Up</h3>
+          <p>Create a new intern account to get started.</p>
+          <a href="{% url 'signup' %}">Sign Up</a>
+        </div>
+
+        <div class="intern-box">
+          <i class="fas fa-sign-in-alt"></i>
+          <h3>Login</h3>
+          <p>Access your dashboard using your account.</p>
+          <a href="{% url 'login' %}">Login</a>
+        </div>
+
+        <div class="intern-box">
+          <i class="fas fa-sign-out-alt"></i>
+          <h3>Logout</h3>
+          <p>Securely log out from your session.</p>
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

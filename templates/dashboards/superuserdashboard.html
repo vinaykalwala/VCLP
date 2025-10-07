@@ -1,8 +1,288 @@
 {% extends 'login_base.html' %}
-{% block title %}SuperUser Dashboard{% endblock %}
+{% block title %}Superuser Dashboard{% endblock %}
 {% block content %}
 {% load static %}
+
+<style>
+/* =======================
+   General Dashboard Styles
+======================= */
+.superuser-dashboard {
+  min-height: 90vh;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Geometric Background */
+.superuser-dashboard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(89, 50, 234, 0.05) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(39, 174, 96, 0.05) 0%, transparent 20%),
+    radial-gradient(circle at 50% 50%, rgba(155, 89, 182, 0.03) 0%, transparent 30%);
+  z-index: 0;
+}
+
+/* =======================
+   Fade In Animation
+======================= */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* =======================
+   Header Section
+======================= */
+.dashboard-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  border-top: 6px solid #5932EA;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.dashboard-header:hover {
+  border-top-color: #1D4ED8;
+  transform: translateY(-3px);
+}
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #5932EA 0%, #1D4ED8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+.dashboard-header h1::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -5px;
+  width: 0%;
+  height: 4px;
+  background: linear-gradient(135deg, #5932EA, #1D4ED8);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.dashboard-header h1:hover::after { width: 100%; }
+.dashboard-header p {
+  font-size: 1.1rem;
+  color: #4b5563;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* =======================
+   Stats Overview
+======================= */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+  border-left: 4px solid #5932EA;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  border-left-color: #1D4ED8;
+}
+.stat-card:nth-child(2) { border-left-color: #27ae60; }
+.stat-card:nth-child(3) { border-left-color: #9b59b6; }
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* =======================
+   Main Dashboard Grid
+======================= */
+.dashboard-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  position: relative;
+  z-index: 2;
+}
+@media (max-width:1024px) { .dashboard-main { grid-template-columns: 1fr; } }
+
+/* =======================
+   Feature Cards
+======================= */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5932EA, #1D4ED8);
+}
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+.feature-icon {
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: white;
+}
+.feature-card:nth-child(1) .feature-icon { background: linear-gradient(135deg,#5932EA,#1D4ED8); }
+.feature-card:nth-child(2) .feature-icon { background: linear-gradient(135deg,#27ae60,#2ecc71); }
+.feature-card:nth-child(3) .feature-icon { background: linear-gradient(135deg,#9b59b6,#8e44ad); }
+.feature-card:nth-child(4) .feature-icon { background: linear-gradient(135deg,#f1c40f,#f39c12); }
+.feature-card h3 { font-size:1.3rem; font-weight:700; margin-bottom:0.75rem; color:#1f2937; }
+.feature-card p { color:#6b7280; line-height:1.6; margin-bottom:1.5rem; }
+.feature-link { display:inline-flex; align-items:center; color:#5932EA; font-weight:600; text-decoration:none; transition:0.3s; }
+.feature-link i { margin-left:0.5rem; transition:0.3s; }
+.feature-link:hover { color:#1D4ED8; }
+.feature-link:hover i { transform: translateX(4px); }
+
+/* =======================
+   Quick Actions Sidebar
+======================= */
+.quick-actions {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+.quick-actions h2 { font-size:1.4rem; font-weight:700; margin-bottom:1.5rem; color:#1f2937; display:flex; align-items:center; gap:0.75rem; }
+.quick-actions h2 i { color:#5932EA; }
+.action-list { display:flex; flex-direction:column; gap:1rem; }
+.action-item {
+  display:flex; align-items:center;
+  padding:1rem; border-radius:12px;
+  background:#f8fafc; text-decoration:none;
+  color:#4b5563; transition:0.3s;
+}
+.action-item:hover { background:#1D4ED8; color:white; transform:translateX(5px); }
+.action-item i { margin-right:1rem; font-size:1.2rem; width:24px; text-align:center; transition:0.3s; }
+.action-item:hover i { color:white; }
+
+/* =======================
+   Animation Delays
+======================= */
+.dashboard-header.animate { animation-delay:0.1s; }
+.stat-card.animate:nth-child(1){ animation-delay:0.2s; }
+.stat-card.animate:nth-child(2){ animation-delay:0.3s; }
+.stat-card.animate:nth-child(3){ animation-delay:0.4s; }
+.feature-card.animate:nth-child(1){ animation-delay:0.5s; }
+.feature-card.animate:nth-child(2){ animation-delay:0.6s; }
+.feature-card.animate:nth-child(3){ animation-delay:0.7s; }
+.feature-card.animate:nth-child(4){ animation-delay:0.8s; }
+.quick-actions.animate { animation-delay:0.9s; }
+</style>
+
 <div class="main-content">
-<h2>Welcome SuperUser {{ request.user.username }}</h2>
+  <div class="superuser-dashboard">
+    
+    <!-- Header -->
+    <div class="dashboard-header animate">
+      <h1>Superuser Control Panel <i class="fas fa-crown"></i></h1>
+      <p>Welcome back, {{ request.user.first_name|default:request.user.username }}. Manage your platform with comprehensive administrative tools.</p>
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="dashboard-main">
+      
+      <!-- Features -->
+      <div class="feature-grid">
+        <div class="feature-card animate">
+          <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
+          <h3>User Management</h3>
+          <p>Create, edit, and manage all user accounts with different roles and permissions across the platform.</p>
+          <a href="{% url 'signup' %}" class="feature-link">Manage Users <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="feature-card animate">
+          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Attendance Analytics</h3>
+          <p>Monitor attendance patterns, generate reports, and analyze participation across all training sessions.</p>
+          <a href="{% url 'attendance_report' %}" class="feature-link">View Reports <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="feature-card animate">
+          <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+          <h3>Intern Management</h3>
+          <p>Oversee intern progress, manage profiles, and track performance metrics for all active interns.</p>
+          <a href="{% url 'intern_list' %}" class="feature-link">Manage Interns <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="feature-card animate">
+          <div class="feature-icon"><i class="fas fa-book-open"></i></div>
+          <h3>Course Administration</h3>
+          <p>Manage training curriculum, course materials, and learning resources for all programs.</p>
+          <a href="{% url 'course_list' %}" class="feature-link">Manage Courses <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions animate">
+        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        <div class="action-list">
+          <a href="{% url 'signup' %}" class="action-item"><i class="fas fa-user-plus"></i>Create New User</a>
+          <a href="{% url 'attendance_report' %}" class="action-item"><i class="fas fa-file-export"></i>Generate Report</a>
+          <a href="{% url 'profile' %}" class="action-item"><i class="fas fa-cog"></i>System Settings</a>
+          <a href="{% url 'intern_list' %}" class="action-item"><i class="fas fa-list-alt"></i>View All Interns</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+
+
 {% endblock %}
