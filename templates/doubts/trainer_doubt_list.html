@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Doubts Assigned to Me</h2>
+
+<h4 class="mt-3">⏳ Unresolved Doubts</h4>
+{% for doubt in unresolved_doubts %}
+  <div class="card mt-3 p-3">
+    <h5>{{ doubt.question }}</h5>
+    <p><strong>From Intern:</strong> {{ doubt.intern.user.username }} | Batch: {{ doubt.batch.name }}</p>
+    <form method="post" action="{% url 'resolve_doubt' doubt.pk %}">
+      {% csrf_token %}
+      <textarea name="answer" placeholder="Write your answer..." class="form-control" required></textarea><br>
+      <button type="submit" class="btn btn-success">Resolve</button>
+    </form>
+  </div>
+{% empty %}
+  <p>No unresolved doubts.</p>
+{% endfor %}
+
+<h4 class="mt-5">✅ Resolved Doubts</h4>
+{% for doubt in resolved_doubts %}
+  <div class="card mt-3 p-3 bg-light">
+    <h5>{{ doubt.question }}</h5>
+    <p><strong>From Intern:</strong> {{ doubt.intern.user.username }} | Batch: {{ doubt.batch.name }}</p>
+    <div class="alert alert-success mt-2">
+      <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
+      <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+    </div>
+  </div>
+{% empty %}
+  <p>No resolved doubts yet.</p>
+{% endfor %}
+{% endblock %}

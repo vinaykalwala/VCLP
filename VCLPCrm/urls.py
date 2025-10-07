@@ -54,6 +54,12 @@ urlpatterns = [
     path('daily_update_edit/<int:pk>/', views.daily_update_edit, name='daily_update_edit'),
     path('daily_update_delete/<int:pk>/', views.daily_update_delete, name='daily_update_delete'),
     path('daily_update_dashboard/', views.daily_update_dashboard, name='daily_update_dashboard'),
+
+
+    path('doubts/', views.doubt_list, name='doubt_list'),
+    path('doubts/create/', views.doubt_create, name='doubt_create'),
+    path('doubts/<int:pk>/resolve/', views.resolve_doubt, name='resolve_doubt'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

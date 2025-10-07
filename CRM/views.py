@@ -1348,3 +1348,112 @@ def daily_update_dashboard(request):
         'selected_batch': selected_batch,
         'selected_month': selected_month
     })
+
+@login_required
+def doubt_list(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    # ============= INTERN =============
+    if role == "intern":
+        intern_profile = getattr(user, 'intern_profile', None)
+        doubts = Doubt.objects.filter(intern=intern_profile).order_by('-created_at')
+        return render(request, 'doubts/intern_doubt_list.html', {'doubts': doubts})
+
+    # ============= TRAINER =============
+    elif role == "trainer":
+        trainer_profile = getattr(user, 'trainer_profile', None)
+        unresolved_doubts = Doubt.objects.filter(trainer=trainer_profile, resolved=False).order_by('-created_at')
+        resolved_doubts = Doubt.objects.filter(trainer=trainer_profile, resolved=True).order_by('-created_at')
+
+        return render(request, 'doubts/trainer_doubt_list.html', {
+            'unresolved_doubts': unresolved_doubts,
+            'resolved_doubts': resolved_doubts
+        })
+
+    # ============= ADMIN / SUPERUSER =============
+    else:
+        doubts = Doubt.objects.all().order_by('-created_at')
+        return render(request, 'doubts/admin_doubt_list.html', {'doubts': doubts})
+
+
+@login_required
+def doubt_create(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+    if role != "intern":
+        messages.error(request, "Only interns can create doubts.")
+        return redirect('doubt_list')
+
+    intern_profile = getattr(user, 'intern_profile', None)
+    if not intern_profile:
+        messages.error(request, "Intern profile missing.")
+        return redirect('doubt_list')
+
+    # get intern's batch (adjust attribute name if different)
+    batch = getattr(intern_profile, 'batch', None)
+    if batch is None:
+        messages.error(request, "Your batch is not set. Contact admin.")
+        return redirect('doubt_list')
+
+    # -------------------------
+    # Robust trainer lookup:
+    # TrainerProfile might use 'assigned_batches' (ManyToMany) or 'batch' (FK).
+    # Check model fields and choose the correct lookup.
+    # -------------------------
+    field_names = [f.name for f in TrainerProfile._meta.get_fields()]
+    if 'assigned_batches' in field_names:
+        trainers = TrainerProfile.objects.filter(assigned_batches=batch)
+    elif 'batch' in field_names:
+        trainers = TrainerProfile.objects.filter(batch=batch)
+    else:
+        # fall back to empty queryset if no relationship found
+        trainers = TrainerProfile.objects.none()
+
+    if request.method == 'POST':
+        form = DoubtForm(request.POST, trainers_qs=trainers)
+        if form.is_valid():
+            doubt = form.save(commit=False)
+            doubt.intern = intern_profile
+            doubt.batch = batch
+            doubt.save()
+            messages.success(request, "Your doubt has been submitted successfully!")
+            return redirect('doubt_list')
+    else:
+        form = DoubtForm(trainers_qs=trainers)
+
+    return render(request, 'doubts/doubt_form.html', {'form': form, 'title': 'Ask Doubt'})
+@login_required
+def resolve_doubt(request, pk):
+    """Trainer resolves a doubt"""
+    doubt = get_object_or_404(Doubt, pk=pk)
+    user = request.user
+
+    if getattr(user, 'role', None) != "trainer":
+        messages.error(request, "Only trainers can resolve doubts.")
+        return redirect('doubt_list')
+
+    trainer_profile = user.trainer_profile
+    if doubt.trainer != trainer_profile:
+        messages.error(request, "This doubt is not assigned to you.")
+        return redirect('doubt_list')
+
+    # If already resolved, redirect
+    if hasattr(doubt, 'resolution'):
+        messages.info(request, "This doubt is already resolved.")
+        return redirect('doubt_list')
+
+    if request.method == 'POST':
+        form = DoubtResolutionForm(request.POST)
+        if form.is_valid():
+            resolution = form.save(commit=False)
+            resolution.doubt = doubt
+            doubt.resolved = True
+            doubt.save()
+            resolution.save()
+            messages.success(request, "Doubt resolved successfully!")
+            return redirect('doubt_list')
+    else:
+        form = DoubtResolutionForm()
+
+    return render(request, 'doubts/resolve_doubt.html', {'form': form, 'doubt': doubt})

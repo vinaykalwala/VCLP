@@ -147,3 +147,22 @@ class DailySessionUpdateForm(forms.ModelForm):
             'summary': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Summary of session'}),
             'challenges': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Challenges (if any)'}),
         }
+
+
+
+class DoubtForm(forms.ModelForm):
+    class Meta:
+        model = Doubt
+        fields = ['trainer', 'question']  # don't let intern pick batch/intern/resolved
+
+    def __init__(self, *args, trainers_qs=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if trainers_qs is not None:
+            self.fields['trainer'].queryset = trainers_qs
+
+
+class DoubtResolutionForm(forms.ModelForm):
+    class Meta:
+        model = DoubtResolution
+        fields = ['answer']
+        widgets = {'answer': forms.Textarea(attrs={'rows': 3})}
