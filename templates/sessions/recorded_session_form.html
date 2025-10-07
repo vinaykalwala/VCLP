@@ -1,13 +1,250 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ title }}</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% load static %}
 
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{% url 'recorded_session_list' %}" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
+<style>
+{% comment %} .main-content {
+    padding: 40px 20px;
+    background-color: #f5f6fa;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} {% endcomment %}
+
+/* === Form Container === */
+.recorded-session-form-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* === Card === */
+.recorded-session-card {
+    width: 100%;
+    max-width: 800px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 45px 35px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.recorded-session-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.12);
+}
+
+/* === Header === */
+.recorded-session-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    background-color: #5932EA;
+    padding: 15px 20px;
+    border-radius: 12px;
+    color: white;
+}
+.recorded-session-card-header i {
+    font-size: 32px;
+}
+.recorded-session-card-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* === Form Fields === */
+.recorded-session-card form p {
+    position: relative;
+    margin-bottom: 22px;
+    width: 100%;
+}
+.recorded-session-card form input,
+.recorded-session-card form select,
+.recorded-session-card form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fafafa;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.recorded-session-card form input:focus,
+.recorded-session-card form select:focus,
+.recorded-session-card form textarea:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 12px rgba(89,50,234,0.15);
+    outline: none;
+}
+
+/* === Labels === */
+.recorded-session-card form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* === File Input === */
+/* === File Input === */
+.file-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9f9fb;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.file-wrapper:hover {
+    border-color: #5932EA;
+    box-shadow: 0 0 10px rgba(89, 50, 234, 0.1);
+}
+
+.file-wrapper input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    left: 0;
+    top: 0;
+}
+
+.file-wrapper::before {
+    content: "Choose File";
+    background-color: #5932EA;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.file-wrapper:hover::before {
+    background-color: #4c28d1;
+}
+
+.file-wrapper span {
+    flex: 1;
+    font-size: 14px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* === Buttons === */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+.btn-save {
+    background: #5932EA;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-save:hover {
+    background: #4c28d1;
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.btn-cancel:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+    .recorded-session-card {
+        padding: 30px 20px;
+    }
+    .recorded-session-card-header h2 {
+        font-size: 22px;
+    }
+    .recorded-session-card-header i {
+        font-size: 28px;
+    }
+    .form-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .btn-save, .btn-cancel {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="recorded-session-form-container">
+        <div class="recorded-session-card">
+            <div class="recorded-session-card-header">
+                <i class="fas fa-video"></i>
+                <h2>{{ title }}</h2>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                <p>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                    {% if field.field.widget.input_type == 'file' %}
+                        <div class="file-wrapper">
+                            {{ field }}
+                            <span>
+                                {% if field.value %}{{ field.value.name|slice:"-30:" }}{% else %}No file chosen{% endif %}
+                            </span>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <span style="color:red; font-size:12px;">{{ field.errors }}</span>
+                    {% endif %}
+                </p>
+                {% endfor %}
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save">Save</button>
+                    <a href="{% url 'recorded_session_list' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 {% endblock %}
