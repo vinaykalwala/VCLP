@@ -166,3 +166,20 @@ class DoubtResolutionForm(forms.ModelForm):
         model = DoubtResolution
         fields = ['answer']
         widgets = {'answer': forms.Textarea(attrs={'rows': 3})}
+
+
+
+class RecordedSessionForm(forms.ModelForm):
+    class Meta:
+        model = RecordedSession
+        fields = ['batch', 'trainer', 'title', 'video', 'description']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user and getattr(user, 'role', None) == "trainer":
+            # Trainer can only upload for batches they handle
+            self.fields['batch'].queryset = user.trainer_profile.assigned_batches.all()
+            # Remove trainer field entirely from the form
+            self.fields.pop('trainer')

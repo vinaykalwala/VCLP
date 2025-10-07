@@ -60,6 +60,11 @@ urlpatterns = [
     path('doubts/create/', views.doubt_create, name='doubt_create'),
     path('doubts/<int:pk>/resolve/', views.resolve_doubt, name='resolve_doubt'),
 
+    path('sessions/', views.recorded_session_list, name='recorded_session_list'),
+    path('sessions/create/', views.recorded_session_create, name='recorded_session_create'),
+    path('sessions/<int:pk>/edit/', views.recorded_session_update, name='recorded_session_update'),
+    path('sessions/<int:pk>/delete/', views.recorded_session_delete, name='recorded_session_delete'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

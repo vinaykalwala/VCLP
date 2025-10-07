@@ -1467,3 +1467,98 @@ def resolve_doubt(request, pk):
         form = DoubtResolutionForm()
 
     return render(request, 'doubts/resolve_doubt.html', {'form': form, 'doubt': doubt})
+
+@login_required
+def recorded_session_list(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer":
+        sessions = RecordedSession.objects.filter(trainer=user.trainer_profile).order_by('-uploaded_at')
+    elif role == "intern":
+        sessions = RecordedSession.objects.filter(batch=request.user.intern_profile.batch).order_by('-uploaded_at')
+    else:  # Admin / Superuser
+        sessions = RecordedSession.objects.all().order_by('-uploaded_at')
+
+    return render(request, 'sessions/recorded_session_list.html', {'sessions': sessions})
+
+# ----------------------
+# CREATE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_create(request):
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to upload sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        form = RecordedSessionForm(request.POST, request.FILES, user=user)
+        if form.is_valid():
+            session = form.save(commit=False)
+            if role == "trainer":
+                session.trainer = user.trainer_profile
+            elif role in ["admin", "superuser"]:
+                # Admin/Superuser must select trainer manually (optional: assign default trainer)
+                session.trainer = form.cleaned_data.get('trainer') if 'trainer' in form.cleaned_data else None
+            session.save()
+            messages.success(request, "Recorded session uploaded successfully!")
+            return redirect('recorded_session_list')
+    else:
+        form = RecordedSessionForm(user=user)
+
+    return render(request, 'sessions/recorded_session_form.html', {'form': form, 'title': 'Upload Recorded Session'})
+
+# ----------------------
+# UPDATE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_update(request, pk):
+    session = get_object_or_404(RecordedSession, pk=pk)
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer" and session.trainer != user.trainer_profile:
+        messages.error(request, "You are not authorized to edit this session.")
+        return redirect('recorded_session_list')
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to edit sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        form = RecordedSessionForm(request.POST, request.FILES, instance=session, user=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Recorded session updated successfully!")
+            return redirect('recorded_session_list')
+    else:
+        form = RecordedSessionForm(instance=session, user=user)
+
+    return render(request, 'sessions/recorded_session_form.html', {'form': form, 'title': 'Edit Recorded Session'})
+
+# ----------------------
+# DELETE RECORDED SESSION
+# ----------------------
+@login_required
+def recorded_session_delete(request, pk):
+    session = get_object_or_404(RecordedSession, pk=pk)
+    user = request.user
+    role = getattr(user, 'role', None)
+
+    if role == "trainer" and session.trainer != user.trainer_profile:
+        messages.error(request, "You are not authorized to delete this session.")
+        return redirect('recorded_session_list')
+
+    if role not in ["trainer", "admin", "superuser"]:
+        messages.error(request, "You are not authorized to delete sessions.")
+        return redirect('recorded_session_list')
+
+    if request.method == "POST":
+        session.delete()
+        messages.success(request, "Recorded session deleted successfully!")
+        return redirect('recorded_session_list')
+
+    return render(request, 'sessions/recorded_session_confirm_delete.html', {'session': session})
