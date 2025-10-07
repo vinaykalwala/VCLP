@@ -133,6 +133,25 @@ class InternProfileForm(forms.ModelForm):
         model = InternProfile
         exclude = ('created_at',)
 
+class TrainerProfileForm(forms.ModelForm):
+    class Meta:
+        model = TrainerProfile
+        fields = [
+            'user',
+            'profile_photo',
+            'bio',
+            'expertise',
+            'years_of_experience',
+            'designation',
+            'highest_qualification',
+            'availability',
+            'linkedin_profile',
+            'portfolio_link',
+        ]
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3}),
+            'availability': forms.Select(),
+        }
 class CurriculumForm(forms.ModelForm):
     class Meta:
         model = Curriculum
@@ -183,3 +202,9 @@ class RecordedSessionForm(forms.ModelForm):
             self.fields['batch'].queryset = user.trainer_profile.assigned_batches.all()
             # Remove trainer field entirely from the form
             self.fields.pop('trainer')
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone','is_active']

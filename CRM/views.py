@@ -1562,3 +1562,135 @@ def recorded_session_delete(request, pk):
         return redirect('recorded_session_list')
 
     return render(request, 'sessions/recorded_session_confirm_delete.html', {'session': session})
+
+
+
+@login_required
+def trainer_list(request):
+    trainers = TrainerProfile.objects.all()
+    query = request.GET.get('q')
+    availability = request.GET.get('availability')
+
+    if query:
+        trainers = trainers.filter(
+            Q(user__username__icontains=query) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(expertise__icontains=query) |
+            Q(designation__icontains=query) |
+            Q(highest_qualification__icontains=query)
+        )
+
+    if availability:
+        trainers = trainers.filter(availability=availability)
+
+    return render(request, "trainers/trainer_list.html", {"trainers": trainers})
+
+
+# =======================
+# Trainer Detail
+# =======================
+@login_required
+def trainer_detail(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    return render(request, "trainers/trainer_detail.html", {"trainer": trainer})
+
+
+# =======================
+# Trainer Create
+# =======================
+@login_required
+def trainer_create(request):
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Trainer profile created successfully.")
+            return redirect("trainer_list")
+    else:
+        form = TrainerProfileForm()
+    return render(request, "trainers/trainer_form.html", {"form": form})
+
+
+# =======================
+# Trainer Update
+# =======================
+@login_required
+def trainer_update(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    if request.method == "POST":
+        form = TrainerProfileForm(request.POST, request.FILES, instance=trainer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Trainer profile updated successfully.")
+            return redirect("trainer_list")
+    else:
+        form = TrainerProfileForm(instance=trainer)
+    return render(request, "trainers/trainer_form.html", {"form": form})
+
+
+# =======================
+# Trainer Delete
+# =======================
+@login_required
+def trainer_delete(request, pk):
+    trainer = get_object_or_404(TrainerProfile, pk=pk)
+    if request.method == "POST":
+        trainer.delete()
+        messages.success(request, "Trainer profile deleted successfully.")
+        return redirect("trainer_list")
+    return render(request, "trainers/trainer_confirm_delete.html", {"trainer": trainer})
+
+from django.contrib.auth.decorators import user_passes_test
+def superuser_required(view_func):
+    return user_passes_test(lambda u: u.is_superuser)(view_func)
+
+@login_required
+def user_list(request):
+    if not request.user.is_superuser:
+        return render(request, "users/no_access.html")
+    
+    users = User.objects.all()
+    query = request.GET.get('q')
+    role_filter = request.GET.get('role')
+    
+    if query:
+        users = users.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone__icontains=query)
+        )
+    if role_filter:
+        users = users.filter(role=role_filter)
+
+    return render(request, "users/user_list.html", {"users": users})
+
+# =======================
+# User Detail/Edit View
+# =======================
+@superuser_required
+def user_update(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User updated successfully.")
+            return redirect("user_list")
+    else:
+        form = UserForm(instance=user)
+    return render(request, "users/user_form.html", {"form": form})
+
+# =======================
+# Delete User
+# =======================
+@superuser_required
+def user_delete(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        user.delete()
+        messages.success(request, "User deleted successfully.")
+        return redirect("user_list")
+    return render(request, "users/user_confirm_delete.html", {"user": user})
