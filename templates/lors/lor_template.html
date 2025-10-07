@@ -53,9 +53,9 @@
 
     <!-- Introduction -->
     <p class="paragraph">
-      This is to certify that <strong>{{ intern.user.get_full_name }}</strong> (Intern ID: <strong>{{ intern.unique_id }}</strong>) 
+      This is to certify that <strong>{{ intern.user.get_full_name|upper }}</strong>
       has successfully completed the <strong>{{ intern.batch.course.name }}</strong> Internship Program 
-      at <strong>{{ company.name }}</strong> in the batch <strong>{{ intern.batch.name }}</strong>.
+      at <strong>{{ company.name }}</strong>. 
     </p>
 
     <!-- Internship Details -->
@@ -67,17 +67,13 @@
       <tr><td><strong>End Date:</strong></td><td>{{ intern.batch.end_date|date:"Y-m-d" }}</td></tr>
       <tr><td><strong>Role:</strong></td><td>Intern</td></tr>
       <tr><td><strong>Course:</strong></td><td>{{ intern.batch.course.name }}</td></tr>
-      <tr><td><strong>Batch:</strong></td><td>{{ intern.batch.name }}</td></tr>
-      <tr><td><strong>Trainer:</strong></td><td>{{ intern.batch.trainer_name }}</td></tr>
-      <tr><td><strong>Working Days:</strong></td><td>Monday to Friday</td></tr>
-      <tr><td><strong>Timings:</strong></td><td>{{ intern.batch.timings }}</td></tr>
     </table>
 
     <!-- Performance & Feedback -->
     <h4 style="font-size:14px; margin-top:12px;">Performance Summary</h4>
     <p class="paragraph">
-      During the internship, {{ intern.user.get_full_name }} displayed exceptional dedication, professionalism, and a strong willingness to learn. 
-      They effectively contributed to projects involving <strong>{{ intern.batch.course.description }}</strong>, 
+      During the internship, {{ intern.user.get_full_name|upper }} displayed exceptional dedication, professionalism, and a strong willingness to learn. 
+      They effectively contributed to projects involving <strong>{{ intern.project_title }}</strong>, 
       showing great enthusiasm and a proactive approach in completing assigned tasks.
     </p>
 
@@ -89,21 +85,15 @@
 
     <!-- Closing -->
     <p class="paragraph">
-      We wish {{ intern.user.get_full_name }} all the very best for their future endeavors.
+      We wish {{ intern.user.get_full_name|upper }} all the very best for their future endeavors.
     </p>
-    <p style="font-size:13px;">Regards,</p>
 
     <!-- Signatures -->
     <table width="100%" style="margin-top:20px;">
       <tr>
         <td style="width:50%; text-align:left;">
           <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
-          <div><strong>{{ intern.batch.trainer_name }}</strong></div>
-          <div style="font-size:11px; color:#444;">Trainer, {{ intern.batch.course.name }}</div>
-          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
-        </td>
-        <td style="width:50%; text-align:right;">
-          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>Vinay Kalvala</strong></div>
           <div><strong>Authorized Signatory</strong></div>
           <div style="font-size:11px; color:#444;">{{ company.name }}</div>
         </td>

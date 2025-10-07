@@ -2,226 +2,200 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Certificate of Completion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Completion Certificate</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600&display=swap');
-
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0; /* For browser preview */
-        }
-
-        .certificate-container {
-            width: 297mm;
-            height: 210mm;
             box-sizing: border-box;
-            padding: 15mm;
-            background-color: #f8f7f2; /* Parchment color */
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
         }
 
-        /* --- Decorative Border --- */
-        .certificate-border {
-            position: absolute;
-            top: 10mm;
-            left: 10mm;
-            right: 10mm;
-            bottom: 10mm;
-            border: 1.5px solid #002d5c;
-        }
-        .certificate-border::before {
-            content: '';
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            right: 4px;
-            bottom: 4px;
-            border: 4px solid #bda068;
-        }
-        .certificate-border::after {
-            content: '';
-            position: absolute;
-            top: 9px;
-            left: 9px;
-            right: 9px;
-            bottom: 9px;
-            border: 1px solid #002d5c;
+       @page { size: A4 portrait; margin: 2cm; }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
         }
 
-        /* --- Watermark --- */
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.05;
-            z-index: 1;
-            color: #002d5c;
-        }
-
-        /* --- Content Z-Index --- */
-        .certificate-content {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .org-name {
-            font-size: 24px;
-            font-weight: 600;
-            color: #002d5c;
-            letter-spacing: 2px;
+        .certificate {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 40px 60px;
+            background: white;
         }
 
         .header {
-            font-family: 'Playfair Display', serif;
-            font-size: 44px;
-            color: #002d5c;
-            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #333;
+            margin-bottom: 40px;
         }
 
-        .subtitle {
-            font-size: 18px;
+        .logo {
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .company-info {
+            flex: 1;
+        }
+
+        .company-name {
+            color: #8B0000;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .company-details {
+            font-size: 10px;
             color: #333;
-            letter-spacing: 1px;
+            line-height: 1.6;
+        }
+
+        .company-details a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .date-line {
+            font-size: 14px;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .content {
+            font-size: 13px;
+            line-height: 1.9;
+            color: #333;
+            text-align: justify;
             margin-bottom: 25px;
         }
 
-        .intern-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 42px;
-            color: #bda068; /* Gold color */
+        .content p {
+            margin-bottom: 18px;
+        }
+
+        .highlight {
             font-weight: 700;
-            border-bottom: 2px solid #002d5c;
-            padding-bottom: 5px;
-            margin: 15px 0;
         }
 
-        .main-text {
-            font-size: 16px;
-            color: #555;
-            margin: 20px 0;
-            line-height: 1.6;
-            max-width: 70%;
+        .signature-section {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
         }
 
-        .course-name {
-            font-weight: 600;
-            color: #002d5c;
-        }
-        
-        .footer {
-            width: 80%;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-        
-        .signature-block {
-            width: 45%;
-            border-top: 1px solid #333;
-            padding-top: 10px;
+        .signature-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 8px;
         }
 
-        .signature-block p {
-            margin: 0;
+        .signatory-name {
             font-size: 14px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            margin-bottom: 3px;
         }
 
-        /* --- Official Seal --- */
-        .seal {
-            position: absolute;
-            bottom: 20mm;
-            right: 20mm;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, #c8ab73 0%, #bda068 100%);
-            border-radius: 50%;
-            /* Flexbox properties for perfect centering */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 3;
-            color: #002d5c;
+        .signatory-title {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 3px;
         }
-        .seal-edge {
-            width: 90px;
-            height: 90px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            /* Flexbox properties for perfect centering */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .company-footer {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .contact-info {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .contact-info .phone-icon {
+            color: #e74c3c;
+        }
+
+        .contact-info a {
+            color: #0066cc;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="certificate-container">
-        <div class="certificate-border"></div>
-
-        <div class="watermark">
-            <svg width="400" height="400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.5L2 6.5V17.5L12 22.5L22 17.5V6.5L12 1.5ZM12 4.15L19.82 9.15L12 14.15L4.18 9.15L12 4.15ZM12 16.5L19.5 11.5V16L12 20L4.5 16V11.5L12 16.5Z"/>
-            </svg>
-        </div>
-
-        <div class="certificate-content">
-            
-            <p class="org-name">Vindus Environment Pvt Ltd</p>
-            
-            <h1 class="header">Certificate of Completion</h1>
-            
-            <p class="subtitle">This certifies that</p>
-            
-            <h2 class="intern-name">{{ intern.user.get_full_name|upper }}</h2>
-            
-            <p class="main-text">
-                has successfully completed all the requirements of the internship program in 
-                <span class="course-name">{{ intern.batch.course.name }}</span>.
-            </p>
-            
-            <p class="main-text">
-                Training Period: <strong>{{ intern.batch.start_date|date:"F d, Y" }}</strong> to <strong>{{ intern.batch.end_date|date:"F d, Y" }}</strong>
-            </p>
-
-            <div class="footer">
-                <div class="signature-block">
-                    <p>Authorized Signatory</p>
-                </div>
-                <div class="signature-block">
-                    <p>Head of Training</p>
+    <div class="certificate">
+        <div class="header">
+            <div class="company-info">
+                <div class="logo">
+               <div class="company-name"><img src="{{ logo_path }}" alt="Company Logo" style="height:60px; vertical-align:middle; margin-right:10px;">VINDUS ENVIRONMENT PRIVATE LIMITED</div>
+            </div>
+                <div class="company-details" style="text-align: center;">
+                    CIN NO : U62099TS2023PTC179794 | Adress #9-110, Shanti Nagar, Dilsukhnagar, Hyderabad- 500 060<br>
+                    Phone No :+914049525396 | WebSite : <a href="http://www.vindusenvironment.com">www.vindusenvironment.com</a>
                 </div>
             </div>
         </div>
 
-        <div class="seal">
-            <div class="seal-edge">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/>
-                </svg>
-            </div>
+        <hr style="border:0; border-top:1px solid #333; margin:8px 0;">
+
+        <div class="title">Internship Completion Certificate</div>
+
+        <div class="date-line">
+            <span class="highlight">Date:</span> {% if today_date %}{{ today_date }}{% else %}{{ intern.batch.end_date|date:"d-m-Y" }}{% endif %}
         </div>
+
+        <div class="content">
+            <p>
+                This is to certify that <span class="highlight">{{ intern.user.get_full_name|upper }}</span>, has successfully completed the <span class="highlight">Vindus Career Launch Paid Internship Program</span> conducted by <span class="highlight">Vindus Environment Private Limited</span>.
+            </p>
+
+            <p>
+                The internship was held <span class="highlight">online</span> from <span class="highlight">{{ intern.batch.start_date|date:"M. d, Y" }}</span> to <span class="highlight">{{ intern.batch.end_date|date:"M. d, Y" }}</span>, under the guidance of <span class="highlight">{% if intern.batch.trainer %}{{ intern.batch.trainer.user.get_full_name|upper }}{% else %}Course Instructor{% endif %}</span>.
+            </p>
+
+            <p>
+                During this period, <span class="highlight">{{ intern.user.get_full_name|upper }}</span> has demonstrated dedication, discipline, and a keen interest in learning <span class="highlight">{{ intern.batch.course.name }}</span>. He/She has actively participated in live sessions, completed assignments, and contributed to real-time projects assigned as part of the internship.
+            </p>
+
+            <p>
+                We hereby acknowledge the successful completion of the internship and appreciate <span class="highlight">{{ intern.user.get_full_name|upper }}'s</span> efforts and performance throughout the program.
+            </p>
+
+            <p>
+                We wish him/her all the best in future professional endeavors.
+            </p>
+        </div>
+
+        <!-- Signatures -->
+    <table width="100%" style="margin-top:20px;">
+      <tr>
+        <td style="width:50%; text-align:left;">
+          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
+          <div><strong>Vinay Kalvala</strong></div>
+          <div><strong>Authorized Signatory</strong></div>
+          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+        </td>
+      </tr>
+    </table>
     </div>
 </body>
 </html>
