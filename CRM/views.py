@@ -930,6 +930,8 @@ import calendar
 import openpyxl
 from xhtml2pdf import pisa
 from django.template.loader import get_template
+import os
+from django.conf import settings
 
 @login_required
 def attendance_report(request):
@@ -1030,13 +1032,16 @@ def attendance_report(request):
     if export_type == 'pdf' and attendances.exists():
         template = get_template('attendance/attendance_report_pdf.html')
         logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        today_date = datetime.now().strftime('%d-%m-%Y')
+        
         html = template.render({
             'attendances': attendances,
             'summary': summary,
             'batch': batch,
-            'selected_date': (date_input or today).strftime('%d-%m-%Y'),
+            'selected_date': (datetime.strptime(date_input, "%Y-%m-%d").strftime('%d-%m-%Y') if date_input else today.strftime('%d-%m-%Y')),
             'month_input': month_input,
             'logo_path': logo_path,
+            'today_date': today_date,
         })
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="attendance_report.pdf"'

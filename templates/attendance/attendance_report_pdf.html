@@ -12,8 +12,43 @@
             padding: 0;
         }
 
-        
-        /* Tables */
+        /* Header */
+        .pdf-header {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .pdf-header img {
+            height: 60px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .pdf-header h1 {
+            font-size: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            color: #660B05;
+            margin: 0;
+        }
+
+        .pdf-header-date {
+            font-size: 12px;
+            text-align: right;
+            margin-top: 5px;
+            margin-right: 20px;
+        }
+
+        /* Divider */
+        .divider {
+            border: 0;
+            border-top: 1px solid #333;
+            margin: 8px 0;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -69,25 +104,34 @@
 </head>
 <body>
 
-    <div style=" align-items: center; justify-content: space-between; margin-bottom: 20px; width: 100%;">
-  
-  <!-- Left: Logo -->
-  <div style="flex: 1; text-align: left;">
-    <img src="{{ logo_path }}" alt="Company Logo" style="height: 60px;">
-  </div>
-  
-  <!-- Center: Company Name -->
-  <div style="flex: 2; text-align: center;">
-    <h1 style="margin: 0; font-size: 20px; color: #660B05;">Vindus Environment Pvt Ltd</h1>
-  </div>
-  
-  <!-- Right: Date -->
-  <div style="flex: 1; text-align: right;">
-    <p style="margin: 0; font-size: 14px;">Date: {{ selected_date }}</p>
-  </div>
+    <!-- Header (Logo + Company Name) -->
+    <div class="pdf-header" style="display:flex; align-items:center; justify-content:center; text-align:center; width:100%; padding:10px 0;">
+    <!-- Left spacer (optional) -->
+    <div style="flex:1;"></div>
 
+    <!-- Centered logo and company name -->
+    <div style="display:flex; align-items:center; justify-content:center; flex:2;">
+        <img src="{{ logo_path }}" alt="Vindus Environment Logo" 
+             style="height:60px; width:auto; object-fit:contain; margin-right:10px;">
+        <h1 style="font-size:22px; color:#660B05; margin:0;">
+            VINDUS ENVIRONMENT PVT.LTD
+        </h1>
+    </div>
+
+    <!-- Right spacer (optional) -->
+    <div style="flex:1;"></div>
 </div>
 
+    <!-- Date on top-right -->
+    <div class="pdf-header-date">
+        Date: {{ today_date }}
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider">
+
+    <!-- Report Title -->
+    <h2 style="text-align:center; margin-bottom:15px;">Attendance Report Of {{ batch.name }}</h2>
 
     <!-- Attendance Table -->
     <table>
