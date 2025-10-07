@@ -126,7 +126,7 @@
 .custom-table th,
 .custom-table td {
   padding: 12px 14px;
-  border-bottom: 1px solid #eee;
+  border: 2px solid #ddd;  /* Adds vertical + horizontal lines */
   text-align: left;
   font-size: 14px;
   color: #333;
@@ -138,6 +138,16 @@
   font-weight: 600;
   text-transform: uppercase;
   font-size: 13px;
+  border: 1px solid #4523c9; /* Slightly darker for header borders */
+}
+
+.custom-table tr:nth-child(even) td {
+  background-color: #fafafa; /* Light shade for alternating rows */
+}
+
+.custom-table {
+  border-collapse: collapse; /* Ensures lines merge cleanly */
+  width: 100%;
 }
 
 /* ====== Status Badges ====== */
