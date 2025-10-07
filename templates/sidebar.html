@@ -247,36 +247,6 @@ body {
   <ul>
     {% if request.user.role == "superuser" %}
 
-<li>
-  <a href="{% url 'daily_update_list' %}">
-    <i class="fas fa-calendar-alt"></i> Sessions List
-  </a>
-</li>
-
-<li>
-  <a href="{% url 'curriculum_list' %}">
-    <i class="fas fa-book-open"></i> Curriculum
-  </a>
-</li> -->
-
-
-
-      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
-      <li><a href="{% url 'course_list' %}"><i class="fas fa-book"></i>Courses</a></li>
-      
-      
-
-    {% elif request.user.role == "admin" %}
-      <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
-      <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
-
-      <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
-       <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
-
-      <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i>Undertaking Letters</a></li>
-      <li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i>Completion Certificates</a></li>
-      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
-    {% elif request.user.role == "trainer" %}
       <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i>Home</a></li>
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
