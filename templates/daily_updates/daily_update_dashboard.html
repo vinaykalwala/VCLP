@@ -6,6 +6,7 @@
     max-width: 1200px;
     margin: 40px auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0 15px;
 }
 
 /* Page Header */
@@ -18,15 +19,20 @@
     padding-left: 12px;
 }
 
-/* Filter Table Styling */
+/* ===== Filter Table Styling ===== */
+.filter-table-container {
+    overflow-x: auto; /* horizontal scroll on small screens */
+    margin-bottom: 30px;
+}
+
 .filter-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 30px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
+    min-width: 600px;
 }
 
 .filter-table th, .filter-table td {
@@ -58,7 +64,13 @@
     box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.2);
 }
 
-/* Buttons */
+/* Buttons Styling */
+.button-group {
+    display: flex;
+    flex-wrap: wrap; /* stack buttons on small screens */
+    gap: 10px; /* spacing between buttons */
+}
+
 .filter-table button,
 .filter-table a {
     padding: 8px 16px;
@@ -69,8 +81,11 @@
     border: none;
     text-decoration: none;
     transition: all 0.3s;
+    flex: 1; /* make buttons equal width on mobile */
+    text-align: center;
 }
 
+/* Filter Button */
 .filter-table button {
     background-color: #5932EA;
     color: #fff;
@@ -80,6 +95,7 @@
     background-color: #4523C9;
 }
 
+/* Reset Button */
 .filter-table a {
     background-color: #FBBF24;
     color: #222;
@@ -89,7 +105,7 @@
     background-color: #e0a815;
 }
 
-/* Trainer Card */
+/* ===== Trainer Card ===== */
 .trainer-card {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -111,10 +127,11 @@
     font-weight: 700;
 }
 
-/* Table */
+/* Table inside trainer card */
 .trainer-card table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 .trainer-card th, .trainer-card td {
@@ -138,13 +155,54 @@
     background-color: #f1f3ff;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .filter-table select {
-        font-size: 13px;
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+    .filter-table {
+        min-width: 500px;
     }
     .trainer-card table {
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-container h3 {
+        font-size: 24px;
+    }
+    .filter-table th, .filter-table td,
+    .trainer-card th, .trainer-card td {
         font-size: 13px;
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-table-container {
+        overflow-x: scroll;
+    }
+    .filter-table {
+        min-width: 450px;
+    }
+    .trainer-card table {
+        min-width: 450px;
+    }
+    .button-group {
+        flex-direction: column; /* stack buttons vertically */
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-container h3 {
+        font-size: 20px;
+    }
+    .filter-table th, .filter-table td,
+    .trainer-card th, .trainer-card td {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    .filter-table button, .filter-table a {
+        font-size: 12px;
+        padding: 8px 12px;
     }
 }
 </style>
@@ -154,50 +212,54 @@
     <h3>Trainer-wise Daily Session Dashboard</h3>
 
     <!-- Filters in Table -->
-    <form method="get">
-        <table class="filter-table">
-            <tr>
-                <th>Trainer</th>
-                <th>Batch</th>
-                <th>Month</th>
-                <th>Actions</th>
-            </tr>
-            <tr>
-                <td>
-                    <select name="trainer">
-                        <option value="">-- Select Trainer --</option>
-                        {% for t in trainers %}
-                            <option value="{{ t.id }}" {% if selected_trainer == t.id|stringformat:"s" %}selected{% endif %}>
-                                {{ t.user.username }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <select name="batch">
-                        <option value="">-- Select Batch --</option>
-                        {% for b in batches %}
-                            <option value="{{ b.id }}" {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>
-                                {{ b.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <select name="month">
-                        <option value="">-- Select Month --</option>
-                        {% for value, name in month_options %}
-                            <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ name }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <button type="submit">Filter</button>
-                    <a href="{% url 'daily_update_dashboard' %}">Reset</a>
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div class="filter-table-container">
+        <form method="get">
+            <table class="filter-table">
+                <tr>
+                    <th>Trainer</th>
+                    <th>Batch</th>
+                    <th>Month</th>
+                    <th>Actions</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="trainer">
+                            <option value="">-- Select Trainer --</option>
+                            {% for t in trainers %}
+                                <option value="{{ t.id }}" {% if selected_trainer == t.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ t.user.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="batch">
+                            <option value="">-- Select Batch --</option>
+                            {% for b in batches %}
+                                <option value="{{ b.id }}" {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ b.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="month">
+                            <option value="">-- Select Month --</option>
+                            {% for value, name in month_options %}
+                                <option value="{{ value }}" {% if selected_month == value %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <div class="button-group">
+                            <button type="submit">Filter</button>
+                            <a href="{% url 'daily_update_dashboard' %}">Reset</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 
     <!-- Trainer Cards -->
     {% for item in trainer_updates %}
@@ -212,28 +274,30 @@
                     {% endif %}
                 </div>
                 <div class="card-body p-3">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Batch</th>
-                                <th>Topic Covered</th>
-                                <th>Summary</th>
-                                <th>Challenges</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for update in item.updates %}
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>{{ update.date }}</td>
-                                    <td>{{ update.batch.name }}</td>
-                                    <td>{{ update.topic_covered|truncatechars:50 }}</td>
-                                    <td>{{ update.summary|truncatechars:50 }}</td>
-                                    <td>{{ update.challenges|truncatechars:50 }}</td>
+                                    <th>Date</th>
+                                    <th>Batch</th>
+                                    <th>Topic Covered</th>
+                                    <th>Summary</th>
+                                    <th>Challenges</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for update in item.updates %}
+                                    <tr>
+                                        <td>{{ update.date }}</td>
+                                        <td>{{ update.batch.name }}</td>
+                                        <td>{{ update.topic_covered|truncatechars:50 }}</td>
+                                        <td>{{ update.summary|truncatechars:50 }}</td>
+                                        <td>{{ update.challenges|truncatechars:50 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         {% endif %}
