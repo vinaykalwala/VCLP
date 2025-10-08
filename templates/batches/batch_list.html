@@ -30,11 +30,7 @@
             min-height: 100vh;
         }
 
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-            transition: var(--transition);
-        }
+       
 
         @media (max-width: 992px) {
             .main-content {
@@ -46,7 +42,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             padding-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -401,23 +397,12 @@
         <div class="container-fluid">
             <div class="page-header">
                 <h1 class="page-title">Batch Management</h1>
-                <a href="{% url 'batch_create' %}" class="btn create-btn" style="color:white;'">
+                <a href="{% url 'batch_create' %}" class="btn create-btn" style="color:white;">
                     <i class="fas fa-plus"></i> Create New Batch
                 </a>
             </div>
 
-            {% if messages %}
-            <div class="messages mb-4">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-custom alert-dismissible fade show" role="alert">
-                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
+           
 {% load tz %}
 
 {% if batches %}

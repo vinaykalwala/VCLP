@@ -1,63 +1,233 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Batch Scores</h2>
+<style>
+/* --- General Page Styling --- */
+.page-title {
+    font-weight: 700;
+    color: #5932EA;
+}
 
-    <!-- Batch Selection Form -->
-    <form method="get" class="mb-4">
-        <div class="row g-2 align-items-center">
-            <div class="col-auto">
-                <label for="batch_id" class="col-form-label">Select Batch:</label>
-            </div>
-            <div class="col-auto">
-                <select name="batch_id" id="batch_id" class="form-select" required>
-    <option value="">-- Select Batch --</option>
-    {% for batch in batches %}
-        <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
-            {{ batch.name }}
-        </option>
-    {% endfor %}
-</select>
+/* Batch Card */
+.batch-card {
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
 
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Show Scores</button>
+/* Scoreboard Table Card */
+.scoreboard-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Table Styling */
+.scoreboard-card table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.scoreboard-card thead th {
+    background-color: #5932EA;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #d0d0d0; /* vertical + horizontal lines */
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.scoreboard-card tbody td {
+    padding: 12px;
+    border: 1px solid #e0e0e0; /* vertical + horizontal lines */
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+/* Align numeric columns right */
+
+
+/* Table row striping for even/odd with higher specificity */
+.scoreboard-card tbody tr:nth-child(odd) td {
+    background-color: #fffff !important; /* light gray for odd rows */
+}
+
+.scoreboard-card tbody tr:nth-child(even) td {
+    background-color: #f9f9f9 !important; /* white for even rows */
+}
+
+/* Hover effect */
+.scoreboard-card tbody tr:hover td {
+    background-color: rgba(89, 50, 234, 0.1) !important; /* purple translucent overlay */
+}
+
+
+.progress-wrapper {
+    background-color: #e9e9e9;
+    border-radius: 12px;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #5932EA; /* default color, overridden dynamically */
+    border-radius: 12px 0 0 12px;
+}
+
+/* Center the percentage number over the bar */
+.progress-text {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+
+/* Default Box */
+.default-box {
+    border-radius: 12px;
+    border: 2px dashed #5932EA;
+    background-color: #fff;
+    padding: 40px 20px;
+    margin-top: 20px;
+}
+
+/* Text Purple Accent */
+.text-purple {
+    color: #5932EA;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #5932EA;
+    border-color: #5932EA;
+}
+
+.btn-primary:hover {
+    background-color: #4727B2;
+    border-color: #4727B2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .batch-card form .col-md-4, .batch-card form .col-md-2 {
+        width: 100%;
+    }
+    .progress-wrapper {
+        width: 100%;
+    }
+    .scoreboard-card table {
+        display: block;
+        overflow-x: auto;
+    }
+    .page-title{
+      text-align: center;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h2 class="page-title">Batch Scores</h2>
+            <p class="text-muted">View intern assignment scores and completion rates</p>
+        </div>
+
+        <!-- Batch Selection Card -->
+        <div class="card shadow-sm mb-4 batch-card">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-center justify-content-center">
+                    <div class="col-md-4">
+                        <select name="batch_id" id="batch_id" class="form-select" required>
+                            <option value="">-- Select Batch --</option>
+                            {% for batch in batches %}
+                                <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
+                                    {{ batch.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary btn-block">Show Scores</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </form>
 
-    {% if selected_batch %}
-        <h3>Scores for Batch: {{ selected_batch.name }}</h3>
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Intern</th>
-                    <th>Total Assignments</th>
-                    <th>Submitted</th>
-                    <th>Graded</th>
-                    <th>Total Score</th>
-                    <th>Average Score</th>
-                    <th>Completion %</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in scoreboard %}
-                <tr>
-                    <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
-                    <td>{{ row.total_assignments }}</td>
-                    <td>{{ row.submitted_count }}</td>
-                    <td>{{ row.graded_count }}</td>
-                    <td>{{ row.total_score }}</td>
-                    <td>{{ row.average_score }}</td>
-                    <td>{{ row.completion_rate }}%</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center">No interns or assignment data found for this batch.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+        {% if selected_batch %}
+        <!-- Scoreboard Card -->
+        <div class="card shadow-sm scoreboard-card">
+            <div class="card-header bg-white border-0 text-center">
+                <h5 class="mb-0 text-purple" style="padding: 15px 0;">Scores for Batch: {{ selected_batch.name }}</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Intern</th>
+                            <th>Total Assignments</th>
+                            <th>Submitted</th>
+                            <th>Graded</th>
+                            <th>Total Score</th>
+                            <th>Average Score</th>
+                            <th>Completion %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in scoreboard %}
+                        <tr>
+                            <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
+                            <td>{{ row.total_assignments }}</td>
+                            <td>{{ row.submitted_count }}</td>
+                            <td>{{ row.graded_count }}</td>
+                            <td>{{ row.total_score }}</td>
+                            <td>{{ row.average_score }}</td>
+                            <td>
+    <div class="progress-wrapper">
+        <div class="progress-bar" 
+             style="width: {{ row.completion_rate }}%;
+                    background: {% if row.completion_rate < 50 %}#E74C3C
+                                {% elif row.completion_rate < 80 %}#F39C12
+                                {% else %}#27AE60
+                                {% endif %};">
+        </div>
+        <div class="progress-text">{{ row.completion_rate }}%</div>
+    </div>
+</td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No interns or assignment data found for this batch.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <!-- Default Box -->
+        <div class="card shadow-sm text-center default-box">
+            <div class="card-body">
+                <h5 class="card-title">Please select a batch to view scores</h5>
+                <p class="text-muted">The scoreboard will appear here once a batch is selected.</p>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
 </div>
 {% endblock %}

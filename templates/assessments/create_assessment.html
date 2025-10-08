@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Assessment</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Select Batch</label>
+            <select name="batch" class="form-select" required>
+                <option value="">-- Select Batch --</option>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}">{{ batch.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Upload Questions (TXT or PDF)</label>
+            <input type="file" name="file" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Assessment</button>
+    </form>
+</div>
+{% endblock %}

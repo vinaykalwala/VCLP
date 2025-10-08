@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>All Assessments</h2>
+    <a href="{% url 'create_assessment' %}" class="btn btn-primary mb-3">Create New Assessment</a>
+
+    {% if assessments %}
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Batch</th>
+                <th>Total Marks</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in assessments %}
+            <tr>
+                <td>{{ a.title }}</td>
+                <td>{{ a.batch.name }}</td>
+                <td>{{ a.total_marks }}</td>
+                <td>{{ a.created_at|date:"d M Y H:i" }}</td>
+                <td>
+                    <a href="{{ a.question_file.url }}" class="btn btn-sm btn-info" target="_blank">View File</a>
+                    <a href="{% url 'edit_assessment' a.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_assessment' a.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'view_submissions' a.id %}" class="btn btn-sm btn-success">Submissions</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No assessments found.</p>
+    {% endif %}
+</div>
+{% endblock %}

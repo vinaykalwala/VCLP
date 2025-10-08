@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="main-content">
+<div class="container">
     <h2>My Assignments</h2>
     <hr>
 
@@ -42,5 +43,6 @@
     {% empty %}
         <p>No assignments found.</p>
     {% endfor %}
+</div>
 </div>
 {% endblock %}
