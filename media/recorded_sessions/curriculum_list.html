@@ -1,5 +1,5 @@
 {% extends 'login_base.html' %}
-{% block title %}Trainers{% endblock %}
+{% block title %}Curriculum{% endblock %}
 {% block content %}
 {% load static %}
 
@@ -41,8 +41,7 @@
     color: #333;
 }
 
-.filter-box select,
-.filter-box input {
+.filter-box select {
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -51,8 +50,7 @@
     transition: 0.2s ease;
 }
 
-.filter-box select:focus,
-.filter-box input:focus {
+.filter-box select:focus {
     border-color: #5932EA;
     outline: none;
     box-shadow: 0 0 0 2px rgba(89, 50, 234, 0.15);
@@ -78,16 +76,6 @@
 
 .btn-primary:hover {
     background-color: #4c28d1;
-    transform: translateY(-2px);
-}
-
-.btn-info {
-    background-color: #10B981;
-    color: #fff;
-}
-
-.btn-info:hover {
-    background-color: #0da271;
     transform: translateY(-2px);
 }
 
@@ -176,22 +164,25 @@
 </style>
 
 <div class="main-content">
-    <h1>Trainer Profiles</h1>
+    <h1>Curriculum</h1>
 
     <div class="top-bar">
+        {% if user_role != "intern" %}
         <form method="get" class="filter-box">
-            <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
-            <select name="availability">
-                <option value="">All Availability</option>
-                <option value="Full-time" {% if request.GET.availability == 'Full-time' %}selected{% endif %}>Full-time</option>
-                <option value="Part-time" {% if request.GET.availability == 'Part-time' %}selected{% endif %}>Part-time</option>
-                <option value="Guest" {% if request.GET.availability == 'Guest' %}selected{% endif %}>Guest</option>
+            <label for="batch">Filter by Batch:</label>
+            <select name="batch" id="batch" onchange="this.form.submit()">
+                <option value="">-- All Batches --</option>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}" {% if selected_batch == batch.id|stringformat:'s' %}selected{% endif %}>
+                        {{ batch.name }}
+                    </option>
+                {% endfor %}
             </select>
-            <button class="btn1 btn-primary" type="submit">Filter</button>
         </form>
+        {% endif %}
 
-        <!-- Add Trainer Button -->
-        <a href="{% url 'trainer_create' %}" class="btn1 btn-primary">+ Add New Trainer</a>
+        <!-- Add Curriculum Button -->
+        <a href="{% url 'create_curriculum' %}" class="btn btn-primary">+ Add Curriculum</a>
     </div>
 
     <!-- Table Section -->
@@ -199,29 +190,48 @@
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Expertise</th>
-                    <th>Designation</th>
-                    <th>Availability</th>
+                    <th>Title</th>
+                    <th>Course</th>
+                    <th>Batch</th>
+                    <th>File</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for trainer in trainers %}
+                {% for c in curriculums %}
                 <tr>
-                    <td>{{ trainer.user.username }}</td>
-                    <td>{{ trainer.expertise }}</td>
-                    <td>{{ trainer.designation }}</td>
-                    <td>{{ trainer.availability }}</td>
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.course.name }}</td>
                     <td>
-                        <a href="{% url 'trainer_detail' trainer.pk %}" class="btn1 btn-info">View</a>
-                        <a href="{% url 'trainer_update' trainer.pk %}" class="btn1 btn-warning">Edit</a>
-                        <a href="{% url 'trainer_delete' trainer.pk %}" class="btn1 btn-danger">Delete</a>
+                        {% if c.batch %}
+                            {{ c.batch.name }}
+                        {% else %}
+                            All Batches
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ c.file.url }}" target="_blank" style="background-color:#10B981; font-weight:500;text-decoration: none;color: #fff;border-radius: 5px;padding:6px 8px;">View</a></td>
+                    <td>
+                        {% if c.uploaded_by %}
+                            {{ c.uploaded_by.user.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ c.uploaded_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if user_role == "trainer" or user_role == "admin" or user_role == "superuser" %}
+                            {% if c.uploaded_by and c.uploaded_by.user == request.user or user_role in "admin superuser" %}
+                                <a href="{% url 'update_curriculum' c.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="{% url 'delete_curriculum' c.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            {% endif %}
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align:center; color:#777; font-style:italic;">No trainers found.</td>
+                    <td colspan="7" style="text-align:center; color:#777; font-style:italic;">No curriculum found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

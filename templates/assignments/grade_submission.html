@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Grade Submission: {{ submission.intern.user.get_full_name }}</h3>
+    <p><a href="{{ submission.file.url }}" target="_blank">Download Submission</a></p>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label>Score</label>
+            <input type="number" name="score" step="0.01" class="form-control" value="{{ submission.score }}">
+        </div>
+        <div class="mb-3">
+            <label>Feedback</label>
+            <textarea name="feedback" class="form-control">{{ submission.feedback }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+{% endblock %}

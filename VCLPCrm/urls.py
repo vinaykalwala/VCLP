@@ -16,6 +16,8 @@ urlpatterns = [
     path('lessons/view/', views.view_lessons, name='view_lessons'),
     path('lessons/<int:lesson_id>/secure-view/', views.secure_pdf_view, name='secure_pdf_view'),
     path('lessons/<int:lesson_id>/viewer/', views.pdf_viewer_page, name='pdf_viewer_page'),
+    path("lessons/edit/<int:pk>/", views.edit_lesson, name="edit_lesson"),
+    path("lessons/delete/<int:pk>/", views.delete_lesson, name="delete_lesson"),
     path("undertaking/", views.undertaking_certificates_home, name="undertaking_home"),
     path("undertaking/single/<int:identifier>/", views.generate_intern_pdf, {"mode": "single"}, name="undertaking_single"),
     path("undertaking/multiple/", views.generate_intern_pdf, {"mode": "multiple"}, name="undertaking_multiple"),
@@ -25,16 +27,11 @@ urlpatterns = [
     path('certificate/download/<int:intern_id>/', views.download_certificate_view, name='download_certificate'),
     path('lors/', views.manage_lor_view, name='manage_lor'),
     path('lor/download/<int:intern_id>/', views.download_lor_view, name='download_lor'),
-    
-
-    
-
-        # Course CRUD
+      
     path("courses/", views.course_list, name="course_list"),
     path("courses/add/", views.course_create, name="course_create"),
     path("courses/<int:pk>/edit/", views.course_update, name="course_update"),
     path("courses/delete/<int:pk>/", views.course_delete_ajax, name="course_delete_ajax"),
-
 
     path('batches/', views.batch_list, name='batch_list'),
     path('batches/create/', views.batch_create, name='batch_create'),
@@ -84,6 +81,17 @@ urlpatterns = [
     path('users/', views.user_list, name='user_list'),
     path('users/<int:pk>/edit/', views.user_update, name='user_update'),
     path('users/<int:pk>/delete/', views.user_delete, name='user_delete'),
+
+    path("assignments/create/", views.create_assignment, name="create_assignment"),
+    path("assignments/edit/<int:pk>/", views.edit_assignment, name="edit_assignment"),
+    path("assignments/delete/<int:pk>/", views.delete_assignment, name="delete_assignment"),
+    path("assignments/", views.view_assignments, name="view_assignments"),
+    path("assignments/<int:pk>/submissions/", views.view_submissions, name="view_submissions"),
+    path("submissions/<int:pk>/grade/", views.grade_submission, name="grade_submission"),
+
+    # Intern
+    path("my-assignments/", views.intern_assignments, name="intern_assignments"),
+    path("submit-assignment/<int:assignment_id>/", views.submit_assignment, name="submit_assignment"),
 
 ]
 if settings.DEBUG:

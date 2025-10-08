@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Assignments</h2>
+    <hr>
+
+    {% for data in assignment_data %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ data.assignment.title }}</h5>
+            <p class="card-text">{{ data.assignment.description }}</p>
+            <p><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</p>
+
+            {% if data.assignment.file %}
+                <p>
+                    <strong>Assignment File:</strong>
+                    <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
+                </p>
+            {% endif %}
+
+            {% if data.is_submitted %}
+                <p><strong>Status:</strong> ✅ Submitted</p>
+                <p>
+                    <strong>Your Submission:</strong>
+                    <a href="{{ data.submission.file.url }}" target="_blank">View File</a>
+                </p>
+                
+                {% if data.is_graded %}
+                    <p><strong>Score:</strong> {{ data.score }}</p>
+                    <p><strong>Feedback:</strong> {{ data.feedback }}</p>
+                {% else %}
+                    <p><strong>Status:</strong> ⏳ Submitted, awaiting grading.</p>
+                {% endif %}
+            {% else %}
+    <p><strong>Status:</strong> ❌ Not Submitted</p>
+    <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-sm btn-primary mt-2">Submit</a>
+{% endif %}
+
+            
+        </div>
+    </div>
+    {% empty %}
+        <p>No assignments found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

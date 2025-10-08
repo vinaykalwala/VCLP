@@ -1,21 +1,318 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Trainer Profile: {{ trainer.user.username }}</h2>
-    <p><strong>Name:</strong> {{ trainer.user.first_name }} {{ trainer.user.last_name }}</p>
-    <p><strong>Email:</strong> {{ trainer.user.email }}</p>
-    <p><strong>Expertise:</strong> {{ trainer.expertise }}</p>
-    <p><strong>Designation:</strong> {{ trainer.designation }}</p>
-    <p><strong>Qualification:</strong> {{ trainer.highest_qualification }}</p>
-    <p><strong>Experience:</strong> {{ trainer.years_of_experience }} years</p>
-    <p><strong>Availability:</strong> {{ trainer.availability }}</p>
-    <p><strong>LinkedIn:</strong> <a href="{{ trainer.linkedin_profile }}">{{ trainer.linkedin_profile }}</a></p>
-    <p><strong>Portfolio:</strong> <a href="{{ trainer.portfolio_link }}">{{ trainer.portfolio_link }}</a></p>
-    {% if trainer.profile_photo %}
-    <p><img src="{{ trainer.profile_photo.url }}" alt="Profile Photo" width="150"></p>
-    {% endif %}
-    <a href="{% url 'trainer_update' trainer.pk %}" class="btn btn-warning">Edit</a>
-    <a href="{% url 'trainer_delete' trainer.pk %}" class="btn btn-danger">Delete</a>
-    <a href="{% url 'trainer_list' %}" class="btn btn-secondary">Back to List</a>
+{% load static %}
+
+<style>
+/* ===== Trainer Profile — Expanded ===== */
+{% comment %} .main-content {
+    padding: 2rem;
+    background: #f7f9fc;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+} {% endcomment %}
+
+/* Profile Card */
+.trainer-profile-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 1000px;
+    transition: all 0.3s ease;
+}
+.trainer-profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Header */
+.trainer-header {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.6rem;
+}
+.trainer-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #dfe6ef;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+.trainer-title {
+    display: flex;
+    flex-direction: column;
+}
+.trainer-title h2 {
+    font-size: 24px;
+    color: #222;
+    font-weight: 700;
+    margin: 0;
+}
+.trainer-title .muted {
+    color: #7b7b7b;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+/* Two-column layout (info + bio) */
+.trainer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem;
+    margin-bottom: 1.6rem;
+}
+@media (max-width: 880px) {
+    .trainer-grid { grid-template-columns: 1fr; }
+}
+
+/* Info blocks */
+.trainer-info {
+    display: grid;
+    gap: 0.9rem;
+}
+.info-item {
+    background: #fafafa;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+    font-size: 15px;
+}
+.info-item strong { color: #333; }
+
+/* Tags / skills */
+.tag {
+    display: inline-block;
+    margin: 0 6px 6px 0;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #eef6ff;
+    color: #1366d6;
+    border: 1px solid rgba(19,102,214,0.08);
+}
+
+/* Bio area */
+.trainer-bio {
+    background: linear-gradient(180deg,#ffffff,#fbfcff);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #f0f4fb;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Links */
+.info-item a { color: #007bff; text-decoration: none; }
+.info-item a:hover { text-decoration: underline; }
+
+/* Rating */
+.rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #ff8a00;
+}
+
+/* Buttons */
+.trainer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.8rem;
+}
+.btn {
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-edit { background: linear-gradient(135deg,#ffcc00,#ff9900); }
+.btn-delete { background: linear-gradient(135deg,#ff4b4b,#e60023); }
+.btn-back { background: #e0e0e0; color: #222; }
+.btn:hover { transform: translateY(-2px); }
+
+/* small meta */
+.meta {
+    color: #8a8a8a;
+    font-size: 13px;
+    margin-top: 0.6rem;
+}
+</style>
+
+<div class="main-content">
+    <div class="trainer-profile-card">
+
+        <!-- Header -->
+        <div class="trainer-header">
+            {% if trainer.profile_photo %}
+                <img class="trainer-avatar" src="{{ trainer.profile_photo.url }}" alt="Profile Photo">
+            {% else %}
+                <img class="trainer-avatar" src="{% static 'images/default-avatar.png' %}" alt="Default Profile">
+            {% endif %}
+
+            <div class="trainer-title">
+                <h2>
+                    {% if trainer.user.first_name or trainer.user.last_name %}
+                        {{ trainer.user.first_name }} {{ trainer.user.last_name }}
+                    {% else %}
+                        {{ trainer.user.username }}
+                    {% endif %}
+                </h2>
+                <div class="muted">
+                    @{{ trainer.user.username }} &nbsp;•&nbsp;
+                    {% if trainer.designation %}{{ trainer.designation }}{% else %}Trainer{% endif %}
+                </div>
+
+                <div class="meta">
+                    {% if trainer.years_of_experience %}{{ trainer.years_of_experience }} years experience • {% endif %}
+                    {% if trainer.highest_qualification %}{{ trainer.highest_qualification }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid: Left = Info, Right = Bio & Misc -->
+        <div class="trainer-grid">
+            <!-- Left column: Key info -->
+            <div class="trainer-info">
+                <div class="info-item"><strong>Email:</strong> <br>{{ trainer.user.email }}</div>
+
+                {% if trainer.phone %}
+                <div class="info-item"><strong>Phone:</strong> <br>{{ trainer.phone }}</div>
+                {% endif %}
+
+                {% if trainer.expertise %}
+                <div class="info-item"><strong>Expertise:</strong> <br>{{ trainer.expertise }}</div>
+                {% endif %}
+
+                {% if trainer.availability %}
+                <div class="info-item"><strong>Availability:</strong> <br>{{ trainer.availability }}</div>
+                {% endif %}
+
+                {% comment %} Skills: works for M2M (skills.all) or plain text fallback {% endcomment %}
+                {% if trainer.skills.all %}
+                <div class="info-item"><strong>Skills:</strong><br>
+                    {% for s in trainer.skills.all %}<span class="tag">{{ s.name }}</span>{% endfor %}
+                </div>
+                {% elif trainer.skills %}
+                <div class="info-item"><strong>Skills:</strong><br>{{ trainer.skills }}</div>
+                {% endif %}
+
+                {% if trainer.certifications.all %}
+                <div class="info-item"><strong>Certifications:</strong><br>
+                    {% for c in trainer.certifications.all %}
+                        <div style="margin-bottom:6px;">• {{ c.name }}{% if c.issued_by %} — {{ c.issued_by }}{% endif %}</div>
+                    {% endfor %}
+                </div>
+                {% elif trainer.certifications %}
+                <div class="info-item"><strong>Certifications:</strong><br>{{ trainer.certifications }}</div>
+                {% endif %}
+
+                {% if trainer.linkedin_profile %}
+                <div class="info-item"><strong>LinkedIn:</strong><br>
+                    <a href="{{ trainer.linkedin_profile }}" target="_blank">{{ trainer.linkedin_profile }}</a>
+                </div>
+                {% endif %}
+
+                {% if trainer.portfolio_link %}
+                <div class="info-item"><strong>Portfolio:</strong><br>
+                    <a href="{{ trainer.portfolio_link }}" target="_blank">{{ trainer.portfolio_link }}</a>
+                </div>
+                {% endif %}
+
+                {% if trainer.languages %}
+                <div class="info-item"><strong>Languages:</strong><br>{{ trainer.languages }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Right column: Bio, Courses, Location, Ratings -->
+            <div>
+                {% if trainer.bio %}
+                <div class="trainer-bio">
+                    <strong>About</strong>
+                    <div style="margin-top:8px;">{{ trainer.bio|linebreaks }}</div>
+                </div>
+                {% endif %}
+
+                {% if trainer.courses.all %}
+                <div class="info-item" style="margin-top:12px;">
+                    <strong>Courses</strong><br>
+                    {% for c in trainer.courses.all %}
+                        <div style="margin-bottom:6px;">
+                            <a href="{% url 'course_detail' c.pk %}">{{ c.title }}</a>
+                            {% if c.duration %} &middot; {{ c.duration }}{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if trainer.batches.all %}
+                <div class="info-item" style="margin-top:12px;">
+                    <strong>Assigned Batches</strong><br>
+                    {% for b in trainer.batches.all %}
+                        <div style="margin-bottom:6px;">
+                            <a href="{% url 'batch_detail' b.pk %}">{{ b.name }}</a>
+                            {% if b.start_date %} • {{ b.start_date }}{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if trainer.address or trainer.city or trainer.state or trainer.country %}
+                <div class="info-item" style="margin-top:12px;">
+                    <strong>Location</strong><br>
+                    {{ trainer.address }}{% if trainer.city %}, {{ trainer.city }}{% endif %}{% if trainer.state %}, {{ trainer.state }}{% endif %}{% if trainer.country %}, {{ trainer.country }}{% endif %}
+                </div>
+                {% endif %}
+
+                {% if trainer.rating %}
+                <div class="info-item" style="margin-top:12px;">
+                    <div class="rating">
+                        <span style="font-size:18px;">★</span>
+                        <span>{{ trainer.rating }} / 5</span>
+                    </div>
+                    {% if trainer.review_count %}
+                        <div class="meta">{{ trainer.review_count }} reviews</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="meta" style="margin-top:10px;">
+                    {% if trainer.created_at %}Joined: {{ trainer.created_at|date:"M d, Y" }}{% endif %}
+                    {% if trainer.updated_at %}<br>Last updated: {{ trainer.updated_at|date:"M d, Y" }}{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="trainer-actions">
+            <a href="{% url 'trainer_update' trainer.pk %}" class="btn btn-edit">
+                <i class="fas fa-edit"></i>&nbsp; Edit
+            </a>
+            <a href="{% url 'trainer_delete' trainer.pk %}" class="btn btn-delete">
+                <i class="fas fa-trash"></i>&nbsp; Delete
+            </a>
+            <a href="{% url 'trainer_list' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i>&nbsp; Back to List
+            </a>
+        </div>
+
+    </div>
 </div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 {% endblock %}

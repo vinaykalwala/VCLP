@@ -1,26 +1,518 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
+{% load static %}
+{% block title %}Resolve Doubt{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Resolve Doubt</h2>
+<style>
+/* ======= CSS Variables ======= */
+:root {
+    --primary: #5932EA;
+    --primary-hover: #4521c4;
+    --success: #10B981;
+    --success-hover: #059669;
+    --warning: #FBBF24;
+    --warning-hover: #f59e0b;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
 
-    <div class="card p-4 mb-4 shadow-sm">
-        <h5><strong>Question:</strong></h5>
-        <p style="white-space: pre-wrap;">{{ doubt.question }}</p>
-        <p><strong>Intern:</strong> {{ doubt.intern.user.username }} | <strong>Batch:</strong> {{ doubt.batch.name }}</p>
-        <p><strong>Assigned Trainer:</strong> {{ doubt.trainer.user.username }}</p>
-        <p><strong>Created At:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
+/* ======= Main Layout ======= */
+.resolve-wrapper {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
+}
+
+/* ======= Page Header ======= */
+.page-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1::before {
+    content: '🎯';
+    font-size: 36px;
+}
+
+.page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ======= Question Card ======= */
+.question-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.question-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+}
+
+.card-header-icon {
+    font-size: 28px;
+}
+
+.card-header h5 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.question-text {
+    background: var(--background);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    border-left: 4px solid var(--primary);
+    position: relative;
+}
+
+.question-text::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    font-size: 48px;
+    color: var(--primary);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+}
+
+/* ======= Meta Information ======= */
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--background);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+    background: #e0e7ff;
+    transform: translateX(4px);
+}
+
+.meta-icon {
+    font-size: 22px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.meta-content {
+    flex: 1;
+}
+
+.meta-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.meta-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ======= Resolution Form Card ======= */
+.resolution-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.resolution-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: linear-gradient(180deg, var(--success), #059669);
+}
+
+.resolution-card h5 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resolution-card h5::before {
+    content: '✍️';
+    font-size: 24px;
+}
+
+/* ======= Form Styling ======= */
+.resolution-card form > div {
+    margin-bottom: 0;
+}
+
+.resolution-card form label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.resolution-card form textarea {
+    width: 100%;
+    min-height: 180px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: all 0.3s ease;
+    background: var(--background);
+    resize: vertical;
+}
+
+.resolution-card form textarea:focus {
+    border-color: var(--success);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    outline: none;
+    background: white;
+}
+
+.resolution-card form textarea::placeholder {
+    color: #94a3b8;
+}
+
+.form-helptext {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ======= Button Group ======= */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    flex: 1;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-submit::after {
+    content: '✓';
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-cancel {
+    background: linear-gradient(135deg, var(--warning) 0%, #f59e0b 100%);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+    flex: 1;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
+}
+
+.btn-cancel::before {
+    content: '←';
+    font-size: 18px;
+}
+
+/* ======= Animations ======= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.question-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.resolution-card {
+    animation: fadeInUp 0.5s ease-out 0.1s both;
+}
+
+/* ======= Status Badge ======= */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    position: absolute;
+    top: 32px;
+    right: 32px;
+}
+
+.status-badge::before {
+    content: '⏳';
+    font-size: 14px;
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 768px) {
+    .resolve-wrapper {
+        padding: 0 16px 32px;
+    }
+
+    .page-header {
+        padding: 30px 24px;
+        border-radius: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .question-card,
+    .resolution-card {
+        padding: 24px;
+    }
+
+    .meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .status-badge {
+        position: static;
+        margin-bottom: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .page-header h1::before {
+        font-size: 28px;
+    }
+
+    .card-header h5 {
+        font-size: 18px;
+    }
+}
+</style>
+<div class="main-content">
+<div class="resolve-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Resolve Doubt</h1>
+        <p class="page-subtitle">Provide a comprehensive solution to help the intern</p>
     </div>
 
-    <div class="card p-4 shadow-sm">
-        <h5 class="mb-3">Write Your Resolution</h5>
+    <!-- Question Card -->
+    <div class="question-card">
+        <span class="status-badge">Pending Resolution</span>
+        
+        <div class="card-header">
+            <span class="card-header-icon">❓</span>
+            <h5>Question Details</h5>
+        </div>
+
+        <div class="question-text">{{ doubt.question }}</div>
+
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="meta-icon">👤</div>
+                <div class="meta-content">
+                    <div class="meta-label">Intern</div>
+                    <div class="meta-value">{{ doubt.intern.user.username }}</div>
+                </div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-icon">📚</div>
+                <div class="meta-content">
+                    <div class="meta-label">Batch</div>
+                    <div class="meta-value">{{ doubt.batch.name }}</div>
+                </div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-icon">👨‍🏫</div>
+                <div class="meta-content">
+                    <div class="meta-label">Assigned Trainer</div>
+                    <div class="meta-value">{{ doubt.trainer.user.username }}</div>
+                </div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-icon">📅</div>
+                <div class="meta-content">
+                    <div class="meta-label">Created At</div>
+                    <div class="meta-value">{{ doubt.created_at|date:"d M Y, H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Form -->
+    <div class="resolution-card">
+        <h5>Write Your Resolution</h5>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-success">Submit Resolution</button>
-            <a href="{% url 'doubt_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+            <p class="form-helptext">💡 Tip: Provide a clear, detailed explanation with examples if possible</p>
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Submit Resolution</button>
+                <a href="{% url 'doubt_list' %}" class="btn-cancel">Cancel</a>
+            </div>
         </form>
     </div>
 </div>
+</div>
 {% endblock %}
-

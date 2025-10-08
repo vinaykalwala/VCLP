@@ -154,6 +154,12 @@
                     <a href="{% url 'pdf_viewer_page' lesson.id %}" target="_blank" class="action-btn action-btn--view">
                         📄 Open
                     </a>
+                    {% if user.role in 'trainer' %}
+                    
+                        <a href="{% url 'edit_lesson' lesson.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'delete_lesson' lesson.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    
+                    {% endif %}
                     <!-- Optional minimal view -->
                     <!-- <button onclick="openMinimalViewer({{ lesson.id }})" class="action-btn action-btn--minimal">
                         🔒 Minimal

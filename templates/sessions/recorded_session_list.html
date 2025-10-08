@@ -33,7 +33,7 @@
                         <p class="text-muted">No video available</p>
                     {% endif %}
                     <div class="session-footer">
-                        <span>Trainer: {{ session.trainer.user.username }}</span>
+                        <span>Trainer: {{ session.trainer.user.username }}</span><br>
                         <span>Uploaded At: {{ session.uploaded_at|date:"d M Y, H:i" }}</span>
                     </div>
                     {% if user.role in 'trainer admin superuser' %}
@@ -84,12 +84,24 @@
     box-shadow: 0 6px 12px rgba(89, 50, 234, 0.3);
 }
 
-/* Grid layout */
 .sessions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 20px;
 }
+
+@media (max-width: 1024px) {
+    .sessions-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row on tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .sessions-grid {
+        grid-template-columns: 1fr; /* 1 card per row on mobile */
+    }
+}
+
 
 /* Card styling */
 .session-card {
@@ -134,7 +146,6 @@
 }
 
 .session-footer {
-    display: flex;
     justify-content: space-between;
     font-size: 13px;
     color: #777;
