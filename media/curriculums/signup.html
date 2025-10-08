@@ -1,0 +1,317 @@
+{% extends 'login_base.html' %}
+{% block title %}Signup{% endblock %}
+{% block content %}
+{% load static %}
+
+<style>
+/* ---------- Signup Page Styles ---------- */
+/* ---------- Black & White Signup Page ---------- */
+body{
+  background: #ffffff;        /* white background */
+
+}
+.signup-container {
+  display: flex;
+  min-height: 100vh;
+  color: #000000;             /* black text */
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 20px;
+}
+
+.signup-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.signup-left h1 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #5932EA;
+}
+.signup-left h1 span {
+  color: #5932EA; /* no highlight color */
+}
+.signup-left p {
+  font-size: 16px;
+  color: #444; /* muted gray */
+  max-width: 420px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+.signup-left img {
+  max-width: 100%;
+  width: 400px;
+  margin-top: 10px;
+  border-radius: 12px;
+}
+
+/* Right section */
+.signup-right {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+.signup-box {
+  background: #ffff;       /* light gray form box */
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  border: 1px dotted #bdabff;
+}
+
+/* Form */
+.signup-box form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.signup-field {
+  display: flex;
+  flex-direction: column;
+}
+.signup-field.full {
+  grid-column: span 2;
+}
+.signup-field label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #666;
+}
+.signup-field input,
+.signup-field select {
+  padding: 12px;
+  border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #eef5ff;
+  color: #000;
+  font-size: 14px;
+  outline: none;
+}
+.signup-field input:focus,
+.signup-field select:focus {
+  border-color: #000;
+}
+
+/* Button */
+.signup-btn {
+  grid-column: span 2;
+  background: #5932EA;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  cursor: pointer;
+}
+.signup-btn:hover {
+  background: #10B981;
+}
+
+/* Link */
+.signup-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+.signup-footer a {
+  color: #000;
+  font-weight: 500;
+  text-decoration: none;
+}
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* for Firefox */
+  color: transparent;
+}
+
+/* Responsive for tablets & below */
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+    padding: 10px; 
+    margin-top: 10px;  /* reduce container padding */
+  }
+
+  .signup-left {
+    padding: 10px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .signup-left img {
+    margin: 15px auto;
+    max-width: 70%;
+  }
+
+  .signup-right {
+    padding: 0;  /* remove extra right section padding */
+  }
+
+  .signup-box {
+    padding: 20px;   /* reduce padding inside box */
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .signup-box form {
+    grid-template-columns: 1fr; /* single column */
+    gap: 12px;                   /* smaller gap */
+  }
+
+  .signup-field.full,
+  .signup-btn {
+    grid-column: span 1;
+  }
+
+  .signup-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+
+/* Larger screens (wide desktop) */
+@media (min-width: 1400px) {
+  .signup-box {
+    max-width: 800px;    /* bigger form box */
+    padding: 60px;       /* more padding */
+  }
+  .signup-left h1 {
+    font-size: 36px;     /* larger headline */
+  }
+  .signup-left p {
+    font-size: 18px;
+  }
+}
+
+/* Extra large screens (very wide desktop) */
+@media (min-width: 1700px) {
+  .signup-container {
+    padding-left: 120px;
+    padding-right: 120px; /* more spacing from screen edges */
+  }
+
+  .signup-box {
+    max-width: 1000px;   /* bigger form box */
+    padding: 80px;       /* more padding inside */
+  }
+
+  .signup-left h1 {
+    font-size: 42px;     /* larger headline */
+  }
+
+  .signup-left p {
+    font-size: 20px;     /* bigger paragraph text */
+    max-width: 600px;    /* allow more width for text */
+  }
+
+  .signup-field input,
+  .signup-field select {
+    padding: 16px;       /* larger inputs */
+    font-size: 16px;
+  }
+
+  .signup-btn {
+    font-size: 18px;
+    padding: 18px;
+  }
+}
+
+</style>
+
+<div class="main-content">
+<div class="signup-container">
+  <!-- Left Section -->
+ <div class="signup-left">
+  <h1>Create Accounts for <span class="gradient-text">Users</span></h1>
+  <p>
+    This page is for <strong>user registrations</strong>.  
+    Admins and Superusers should create accounts for their team members directly through the admin dashboard.
+  </p>
+  <img src="{% static 'images/signup.webp' %}" alt="Join us">
+</div>
+
+
+  <!-- Right Section -->
+  <div class="signup-right">
+    <div class="signup-box">
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="signup-field">
+          <label>Username</label>
+          <input type="text" name="username" required>
+        </div>
+
+        <div class="signup-field">
+          <label>First Name</label>
+          <input type="text" name="first_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Last Name</label>
+          <input type="text" name="last_name" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Email</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Phone</label>
+          <input type="text" name="phone" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Password</label>
+          <input type="password" name="password1" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Confirm Password</label>
+          <input type="password" name="password2" required>
+        </div>
+
+        <div class="signup-field">
+          <label>Role</label>
+          <select name="role" required>
+            {% for value, label in role_choices %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="signup-btn">Create Account</button>
+      </form>
+
+     
+    </div
+  </div>
+</div>
+</div>
+{% endblock %}
