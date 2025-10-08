@@ -1,0 +1,325 @@
+{% extends 'login_base.html' %}
+{% block title %}{{ title }} Course{% endblock %}
+{% block content %}
+{% load static %}<style>
+:root {
+  --primary: #5932EA;         
+  --primary-dark: #1D4ED8;    
+  --primary-light: #60A5FA;   
+  --bg: #ffffff;              
+  --bg-light: #F3F4F6;        
+  --text-light: #111827;      
+  --text-muted: #6B7280;      
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
+}
+
+/* Page Layout */
+.course-form-page {
+  margin-left: 260px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--bg-light) 0%, #f8f9fa 100%);
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-light);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: var(--transition);
+}
+
+/* Form Container */
+.form-container {
+  width: 100%;
+  max-width: 1100px;
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(89, 50, 234, 0.1);
+  animation: fadeIn 0.6s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+/* Header Section */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 35px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-content h1 {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.header-content .subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Form Layout */
+.form-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* Image Section */
+.form-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.form-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Form Fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  color: var(--text-light);
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(89, 50, 234, 0.15);
+  outline: none;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Error messages */
+.form-errors {
+  color: var(--primary-dark);
+  font-size: 13px;
+  margin-top: 6px;
+  padding: 5px 10px;
+  background: rgba(89, 50, 234, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary);
+}
+
+/* Buttons */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  grid-column: 1 / -1;
+}
+
+.reset-btn,
+.confirm-btn {
+  padding: 14px 25px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Reset Button */
+.reset-btn {
+  background: var(--bg);
+  color: var(--text-light);
+  border: 1.5px solid var(--primary);
+}
+
+.reset-btn:hover {
+  background: var(--bg-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(89, 50, 234, 0.15);
+}
+
+/* Confirm Button */
+.confirm-btn {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(89, 50, 234, 0.3);
+}
+
+.confirm-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(89, 50, 234, 0.4);
+}
+
+/* Back Link */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 25px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: var(--primary);
+  transition: var(--transition);
+}
+
+.back-link:hover {
+  background: var(--primary-dark);
+  transform: translateX(-3px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1280px) {
+  .course-form-page { margin-left: 0; padding: 30px 20px; }
+  .form-container { padding: 35px; }
+  .form-content { gap: 25px; }
+}
+
+@media (max-width: 1024px) {
+  .form-header h1 { font-size: 30px; }
+  .header-content .subtitle { font-size: 15px; }
+  .form-image { min-height: 250px; }
+}
+
+@media (max-width: 768px) {
+  .form-content { grid-template-columns: 1fr; gap: 20px; }
+  .form-header { flex-direction: column; align-items: flex-start; }
+  .form-actions { flex-direction: column; }
+  .form-container { padding: 25px; }
+  .form-header h1 { font-size: 28px; }
+  .form-header .subtitle { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  .course-form-page { padding: 15px; }
+  .form-container { padding: 20px; border-radius: 12px; }
+  .form-header h1 { font-size: 24px; }
+  .form-header .subtitle { font-size: 13px; }
+  .form-actions { gap: 12px; }
+  .reset-btn, .confirm-btn { font-size: 14px; padding: 12px; }
+  .form-image { min-height: 200px; }
+  .form-group input, .form-group select, .form-group textarea { font-size: 14px; padding: 12px; }
+}
+</style>
+
+<div class="course-form-page">
+  <div class="form-container">
+    <!-- Header Section -->
+    <div class="form-header">
+      <div class="header-content">
+        <h1>{{ title }} Course</h1>
+        <p class="subtitle">Design and organize your educational content</p>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <form method="POST">
+      {% csrf_token %}
+      
+      <div class="form-content">
+        <!-- Image Section -->
+        <div class="form-image">
+          <img src="{% static 'images/course.webp' %}" alt="Course Image">
+        </div>
+        
+        <!-- Form Fields -->
+        <div class="form-fields">
+          {% if form.non_field_errors %}
+            <div class="form-errors">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="form-errors">{{ field.errors|striptags }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="reset" class="reset-btn">
+            <span>🔄</span>
+            <span>Reset</span>
+          </button>
+          <button type="submit" class="confirm-btn">
+            <span>✅</span>
+            <span>Confirm</span>
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <a href="{% url 'course_list' %}" class="back-link">
+      <span>⬅</span>
+      <span>Back to Course List</span>
+    </a>
+  </div>
+</div>
+
+{% endblock %}
