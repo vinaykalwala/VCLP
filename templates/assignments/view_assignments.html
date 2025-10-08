@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Your Assignments</h3>
+    <a href="{% url 'create_assignment' %}" class="btn btn-primary mb-3">Create New</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th><th>Batch</th><th>Deadline</th><th>Created</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in assignments %}
+            <tr>
+                <td>{{ a.title }}</td>
+                <td>{{ a.batch.name }}</td>
+                <td>{{ a.deadline|date:"d M Y H:i" }}</td>
+                <td>{{ a.created_at|date:"d M Y" }}</td>
+                <td>
+                    <a href="{% url 'edit_assignment' a.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_assignment' a.id %}" class="btn btn-sm btn-danger">Delete</a>
+                       
+                    <a href="{% url 'view_submissions' a.id %}" class="btn btn-sm btn-info">View Submissions</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

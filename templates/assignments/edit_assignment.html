@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Assignment</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label>Title</label>
+            <input type="text" name="title" value="{{ assignment.title }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea name="description" class="form-control">{{ assignment.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Batch</label>
+            <select name="batch" class="form-select" required>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}" {% if batch.id == assignment.batch.id %}selected{% endif %}>
+                        {{ batch.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Deadline</label>
+            <input type="datetime-local" name="deadline" value="{{ assignment.deadline|date:'Y-m-d\\TH:i' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>File (Optional)</label>
+            {% if assignment.file %}
+                <p>Current file: <a href="{{ assignment.file.url }}" target="_blank">View</a></p>
+            {% endif %}
+            <input type="file" name="file" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <a href="{% url 'view_assignments' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

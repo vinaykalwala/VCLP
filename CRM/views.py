@@ -1923,3 +1923,212 @@ def user_delete(request, pk):
         messages.success(request, "User deleted successfully.")
         return redirect("user_list")
     return render(request, "users/user_confirm_delete.html", {"user": user})
+
+
+from django.utils import timezone
+
+@login_required
+def create_assignment(request):
+    if request.user.role != "trainer":
+        return redirect('dashboard')
+
+    trainer = request.user.trainer_profile
+    batches = trainer.assigned_batches.all()
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        batch_id = request.POST.get("batch")
+        file = request.FILES.get("file")
+        deadline = request.POST.get("deadline")
+
+        if not title or not batch_id or not deadline:
+            messages.error(request, "All fields except file are required.")
+            return redirect("create_assignment")
+
+        assignment = Assignment.objects.create(
+            trainer=trainer,
+            batch_id=batch_id,
+            title=title,
+            description=description,
+            file=file,
+            deadline=deadline
+        )
+        messages.success(request, "Assignment created successfully!")
+        return redirect("view_assignments")
+
+    return render(request, "assignments/create_assignment.html", {"batches": batches})
+
+
+@login_required
+def view_assignments(request):
+    user = request.user
+
+    if user.role == "trainer":
+        trainer = user.trainer_profile
+        assignments = Assignment.objects.filter(trainer=trainer).order_by("-created_at")
+    elif user.role in ["admin", "superuser"]:
+        assignments = Assignment.objects.all().order_by("-created_at")
+    else:
+        return redirect("dashboard")
+
+    return render(request, "assignments/view_assignments.html", {"assignments": assignments})
+
+@login_required
+def edit_assignment(request, pk):
+    if request.user.role != "trainer":
+        return redirect("dashboard")
+
+    trainer = request.user.trainer_profile
+    assignment = get_object_or_404(Assignment, pk=pk, trainer=trainer)
+    batches = trainer.assigned_batches.all()
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        batch_id = request.POST.get("batch")
+        file = request.FILES.get("file")
+        deadline = request.POST.get("deadline")
+
+        if not title or not batch_id or not deadline:
+            messages.error(request, "All fields except file are required.")
+            return redirect("edit_assignment", pk=assignment.id)
+
+        assignment.title = title
+        assignment.description = description
+        assignment.batch_id = batch_id
+        assignment.deadline = deadline
+
+        if file:
+            assignment.file = file
+
+        assignment.save()
+        messages.success(request, "Assignment updated successfully!")
+        return redirect("view_assignments")
+
+    return render(request, "assignments/edit_assignment.html", {
+        "assignment": assignment,
+        "batches": batches,
+    })
+
+
+@login_required
+def delete_assignment(request, pk):
+    if request.user.role != "trainer":
+        return redirect("dashboard")
+
+    trainer = request.user.trainer_profile
+    assignment = get_object_or_404(Assignment, pk=pk, trainer=trainer)
+
+    if request.method == "POST":
+        assignment.delete()
+        messages.success(request, "Assignment deleted successfully!")
+        return redirect("view_assignments")
+
+    return render(request, "assignments/delete_assignment.html", {"assignment": assignment})
+# ==============================================
+# Trainer: View Submissions & Grade
+# ==============================================
+@login_required
+def view_submissions(request, pk):
+    assignment = get_object_or_404(Assignment, pk=pk)
+
+    if request.user.role == "trainer" and assignment.trainer != request.user.trainer_profile:
+        return HttpResponseForbidden("You are not allowed to view these submissions.")
+
+    submissions = assignment.submissions.select_related("intern").all()
+    return render(request, "assignments/view_submissions.html", {
+        "assignment": assignment,
+        "submissions": submissions
+    })
+
+
+@login_required
+def grade_submission(request, pk):
+    submission = get_object_or_404(AssignmentSubmission, pk=pk)
+    assignment = submission.assignment
+
+    if request.user.role == "trainer" and assignment.trainer != request.user.trainer_profile:
+        return HttpResponseForbidden("You are not allowed to grade this submission.")
+
+    if request.method == "POST":
+        score = request.POST.get("score")
+        feedback = request.POST.get("feedback")
+
+        submission.score = score
+        submission.feedback = feedback
+        submission.graded = True
+        submission.save()
+
+        messages.success(request, "Submission graded successfully!")
+        return redirect("view_submissions", pk=assignment.id)
+
+    return render(request, "assignments/grade_submission.html", {"submission": submission})
+    
+
+# ==============================================
+# Intern: View Assignments & Submit
+# ==============================================
+@login_required
+def intern_assignments(request):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+
+    intern = request.user.intern_profile
+    batch = intern.batch
+
+    # Get all assignments for the intern's batch
+    assignments = Assignment.objects.filter(batch=batch).order_by("-created_at")
+
+    # Get all submissions by this intern
+    submissions = AssignmentSubmission.objects.filter(intern=intern)
+
+    # Create a dictionary mapping assignment_id → submission object
+    submission_map = {sub.assignment_id: sub for sub in submissions}
+
+    # Combine both datasets
+    assignment_data = []
+    for assignment in assignments:
+        submission = submission_map.get(assignment.id)
+        assignment_data.append({
+            "assignment": assignment,
+            "submission": submission,
+            "is_submitted": submission is not None,
+            "is_graded": submission.graded if submission else False,
+            "score": submission.score if submission and submission.graded else None,
+            "feedback": submission.feedback if submission and submission.graded else None,
+        })
+
+    return render(request, "assignments/intern_assignments.html", {
+        "assignment_data": assignment_data,
+    })
+
+
+@login_required
+def submit_assignment(request, assignment_id):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+
+    intern = request.user.intern_profile
+    assignment = get_object_or_404(Assignment, pk=assignment_id)
+
+    # check if submission already exists
+    if AssignmentSubmission.objects.filter(assignment=assignment, intern=intern).exists():
+        messages.error(request, "You already submitted this assignment.")
+        return redirect("intern_assignments")
+
+    if request.method == "POST" and request.FILES.get("file"):
+        file = request.FILES["file"]
+
+        if timezone.now() > assignment.deadline:
+            messages.warning(request, "Deadline has passed. Submission may be late.")
+
+        AssignmentSubmission.objects.create(
+            assignment=assignment,
+            intern=intern,
+            file=file
+        )
+        messages.success(request, "Assignment submitted successfully!")
+        return redirect("intern_assignments")
+
+    return render(request, "assignments/submit_assignment.html", {"assignment": assignment})

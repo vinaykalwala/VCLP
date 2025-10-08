@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Submissions for "{{ assignment.title }}"</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Intern</th><th>File</th><th>Submitted</th><th>Score</th><th>Feedback</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in submissions %}
+            <tr>
+                <td>{{ s.intern.user.get_full_name }}</td>
+                <td><a href="{{ s.file.url }}" target="_blank">Download</a></td>
+                <td>{{ s.submitted_at|date:"d M Y H:i" }}</td>
+                <td>{{ s.score|default:"-" }}</td>
+                <td>{{ s.feedback|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'grade_submission' s.id %}" class="btn btn-sm btn-warning">Grade</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
