@@ -32,8 +32,11 @@
                     <p><strong>Status:</strong> ⏳ Submitted, awaiting grading.</p>
                 {% endif %}
             {% else %}
-                <p><strong>Status:</strong> ❌ Not Submitted</p>
-            {% endif %}
+    <p><strong>Status:</strong> ❌ Not Submitted</p>
+    <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-sm btn-primary mt-2">Submit</a>
+{% endif %}
+
+            
         </div>
     </div>
     {% empty %}
