@@ -3,250 +3,451 @@
 
 {% block content %}
 <style>
-/* ======== Mark Attendance Page Styling ======== */
-.mark-attendance-wrapper {
-    max-width: 1100px;
-    margin: 50px auto;
-    background: #f9fafb;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    padding: 40px 30px;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
+/* ====== Layout Wrapper ====== */
+.attendance-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 20px;
+  background: #f8f9fb;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  transition: margin-left 0.3s ease;
+  overflow: hidden;
+  padding-right: 340px; /* ✅ Better than margin-right */
+  box-sizing: border-box;
 }
 
-.mark-attendance-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 25px;
-    border-left: 5px solid #007bff;
-    padding-left: 10px;
+/* ===== Left Attendance Section ====== */
+.attendance-container {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 25px 30px;
+  overflow-y: auto;
 }
 
-/* Batch selection */
-.batch-select-container {
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.attendance-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  border-left: 5px solid #5932EA;
+  padding-left: 10px;
+  margin-bottom: 20px;
 }
 
-.batch-select-container label {
-    font-weight: 600;
-    color: #333;
+/* Filters */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.filters select,
+.filters input[type="date"],
+.filters input[type="text"] {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.3s;
+}
+.filters select:hover,
+.filters input:focus {
+  border-color: #5932EA;
+}
+.filters input[type="text"] {
+  flex: 1;
 }
 
-.batch-select-container select {
-    padding: 8px 14px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    outline: none;
-    background: #fff;
-    transition: all 0.3s;
+/* ===== Table Styling ====== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
-.batch-select-container select:hover {
-    border-color: #007bff;
+.table {
+  width: 100%;
+  border-collapse: collapse;
 }
-
-/* Date picker */
-.attendance-date-container {
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.table th,
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+  text-align: left;
 }
-
-.attendance-date-container label {
-    font-weight: 600;
-    color: #333;
-}
-
-.attendance-date-container input[type="date"] {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    background: #fff;
-    transition: all 0.3s;
-}
-.attendance-date-container input[type="date"]:focus {
-    border-color: #007bff;
+.table th {
+  background: #5932EA;
+  color: #fff;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-/* Table */
-.attendance-table-wrapper {
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background: #fff;
+/* ===== Attendance Circles ====== */
+.status-dot {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.status-dot:checked {
+  background: #007bff;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+.status-dot:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
 }
 
-.attendance-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
+/* ===== Stats Badge Styling ===== */
+.stats-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, #5932EA, #8B5CF6);
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  text-align: center;
 }
 
-.attendance-table th,
-.attendance-table td {
-    padding: 10px 12px;
-    border: 2px solid #ddd; /* Adds vertical + horizontal borders */
-    text-align: left;
+.stats-badge i {
+  font-size: 24px;
+  opacity: 0.9;
 }
 
-.attendance-table th {
-    background: #5932EA;
-    color: #fff;
-    font-weight: 600;
-    border: 1px solid #4523c9; /* Slightly darker header border */
+#current-date {
+  font-size: 18px;
+  font-weight: 700;
 }
 
-.attendance-table tr:nth-child(even) td {
-    background-color: #fafafa; /* Alternate row shade for clarity */
-}
-
-.attendance-table {
-    border-collapse: collapse; /* Ensures clean joined borders */
-    width: 100%;
-}
-
-.attendance-table tr:hover {
-    background: #f1f7ff;
-}
-
-/* Status dropdown */
-.status-dropdown {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-.status-dropdown:hover {
-    border-color: #007bff;
-}
-
-/* Buttons */
-.submit-btn-container {
-    text-align: right;
-    margin-top: 20px;
-}
-
+/* ===== Buttons ====== */
+.submit-btn-container { text-align: right; margin-top: 20px; }
 .save-btn {
-    background: #5932EA;
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
+  background: #5932EA;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
 }
-.save-btn:hover {
-    background: #5932EA;
-}
+.save-btn:hover { background: #4725c8; }
 
-.back-btn-container {
-    margin-top: 25px;
-    text-align: left;
-}
-
+.back-btn-container { margin-top: 25px; }
 .back-btn {
-    text-decoration: none;
-    color: #5932EA;
+  color: #5932EA;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-btn:hover { text-decoration: underline; }
+
+/* ===== Right Panel ===== */
+.right-panel {
+  position: fixed;
+  right: 20px;
+  top: 120px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ✅ Added spacing from right border */
+.right-panel > * {
+  margin-left: 5px;
+ 
+}
+
+/* Cards */
+.calendar-box,
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+
+}
+.stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 600;
+  border-left: 6px solid;
+}
+.stat-yellow { border-color: #facc15; background: #fff9db; }
+.stat-green  { border-color: #22c55e; background: #e9ffe9; }
+.stat-red    { border-color: #ef4444; background: #ffecec; }
+.stat-value { font-size: 20px; font-weight: 700; color: #111; }
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+  .attendance-wrapper {
+    flex-direction: column;
+    padding-right: 20px;
+  }
+  .right-panel {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .attendance-container,
+  .right-panel { width: 100%; }
+  .filters { flex-direction: column; }
+  .filters input[type="text"] { width: 100%; }
+}
+
+/* ===== Mobile Card View for Table ===== */
+@media (max-width: 600px) {
+  .table, .table thead, .table tbody, .table th, .table td, .table tr {
+    display: block;
+  }
+  .table thead { display: none; }
+  .table tr {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+    border-bottom: none;
+    font-size: 14px;
+  }
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
     font-weight: 600;
-    transition: 0.3s;
+    text-align: left;
+  }
 }
-.back-btn:hover {
-    text-decoration: underline;
-}
-
-/* Responsive */
+/* ===== Responsive Improvements ===== */
 @media (max-width: 768px) {
-    .batch-select-container, .attendance-date-container {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .attendance-wrapper {
+    flex-direction: column;
+    padding-right: 20px; /* remove extra right padding */
+  }
 
-    .mark-attendance-wrapper {
-        padding: 25px 20px;
-    }
+  .filters {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .mark-attendance-title {
-        font-size: 24px;
-    }
+  .filters select,
+  .filters input[type="date"],
+  .filters input[type="text"] {
+    width: 100%; /* full width for better touch usability */
+  }
+
+  .right-panel {
+    position: static;
+    width: 100%;
+    margin-top: 20px; /* spacing below attendance table */
+    flex-direction: row; 
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .calendar-box,
+  .stat-card {
+    flex: 1 1 calc(50% - 10px); /* two items per row on mobile */
+    padding: 15px;
+  }
+
+  .calendar-box .stats-badge {
+    flex-direction: row;
+    gap: 10px;
+    font-size: 14px;
+    justify-content: flex-start;
+  }
+
+  .calendar-box .stats-badge i {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    font-size: 14px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
 }
+
+@media (max-width: 480px) {
+  .right-panel {
+    flex-direction: column;
+  }
+
+  .calendar-box,
+  .stat-card {
+    flex: 1 1 100%;
+  }
+}
+
 </style>
 
+<!-- ==================== MAIN CONTENT ==================== -->
 <div class="main-content">
-<div class="mark-attendance-wrapper">
-    <h2 class="mark-attendance-title">Mark Attendance</h2>
+  <div class="attendance-wrapper">
 
-    <form method="post" class="mark-attendance-form">
+    <!-- Left Section -->
+    <div class="attendance-container">
+      <div class="attendance-header">
+        <h2>Mark Attendance</h2>
+      </div>
+
+      <form method="post" class="attendance-form" id="attendanceForm">
         {% csrf_token %}
 
-        <!-- Batch Selection -->
-        <div class="batch-select-container">
-            <label for="batch">Select Batch:</label>
-            <select name="batch" id="batch" onchange="this.form.submit()">
-                <option value="">-- Select Batch --</option>
-                {% for batch in batches %}
-                <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
-                    {{ batch.name }} ({{ batch.course.name }})
-                </option>
-                {% endfor %}
-            </select>
+        <!-- Filters -->
+        <div class="filters">
+          <select name="batch" id="batch" onchange="this.form.submit()">
+            <option value="">-- Select Batch --</option>
+            {% for batch in batches %}
+            <option value="{{ batch.id }}" {% if selected_batch and batch.id == selected_batch.id %}selected{% endif %}>
+              {{ batch.name }} ({{ batch.course.name }})
+            </option>
+            {% endfor %}
+          </select>
+
+          <input type="date" name="date" id="date" required>
+          <input type="text" id="searchInput" placeholder="🔍 Search by name or ID...">
         </div>
 
         {% if selected_batch %}
-        <!-- Attendance Date -->
-        <div class="attendance-date-container">
-            <label for="date">Date:</label>
-            <input type="date" name="date" id="date" required>
-        </div>
-
         <!-- Attendance Table -->
-        <div class="attendance-table-wrapper">
-            <table class="attendance-table">
-                <thead>
-                    <tr>
-                        <th>Intern ID</th>
-                        <th>Name</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for intern in interns %}
-                    <tr>
-                        <td>{{ intern.unique_id }}</td>
-                        <td>{{ intern.user.username }}</td>
-                        <td>
-                            <select name="status_{{ intern.id }}" class="status-dropdown">
-                                <option value="">--</option>
-                                <option value="Present">Present</option>
-                                <option value="Absent">Absent</option>
-                            </select>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="table-wrapper">
+          <table class="table" id="attendanceTable">
+            <thead>
+              <tr>
+                <th>Intern ID</th>
+                <th>Name</th>
+                <th style="text-align:center;">Present</th>
+                <th style="text-align:center;">Absent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for intern in interns %}
+              <tr>
+                <td data-label="Intern ID">{{ intern.unique_id }}</td>
+                <td data-label="Name">{{ intern.user.username }}</td>
+                <td data-label="Present" style="text-align:center;">
+                  <input type="radio" name="status_{{ intern.id }}" value="Present" class="status-dot present">
+                </td>
+                <td data-label="Absent" style="text-align:center;">
+                  <input type="radio" name="status_{{ intern.id }}" value="Absent" class="status-dot absent">
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
 
         <!-- Submit Button -->
         <div class="submit-btn-container">
-            <button type="submit" name="save_attendance" class="save-btn">Save Attendance</button>
+          <button type="submit" name="save_attendance" class="save-btn">Save Attendance</button>
         </div>
         {% endif %}
-    </form>
+      </form>
 
-    <div class="back-btn-container">
+      <div class="back-btn-container">
         <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
+      </div>
     </div>
-</div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="right-panel">
+    <div class="calendar-box">
+      <div class="stats-badge">
+        <i class="fas fa-calendar-day"></i>
+        <span id="current-date">{{ current_date }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-yellow">
+      <span>Total Interns</span>
+      <span class="stat-value" id="totalCount">{{ interns|length }}</span>
+    </div>
+
+    <div class="stat-card stat-green">
+      <span>Present Today</span>
+      <span class="stat-value" id="presentCount">0</span>
+    </div>
+
+    <div class="stat-card stat-red">
+      <span>Absent Today</span>
+      <span class="stat-value" id="absentCount">0</span>
+    </div>
+  </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const presentCount = document.getElementById("presentCount");
+  const absentCount = document.getElementById("absentCount");
+  const searchInput = document.getElementById("searchInput");
+  const rows = document.querySelectorAll("#attendanceTable tbody tr");
+  const mainDateInput = document.querySelector('input[name="date"]');
+  const currentDateElement = document.getElementById('current-date');
+
+  // Update date
+  function updateCurrentDate() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    currentDateElement.textContent = now.toLocaleDateString('en-US', options);
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  mainDateInput.value = today;
+  updateCurrentDate();
+  setInterval(updateCurrentDate, 60000);
+
+  function updateCounts() {
+    const present = document.querySelectorAll('input[value="Present"]:checked').length;
+    const absent = document.querySelectorAll('input[value="Absent"]:checked').length;
+    presentCount.textContent = present;
+    absentCount.textContent = absent;
+  }
+
+  document.querySelectorAll(".status-dot").forEach(dot => {
+    dot.addEventListener("change", updateCounts);
+  });
+
+  searchInput.addEventListener("keyup", function() {
+    const term = this.value.toLowerCase();
+    rows.forEach(row => {
+      const id = row.cells[0].textContent.toLowerCase();
+      const name = row.cells[1].textContent.toLowerCase();
+      row.style.display = id.includes(term) || name.includes(term) ? "" : "none";
+    });
+  });
+
+  mainDateInput.addEventListener('change', updateCurrentDate);
+});
+</script>
 {% endblock %}
