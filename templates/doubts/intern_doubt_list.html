@@ -1,23 +1,210 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<h2>My Doubts</h2>
-<a href="{% url 'doubt_create' %}" class="btn btn-primary">Ask a Doubt</a>
+<style>
+/* ====== Page Container ====== */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-{% for doubt in doubts %}
-  <div class="card mt-3 p-3">
-    <h5>{{ doubt.question }}</h5>
-    <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
-    <p><strong>Created:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
-    <p><strong>Status:</strong> {% if doubt.resolved %}✅ Resolved{% else %}⏳ Pending{% endif %}</p>
+/* ====== Header Section ====== */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1100px;
+    margin-bottom: 35px;
+    background: linear-gradient(90deg, #5932EA 0%, #7153F8 100%);
+    padding: 16px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(89, 50, 234, 0.3);
+}
 
-    {% if doubt.resolved %}
-      <div class="alert alert-success mt-2">
-        <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
-        <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
-      </div>
-    {% endif %}
+.header-bar h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* ====== Ask Doubt Button ====== */
+.btn-ask {
+    background-color: #fff;
+    color: #5932EA;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 10px 24px;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.btn-ask:hover {
+    background-color: #10B981;
+    color: #ffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.3);
+}
+
+/* ====== Cards Wrapper ====== */
+.cards-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ====== Individual Card ====== */
+.card {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px 30px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-left: 6px solid #5932EA;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* ====== Card Content ====== */
+.card h5 {
+    font-size: 15px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.card p {
+    margin: 4px 0;
+    font-size: 10px;
+    color: #555;
+}
+
+/* ====== Status Badge ====== */
+.status {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+}
+
+.status.pending {
+    background-color: #FFF4D6;
+    color: #9A7300;
+}
+
+.status.resolved {
+    background-color: #E3F8E3;
+    color: #107C10;
+}
+
+/* ====== Answer Box ====== */
+.alert {
+    background-color: #F8F9FF;
+    border-left: 4px solid #5932EA;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-top: 12px;
+    color: #333;
+    font-size: 14px;
+}
+
+.alert strong {
+    color: #000;
+    font-weight: 600;
+}
+
+/* ====== Empty State ====== */
+.empty-state {
+    text-align: center;
+    color: #777;
+    margin-top: 40px;
+    font-size: 16px;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 992px) {
+    .dashboard-container {
+        max-width: 95%;
+    }
+
+    .header-bar {
+        max-width: 100%;
+        flex-direction: column;
+        gap: 10px;
+        border-radius: 25px;
+    }
+
+    .btn-ask {
+        align-self: center;
+        padding: 9px 20px;
+    }
+
+    .card {
+        max-width: 100%;
+        padding: 20px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .dashboard-container {
+        max-width: 1300px;
+    }
+
+    .card {
+        max-width: 1100px;
+    }
+}
+</style>
+
+<div class="main-content">
+  <div class="dashboard-container">
+    <div class="header-bar">
+        <h2>My Doubts</h2>
+        <a href="{% url 'doubt_create' %}" class="btn-ask">+ Ask a Doubt</a>
+    </div>
+
+    {% for doubt in doubts %}
+    <div class="card">
+        <h5>{{ doubt.question }}</h5>
+        <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
+        <p><strong>Created:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
+        <p>
+            <strong>Status:</strong>
+            {% if doubt.resolved %}
+                <span class="status resolved">✅ Resolved</span>
+            {% else %}
+                <span class="status pending">⏳ Pending</span>
+            {% endif %}
+        </p>
+
+        {% if doubt.resolved %}
+        <div class="alert">
+            <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
+            <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+        <p class="empty-state">No doubts raised yet.</p>
+    {% endfor %}
   </div>
-{% empty %}
-  <p>No doubts raised yet.</p>
-{% endfor %}
+</div>
 {% endblock %}

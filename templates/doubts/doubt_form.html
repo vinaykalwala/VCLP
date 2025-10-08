@@ -1,12 +1,167 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
+{% block title %}Ask a Doubt{% endblock %}
 {% block content %}
-  <h2>{{ title }}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+{% load static %}
 
+<style>
+/* === Container === */
+.askdoubt-container {
+    min-height: 90vh; /* almost full viewport */
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center;     /* vertical center */
+    padding: 15px;
+}
 
+/* === Card === */
+.askdoubt-card {
+    width: 100%;
+    max-width: 700px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.askdoubt-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.12);
+}
 
+/* === Card Header === */
+.askdoubt-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    background-color: #5932EA;
+    padding: 15px 20px;
+    border-radius: 12px;
+    color: white;
+}
+.askdoubt-header i {
+    font-size: 28px;
+}
+.askdoubt-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* === Form Fields === */
+.askdoubt-card form p {
+    margin-bottom: 20px;
+}
+
+.askdoubt-card form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+.askdoubt-card form input,
+.askdoubt-card form select,
+.askdoubt-card form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fafafa;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.askdoubt-card form input:focus,
+.askdoubt-card form select:focus,
+.askdoubt-card form textarea:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 12px rgba(89,50,234,0.15);
+    outline: none;
+}
+
+/* === Buttons === */
+.askdoubt-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.askdoubt-submit {
+    background-color: #5932EA;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 120px;
+}
+
+.askdoubt-submit:hover {
+    background-color: #4c28d1;
+    transform: translateY(-2px);
+}
+
+.askdoubt-cancel {
+    background-color: #f3f4f6;
+    color: #333;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 120px;
+}
+
+.askdoubt-cancel:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+    .askdoubt-card { padding: 30px 20px; }
+    .askdoubt-header h2 { font-size: 22px; }
+    .askdoubt-header i { font-size: 24px; }
+    .askdoubt-buttons { flex-direction: column; gap: 12px; }
+    .askdoubt-submit, .askdoubt-cancel { width: 100%; text-align: center; }
+}
+</style>
+<div class="main-content">
+<div class="askdoubt-container">
+    <div class="askdoubt-card">
+        <div class="askdoubt-header">
+            <i class="fas fa-question-circle"></i>
+            <h2>{{ title }}</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <p>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <span style="color:red; font-size:12px;">{{ field.errors }}</span>
+                {% endif %}
+            </p>
+            {% endfor %}
+            <div class="askdoubt-buttons">
+                <button type="submit" class="askdoubt-submit">Submit</button>
+                <a href="{% url 'dashboard' %}" class="askdoubt-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
 {% endblock %}
+

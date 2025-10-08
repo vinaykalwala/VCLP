@@ -1,33 +1,537 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
+{% load static %}
+{% block title %}Doubts Assigned to Me{% endblock %}
+
 {% block content %}
-<h2>Doubts Assigned to Me</h2>
+<style>
+/* ======= CSS Variables ======= */
+:root {
+    --primary: #5932EA;
+    --primary-hover: #4521c4;
+    --success: #10B981;
+    --success-hover: #059669;
+    --success-light: #dcfce7;
+    --success-dark: #065f46;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
 
-<h4 class="mt-3">⏳ Unresolved Doubts</h4>
-{% for doubt in unresolved_doubts %}
-  <div class="card mt-3 p-3">
-    <h5>{{ doubt.question }}</h5>
-    <p><strong>From Intern:</strong> {{ doubt.intern.user.username }} | Batch: {{ doubt.batch.name }}</p>
-    <form method="post" action="{% url 'resolve_doubt' doubt.pk %}">
-      {% csrf_token %}
-      <textarea name="answer" placeholder="Write your answer..." class="form-control" required></textarea><br>
-      <button type="submit" class="btn btn-success">Resolve</button>
-    </form>
-  </div>
-{% empty %}
-  <p>No unresolved doubts.</p>
-{% endfor %}
+/* ======= Main Wrapper ======= */
+.doubt-wrapper {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px 40px;
+}
 
-<h4 class="mt-5">✅ Resolved Doubts</h4>
-{% for doubt in resolved_doubts %}
-  <div class="card mt-3 p-3 bg-light">
-    <h5>{{ doubt.question }}</h5>
-    <p><strong>From Intern:</strong> {{ doubt.intern.user.username }} | Batch: {{ doubt.batch.name }}</p>
-    <div class="alert alert-success mt-2">
-      <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
-      <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+/* ======= Page Header ======= */
+.page-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1::before {
+    content: '💡';
+    font-size: 36px;
+}
+
+.page-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ======= Section Headers ======= */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 40px 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-count {
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-left: auto;
+}
+
+/* ======= Doubt Card ======= */
+.doubt-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.doubt-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary), #7c3aed);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.doubt-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.doubt-card:hover::before {
+    transform: scaleY(1);
+}
+
+.doubt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.doubt-card h5 {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.doubt-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--background);
+    border-radius: 8px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.meta-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.meta-icon {
+    font-size: 16px;
+}
+
+/* ======= Form Styling ======= */
+.doubt-form {
+    margin-top: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.doubt-card textarea {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 120px;
+    resize: vertical;
+    transition: all 0.3s ease;
+    background: var(--background);
+}
+
+.doubt-card textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(89, 50, 234, 0.1);
+    outline: none;
+    background: white;
+}
+
+.doubt-card textarea::placeholder {
+    color: #94a3b8;
+}
+
+/* ======= Buttons ======= */
+.btn-resolve {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-resolve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-resolve:active {
+    transform: translateY(0);
+}
+
+.btn-resolve::after {
+    content: '→';
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.btn-resolve:hover::after {
+    transform: translateX(4px);
+}
+
+/* ======= Resolved Doubts ======= */
+.resolved-card {
+    background: linear-gradient(to right, #f0fdf4 0%, white 50%);
+    border-left: 5px solid var(--success);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #d1fae5;
+    transition: all 0.3s ease;
+}
+
+.resolved-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.resolved-card h5 {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-primary);
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.resolved-card h5::before {
+    content: '✓';
+    background: var(--success);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.answer-box {
+    background: linear-gradient(135deg, var(--success-light) 0%, #f0fdf4 100%);
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 16px;
+    border: 1px solid #bbf7d0;
+    position: relative;
+}
+
+.answer-box::before {
+    content: '💬';
+    position: absolute;
+    top: -12px;
+    left: 18px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.answer-label {
+    font-weight: 600;
+    color: var(--success-dark);
+    display: block;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.answer-text {
+    color: #047857;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.resolved-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #059669;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #bbf7d0;
+}
+
+.resolved-time::before {
+    content: '🕐';
+    font-size: 14px;
+}
+
+/* ======= Empty State ======= */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px dashed var(--border);
+    margin-top: 20px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-text {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ======= Animations ======= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.doubt-card, .resolved-card {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 768px) {
+    .doubt-wrapper {
+        padding: 0 16px 32px;
+    }
+
+    .page-header {
+        padding: 30px 24px;
+        border-radius: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .doubt-card, .resolved-card {
+        padding: 20px;
+    }
+
+    .doubt-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-resolve {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .section-count {
+        position: static;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .page-header h1::before {
+        font-size: 28px;
+    }
+}
+</style>
+
+<div class="doubt-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Doubts Assigned to Me</h1>
+        <p class="page-subtitle">Manage and resolve intern questions efficiently</p>
     </div>
-  </div>
-{% empty %}
-  <p>No resolved doubts yet.</p>
-{% endfor %}
+
+    <!-- Unresolved Doubts -->
+    <div class="section-header">
+        <div class="section-icon">⏳</div>
+        <h2 class="section-title">Unresolved Doubts</h2>
+        {% if unresolved_doubts %}
+        <span class="section-count">{{ unresolved_doubts|length }}</span>
+        {% endif %}
+    </div>
+
+    {% for doubt in unresolved_doubts %}
+        <div class="doubt-card">
+            <div class="doubt-header">
+                <h5>{{ doubt.question }}</h5>
+            </div>
+            
+            <div class="doubt-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <strong>Intern:</strong> {{ doubt.intern.user.username }}
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📚</span>
+                    <strong>Batch:</strong> {{ doubt.batch.name }}
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'resolve_doubt' doubt.pk %}" class="doubt-form">
+                {% csrf_token %}
+                <label class="form-label">Your Answer</label>
+                <textarea name="answer" placeholder="Provide a detailed answer to help the intern understand..." required></textarea>
+                <button type="submit" class="btn-resolve">Resolve Doubt</button>
+            </form>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">✨</div>
+            <p class="empty-text">No unresolved doubts at the moment. Great work!</p>
+        </div>
+    {% endfor %}
+
+    <!-- Resolved Doubts -->
+    <div class="section-header">
+        <div class="section-icon">✅</div>
+        <h2 class="section-title">Resolved Doubts</h2>
+        {% if resolved_doubts %}
+        <span class="section-count">{{ resolved_doubts|length }}</span>
+        {% endif %}
+    </div>
+
+    {% for doubt in resolved_doubts %}
+        <div class="resolved-card">
+            <h5>{{ doubt.question }}</h5>
+            
+            <div class="doubt-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <strong>Intern:</strong> {{ doubt.intern.user.username }}
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📚</span>
+                    <strong>Batch:</strong> {{ doubt.batch.name }}
+                </div>
+            </div>
+
+            <div class="answer-box">
+                <span class="answer-label">Answer:</span>
+                <div class="answer-text">{{ doubt.resolution.answer }}</div>
+                <div class="resolved-time">
+                    Resolved on {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <p class="empty-text">No resolved doubts yet. Start resolving questions above!</p>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

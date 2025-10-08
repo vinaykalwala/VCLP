@@ -26,6 +26,16 @@ urlpatterns = [
     path('lors/', views.manage_lor_view, name='manage_lor'),
     path('lor/download/<int:intern_id>/', views.download_lor_view, name='download_lor'),
     
+
+    
+
+        # Course CRUD
+    path("courses/", views.course_list, name="course_list"),
+    path("courses/add/", views.course_create, name="course_create"),
+    path("courses/<int:pk>/edit/", views.course_update, name="course_update"),
+    path("courses/delete/<int:pk>/", views.course_delete_ajax, name="course_delete_ajax"),
+
+
     path('batches/', views.batch_list, name='batch_list'),
     path('batches/create/', views.batch_create, name='batch_create'),
     path('batches/<int:pk>/', views.batch_detail, name='batch_detail'),
