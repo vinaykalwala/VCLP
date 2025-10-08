@@ -1,14 +1,134 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3>Submit Assignment: {{ assignment.title }}</h3>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label>File</label>
-            <input type="file" name="file" class="form-control" required>
+{% load static %}
+
+<style>
+/* --- Submission Card --- */
+.submission-card {
+    max-width: 800px;
+    width: 100%;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Card Header */
+.submission-card .card-header {
+    background: linear-gradient(135deg, #5932EA, #4727B2);
+    padding: 30px 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* Card Body Split */
+.submission-card .card-body {
+    display: flex;
+    gap: 50px;
+    padding: 40px 30px;
+    flex-wrap: wrap;
+}
+
+/* Left: Form */
+.submission-form {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Right: Image */
+.submission-image {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.submission-image img {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 20px;
+}
+
+/* File Input Styling */
+.submission-form input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.submission-form input[type="file"]:hover {
+    border-color: #5932EA;
+}
+
+/* Submit Button */
+.submission-form button {
+    width: 100%;
+    background: #5932EA;
+    color: #fff;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submission-form button:hover {
+    background: #4727B2;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(89, 50, 234, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .submission-card .card-body {
+        flex-direction: column;
+        gap: 25px;
+    }
+    .submission-image img {
+        max-width: 100%;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="submission-card">
+
+        <!-- Header -->
+        <div class="card-header">
+            Submit Assignment
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-    </form>
+
+        <!-- Card Body: Form + Image -->
+        <div class="card-body">
+
+            <!-- Left: Form -->
+            <div class="submission-form">
+                <p style="color:#555; margin-bottom:20px;">
+                    Upload your assignment file below. 
+                </p>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" id="file" required>
+                    <button type="submit">Submit Assignment</button>
+                </form>
+            </div>
+
+            <!-- Right: Image -->
+            <div class="submission-image">
+                <img src="{% static 'images/upload1.jpg' %}" alt="Assignment Illustration">
+            </div>
+
+        </div>
+    </div>
 </div>
 {% endblock %}

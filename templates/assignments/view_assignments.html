@@ -1,6 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
+<div class="main-content">
+<div class="container">
     <h3>Your Assignments</h3>
     <a href="{% url 'create_assignment' %}" class="btn btn-primary mb-3">Create New</a>
     <table class="table table-bordered">
@@ -26,5 +27,6 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endblock %}

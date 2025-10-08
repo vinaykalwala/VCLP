@@ -1,12 +1,88 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container mt-4">
-    <h3>Are you sure you want to delete "{{ lesson.title }}"?</h3>
+{% extends 'login_base.html' %}
+{% block title %}Delete Lesson{% endblock %}
 
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'view_lessons' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+{% block content %}
+{% load static %}
+<div class="main-content">
+    <div class="container">
+        <div class="delete-wrapper d-flex justify-content-center align-items-center min-vh-80">
+            <div class="delete-card p-5 rounded-4 shadow-sm text-center">
+                <img src="{% static 'images/deletelesson.png' %}" alt="Warning" class="delete-icon mb-3">
+                <h3 class="delete-title mb-2">Confirm Deletion</h3>
+                <p class="delete-text mb-4">Are you sure you want to delete <strong>"{{ lesson.title }}"</strong>?</p>
+
+                <form method="POST" class="d-flex justify-content-center gap-3 flex-wrap">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg px-4">Yes, Delete</button>
+                    <a href="{% url 'view_lessons' %}" class="btn btn-outline-secondary btn-lg px-4">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+/* Unique styling for delete page */
+.delete-wrapper {
+    min-height: 70vh;
+}
+
+.delete-card {
+    background: white;
+    max-width: 450px;
+    width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.delete-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.delete-icon {
+    width: 70px;
+    height: 70px;
+}
+
+.delete-title {
+    color: #c71c1c;
+    font-weight: 700;
+}
+
+.delete-text {
+    color: #333;
+    font-size: 16px;
+}
+
+.btn-danger {
+    background: #c71c1c;
+    border: none;
+    transition: background 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #a51515;
+}
+
+.btn-outline-secondary {
+    border-color: #c71c1c;
+    color: #c71c1c;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #c71c1c;
+    color: white;
+}
+
+@media (max-width: 576px) {
+    .delete-card {
+        padding: 3rem 2rem;
+    }
+    .delete-icon {
+        width: 60px;
+        height: 60px;
+    }
+}
+</style>
 {% endblock %}

@@ -6,7 +6,7 @@
 <style>
 /* Trainer Dashboard Wrapper */
 .trainer-dashboard {
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,10 @@
   position: relative;
   overflow: hidden;
 }
-
+a {
+  text-decoration: none !important;
+  color: inherit;
+}
 /* Floating gradient blobs */
 .trainer-dashboard::before,
 .trainer-dashboard::after {
@@ -27,8 +30,6 @@
   z-index: 0;
 }
 
-
-
 /* Glass Container */
 .trainer-card {
   position: relative;
@@ -38,7 +39,7 @@
   border-radius: 28px;
   padding: 2.5rem 2rem;
   width: 100%;
-  max-width: 950px;
+  max-width: 1050px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.08);
   animation: fadeInUp 0.8s ease forwards;
   opacity: 0;
@@ -59,10 +60,24 @@
 }
 
 .trainer-header h1 span {
-            background: #5932EA;
+  background: #5932EA;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+    text-decoration: none;
+
 }
+/* Icon Colors for pastel gradients */
+.trainer-box.lessons i { color: #ff6fa3; }      /* pink pastel */
+.trainer-box.attendance i { color: #2eccb3; }   /* teal pastel */
+.trainer-box.profile i { color: #a37eff; }      /* purple pastel */
+.trainer-box.home i { color: #4aa6ff; }         /* blue pastel */
+.trainer-box.report i { color: #f1d86f; }       /* yellow pastel */
+.trainer-box.intern i { color: #ff6b6b; }       /* soft red */
+.trainer-box.mark i { color: #6ee7b7; }         /* mint green */
+.trainer-box.session i { color: #ffb96f; }      /* soft orange */
+.trainer-box.curriculum i { color: #c38fff; }   /* lavender */
+.trainer-box.video i { color: #6fb4ff; }        /* sky blue */
+.trainer-box.doubt i { color: #f0b86f; }       /* soft amber */
 
 .trainer-header p {
   font-size: 1.05rem;
@@ -70,6 +85,8 @@
   line-height: 1.6;
   max-width: 600px;
   margin: auto;
+    text-decoration: none;
+
 }
 
 /* Dashboard Grid */
@@ -94,18 +111,14 @@
   box-shadow: 0 18px 35px rgba(0,0,0,0.1);
 }
 
-/* Individual card gradients - Thicker */
-.trainer-box.lessons {
-  background: linear-gradient(145deg, rgba(255, 145, 198, 0.35), rgba(255, 152, 236, 0.15));
+/* Individual card gradients - New Colors, Soft & Elegant */
+
+
+.trainer-box{
+  background: linear-gradient(145deg, #eef5ff, #e6f2ff);
+  border: 1px solid #c1c4d2;
 }
 
-.trainer-box.attendance {
-  background: linear-gradient(145deg, rgba(39,174,96,0.35), rgba(39,174,96,0.15));
-}
-
-.trainer-box.profile {
-  background: linear-gradient(145deg, rgba(155,89,182,0.35), rgba(155,89,182,0.15));
-}
 
 
 .trainer-box i {
@@ -113,21 +126,21 @@
   margin-bottom: 1rem;
 }
 
-.trainer-box.lessons i { color: #3498db; }
-.trainer-box.attendance i { color: #27ae60; }
-.trainer-box.profile i { color: #9b59b6; }
-
 .trainer-box h3 {
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #1f2937;
+    text-decoration: none;
+
 }
 
 .trainer-box p {
   font-size: 0.95rem;
   color: #555;
   line-height: 1.4;
+    text-decoration: none;
+
 }
 
 /* Fade-in animation */
@@ -145,40 +158,84 @@
 }
 </style>
 
-
 <div class="main-content">
   <div class="trainer-dashboard">
     <div class="trainer-card">
-      
+
       <!-- Welcome Section -->
       <div class="trainer-header">
         <h1>Welcome, <span>{{ request.user.first_name|default:request.user.username }}</span> 👋</h1>
-        <p>
-          This is your personalized trainer dashboard. Monitor your lessons, track attendance,
-          and update your profile — all in one sleek interface.
-        </p>
+        <p>This is your personalized trainer dashboard. Monitor lessons, attendance, interns, and more — all in one sleek interface.</p>
       </div>
 
       <!-- Dashboard Grid -->
       <div class="trainer-grid">
 
-        <div class="trainer-box lessons">
-          <i class="fas fa-upload"></i>
-          <h3>Lessons Uploaded</h3>
-          <p>You’ve uploaded <b>{{ request.user.trainer_profile.uploaded_files.count }}</b> lessons.</p>
-        </div>
+        <a href="{% url 'dashboard' %}" class="trainer-box home">
+          <i class="fas fa-home"></i>
+          <h3>Home</h3>
+          <p>Return to your main dashboard overview.</p>
+        </a>
 
-        <div class="trainer-box attendance">
-          <i class="fas fa-check-circle"></i>
-          <h3>Attendance</h3>
-          <p>Quickly mark and review trainee attendance records.</p>
-        </div>
-
-        <div class="trainer-box profile">
-          <i class="fas fa-user-circle"></i>
+        <a href="{% url 'profile' %}" class="trainer-box profile">
+          <i class="fas fa-user"></i>
           <h3>Profile</h3>
-          <p>Keep your trainer profile updated for a personalized experience.</p>
-        </div>
+          <p>View and update your personal trainer details.</p>
+        </a>
+
+        <a href="{% url 'attendance_report' %}" class="trainer-box report">
+          <i class="fas fa-calendar-check"></i>
+          <h3>Attendance Report</h3>
+          <p>Review detailed attendance statistics and insights.</p>
+        </a>
+
+        <a href="{% url 'intern_list' %}" class="trainer-box intern">
+          <i class="fas fa-user-friends"></i>
+          <h3>Intern List</h3>
+          <p>View and manage your assigned interns efficiently.</p>
+        </a>
+
+        <a href="{% url 'mark_attendance' %}" class="trainer-box mark">
+          <i class="fas fa-check-circle"></i>
+          <h3>Mark Attendance</h3>
+          <p>Quickly mark trainee attendance with ease.</p>
+        </a>
+
+        <a href="{% url 'upload_lesson' %}" class="trainer-box lessons">
+          <i class="fas fa-upload"></i>
+          <h3>Upload Lesson</h3>
+          <p>Upload new lessons and resources for your trainees.</p>
+        </a>
+
+        <a href="{% url 'view_lessons' %}" class="trainer-box lessons">
+          <i class="fas fa-book"></i>
+          <h3>Lessons</h3>
+          <p>Access all uploaded lessons in one place.</p>
+        </a>
+
+        <a href="{% url 'daily_update_list' %}" class="trainer-box session">
+          <i class="fas fa-calendar-alt"></i>
+          <h3>Sessions List</h3>
+          <p>Track and manage your scheduled training sessions.</p>
+        </a>
+
+        <a href="{% url 'curriculum_list' %}" class="trainer-box curriculum">
+          <i class="fas fa-book-open"></i>
+          <h3>Curriculum</h3>
+          <p>Browse and manage training curriculum details.</p>
+        </a>
+
+        <a href="{% url 'recorded_session_list' %}" class="trainer-box video">
+          <i class="fas fa-video"></i>
+          <h3>Recorded Classes</h3>
+          <p>Access and manage your recorded training sessions.</p>
+        </a>
+
+        <a href="{% url 'doubt_list' %}" class="trainer-box doubt">
+          <i class="fas fa-question-circle"></i>
+          <h3>Doubts</h3>
+          <p>View and resolve trainee doubts and queries.</p>
+        </a>
 
       </div>
     </div>
