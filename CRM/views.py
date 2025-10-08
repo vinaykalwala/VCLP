@@ -2132,3 +2132,61 @@ def submit_assignment(request, assignment_id):
         return redirect("intern_assignments")
 
     return render(request, "assignments/submit_assignment.html", {"assignment": assignment})
+
+
+from django.db.models import Sum
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Batch, Assignment, AssignmentSubmission, InternProfile, TrainerProfile
+
+@login_required
+def batch_scores(request):
+    user = request.user
+    selected_batch = None
+    scoreboard = []
+    total_assignments = 0
+
+    # Determine available batches based on role
+    if user.role == "intern":
+        batches = Batch.objects.filter(id=user.intern_profile.batch.id)
+    elif user.role == "trainer":
+        batches = user.trainer_profile.assigned_batches.all()
+    elif user.role in ["admin", "superuser"]:
+        batches = Batch.objects.all()
+    else:
+        return redirect("dashboard")
+
+    # If a batch is selected via GET
+    batch_id = request.GET.get("batch_id")
+    if batch_id:
+        # Ensure the selected batch is in the user's accessible batches
+        selected_batch = get_object_or_404(batches, id=batch_id)
+        interns = selected_batch.interns.all()
+        total_assignments = Assignment.objects.filter(batch=selected_batch).count()
+
+        for intern in interns:
+            submissions = AssignmentSubmission.objects.filter(
+                intern=intern, assignment__batch=selected_batch
+            )
+
+            submitted_count = submissions.count()
+            graded_count = submissions.filter(graded=True).count()
+            total_score = submissions.aggregate(Sum("score"))["score__sum"] or 0
+            avg_score = total_score / graded_count if graded_count > 0 else 0
+            completion_rate = (submitted_count / total_assignments) * 100 if total_assignments > 0 else 0
+
+            scoreboard.append({
+                "intern": intern,
+                "total_assignments": total_assignments,
+                "submitted_count": submitted_count,
+                "graded_count": graded_count,
+                "total_score": round(total_score, 2),
+                "average_score": round(avg_score, 2),
+                "completion_rate": round(completion_rate, 2),
+            })
+
+    return render(request, "assignments/batch_scores.html", {
+        "batches": batches,
+        "selected_batch": selected_batch,
+        "scoreboard": scoreboard,
+    })

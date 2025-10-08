@@ -92,6 +92,9 @@ urlpatterns = [
     # Intern
     path("my-assignments/", views.intern_assignments, name="intern_assignments"),
     path("submit-assignment/<int:assignment_id>/", views.submit_assignment, name="submit_assignment"),
+    path("assignments/scores/", views.batch_scores, name="batch_scores"),
+
+
 
 ]
 if settings.DEBUG:
