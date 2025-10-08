@@ -245,8 +245,8 @@
       <div class="feature-grid">
         <div class="feature-card animate">
           <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
-          <h3>User Management</h3>
-          <p>Create, edit, and manage all user accounts with different roles and permissions across the platform.</p>
+          <h3>Create User</h3>
+          <p>Create and manage all user accounts with different roles and permissions across the platform.</p>
           <a href="{% url 'signup' %}" class="feature-link">Manage Users <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="feature-card animate">
@@ -257,14 +257,14 @@
         </div>
         <div class="feature-card animate">
           <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
-          <h3>Intern Management</h3>
-          <p>Oversee intern progress, manage profiles, and track performance metrics for all active interns.</p>
+          <h3>Interns List</h3>
+          <p>Oversee intern progress, manage profiles, and create and edit interns data.</p>
           <a href="{% url 'intern_list' %}" class="feature-link">Manage Interns <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="feature-card animate">
           <div class="feature-icon"><i class="fas fa-book-open"></i></div>
           <h3>Course Administration</h3>
-          <p>Manage training curriculum, course materials, and learning resources for all programs.</p>
+          <p>Manage training  course materials, and learning resources for all programs.</p>
           <a href="{% url 'course_list' %}" class="feature-link">Manage Courses <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
@@ -274,8 +274,8 @@
         <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
         <div class="action-list">
           <a href="{% url 'signup' %}" class="action-item"><i class="fas fa-user-plus"></i>Create New User</a>
-          <a href="{% url 'attendance_report' %}" class="action-item"><i class="fas fa-file-export"></i>Generate Report</a>
-          <a href="{% url 'profile' %}" class="action-item"><i class="fas fa-cog"></i>System Settings</a>
+          <a href="{% url 'attendance_report' %}" class="action-item"><i class="fas fa-file-export"></i>Attendence Report</a>
+          <a href="{% url 'profile' %}" class="action-item"><i class="fas fa-cog"></i>Profile</a>
           <a href="{% url 'intern_list' %}" class="action-item"><i class="fas fa-list-alt"></i>View All Interns</a>
         </div>
       </div>

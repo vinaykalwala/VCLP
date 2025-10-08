@@ -15,7 +15,9 @@
   --transition: all 0.3s ease;
 }
 
-/* Page Layout */
+/* ==========================================
+   Base Dashboard Layout
+========================================== */
 .dashboard-page {
   margin-left: 260px;
   padding: 40px 20px;
@@ -31,7 +33,9 @@
   margin: 0 auto;
 }
 
-/* Welcome Section */
+/* ==========================================
+   Welcome Section
+========================================== */
 .welcome-section {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   border-radius: 20px;
@@ -84,16 +88,6 @@
   opacity: 0.9;
 }
 
-.motivational-quote {
-  font-style: italic;
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  border-left: 4px solid rgba(255, 255, 255, 0.5);
-  margin-top: 20px;
-  font-size: 16px;
-}
-
 .quote-author {
   display: block;
   text-align: right;
@@ -126,7 +120,27 @@
   gap: 8px;
 }
 
-/* Cards Layout */
+.personalized-tip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  margin-top: 20px;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.personalized-tip i {
+  color: #FFD700;
+  font-size: 18px;
+}
+
+/* ==========================================
+   Dashboard Cards
+========================================== */
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -139,8 +153,6 @@
   padding: 25px 20px;
   box-shadow: var(--shadow);
   transition: var(--transition);
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -183,7 +195,6 @@
   margin-bottom: 20px;
 }
 
-/* Buttons */
 .card .btn {
   display: inline-flex;
   align-items: center;
@@ -203,42 +214,121 @@
   transform: translateY(-2px);
 }
 
-/* Responsive Styles */
-@media (max-width: 1280px) {
-  .dashboard-page { padding: 30px 20px; }
-  .welcome-section { padding: 35px; }
+/* ==========================================
+   Responsive Design for All Screens
+========================================== */
+
+/* Large screens (Desktops > 1440px) */
+@media (min-width: 1440px) {
+  .dashboard-container {
+    max-width: 1300px;
+  }
+  .welcome-section h1 {
+    font-size: 40px;
+  }
+  .learning-icon {
+    font-size: 90px;
+  }
 }
 
+/* Laptops & mid screens (1025px - 1439px) */
+@media (max-width: 1439px) {
+  .dashboard-page {
+    padding: 30px 25px;
+  }
+  .welcome-section {
+    padding: 35px;
+  }
+}
+
+/* Tablets (768px - 1024px) */
 @media (max-width: 1024px) {
-  .welcome-section h1 { font-size: 32px; }
-  .welcome-section p { font-size: 16px; }
-  .learning-icon { font-size: 70px; }
+  .dashboard-page {
+    margin-left: 0;
+  }
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px;
+  }
+  .welcome-section h1 {
+    font-size: 30px;
+  }
+  .welcome-section p {
+    font-size: 16px;
+  }
+  .learning-icon {
+    font-size: 70px;
+  }
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
 }
 
-@media (max-width: 768px) {
-  .dashboard-page { margin-left: 0; padding: 25px 15px; }
-  .welcome-section { padding: 30px 20px; border-radius: 16px; }
-  .welcome-content { flex-direction: column; text-align: center; gap: 25px; }
-  .welcome-visual { order: -1; }
-  .welcome-section h1 { font-size: 28px; }
-  .welcome-section p { font-size: 15px; }
-  .learning-icon { font-size: 60px; }
-  .dashboard-cards { gap: 20px; grid-template-columns: 1fr; }
+/* Mobile devices (481px - 767px) */
+@media (max-width: 767px) {
+  .welcome-section {
+    padding: 25px 20px;
+    border-radius: 16px;
+  }
+  .welcome-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  .welcome-visual {
+    order: -1;
+  }
+  .welcome-section h1 {
+    font-size: 26px;
+  }
+  .welcome-section p {
+    font-size: 15px;
+  }
+  .learning-icon {
+    font-size: 60px;
+  }
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .card {
+    padding: 20px;
+  }
 }
 
+/* Extra small devices (<480px) */
 @media (max-width: 480px) {
-  .dashboard-page { padding: 20px 10px; }
-  .welcome-section { padding: 25px 15px; }
-  .welcome-section h1 { font-size: 24px; }
-  .welcome-section p { font-size: 14px; }
-  .learning-icon { font-size: 50px; }
-  .motivational-quote { font-size: 14px; padding: 12px 16px; }
-  .card { padding: 20px 15px; }
-  .card h3 { font-size: 18px; }
-  .card p { font-size: 14px; }
-  .card .btn { font-size: 13px; padding: 10px 16px; }
+  .dashboard-page {
+    padding: 20px 10px;
+  }
+  .welcome-section h1 {
+    font-size: 22px;
+  }
+  .welcome-section p {
+    font-size: 14px;
+  }
+  .learning-icon {
+    font-size: 50px;
+  }
+  .personalized-tip {
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+  .card h3 {
+    font-size: 18px;
+  }
+  .card p {
+    font-size: 14px;
+  }
+  .card .btn {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
 }
 </style>
+
 
 
 <div class="dashboard-page">
@@ -249,11 +339,10 @@
         <div class="welcome-text">
           <h1><i class="fas fa-graduation-cap"></i> Welcome back, {{ request.user.first_name }}!</h1>
           <p>Ready to continue your learning journey? Explore your lessons and track your progress.</p>
-          
-          <div class="motivational-quote">
-"It's not a bug – it's an undocumented feature."
-
-          </div>
+          <div class="personalized-tip">
+  <i class="fas fa-lightbulb"></i>
+  <strong>Pro Tip:</strong> Practice the session you completed yesterday for better retention
+</div>
         </div>
         
         <div class="welcome-visual">
@@ -272,7 +361,7 @@
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><i class="fas fa-book-open"></i></div>
-          <h3>My Learning Hub</h3>
+          <h3>My Lessons</h3>
         </div>
         <p>Access all your assigned lessons and course materials.</p>
         <a href="{% url 'view_lessons' %}" class="btn"><i class="fas fa-arrow-right"></i> Explore Lessons</a>
@@ -280,11 +369,11 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
-          <h3>Progress Tracker</h3>
+          <div class="card-icon"><i class="fas fa-video"></i></div>
+          <h3>Recorded Classes</h3>
         </div>
-        <p>Track your achievements and completion rates across modules.</p>
-        <a href="{% url 'profile' %}" class="btn"><i class="fas fa-chart-bar"></i> View Progress</a>
+        <p>Access and review your recorded class sessions anytime.</p>
+<a href="{% url 'recorded_session_list'%}" class="btn"><i class="fas fa-play-circle"></i> View Classes</a>
       </div>
 
       <div class="card">
