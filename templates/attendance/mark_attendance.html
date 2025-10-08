@@ -6,24 +6,27 @@
 /* ====== Layout Wrapper ====== */
 .attendance-wrapper {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
   gap: 25px;
   padding: 20px;
   background: #f8f9fb;
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  
   transition: margin-left 0.3s ease;
+  overflow: hidden;
+  padding-right: 340px; /* ✅ Better than margin-right */
+  box-sizing: border-box;
 }
 
 /* ===== Left Attendance Section ====== */
 .attendance-container {
-  flex: 2;
+  flex: 1;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   padding: 25px 30px;
+  overflow-y: auto;
 }
 
 .attendance-header h2 {
@@ -130,6 +133,7 @@
   font-size: 18px;
   font-weight: 700;
 }
+
 /* ===== Buttons ====== */
 .submit-btn-container { text-align: right; margin-top: 20px; }
 .save-btn {
@@ -154,19 +158,29 @@
 
 /* ===== Right Panel ===== */
 .right-panel {
-  flex: 0.8;
+  position: fixed;
+  right: 20px;
+  top: 120px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  position: sticky;
-  top: 20px;
 }
+
+/* ✅ Added spacing from right border */
+.right-panel > * {
+  margin-left: 5px;
+ 
+}
+
+/* Cards */
 .calendar-box,
 .stat-card {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   padding: 20px;
+
 }
 .stat-card {
   display: flex;
@@ -182,12 +196,18 @@
 .stat-value { font-size: 20px; font-weight: 700; color: #111; }
 
 /* ===== Responsive ===== */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .attendance-wrapper {
-    min-height:auto;
     flex-direction: column;
-    padding: 15px;
+    padding-right: 20px;
   }
+  .right-panel {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
   .attendance-container,
   .right-panel { width: 100%; }
   .filters { flex-direction: column; }
@@ -224,10 +244,76 @@
     text-align: left;
   }
 }
+/* ===== Responsive Improvements ===== */
+@media (max-width: 768px) {
+  .attendance-wrapper {
+    flex-direction: column;
+    padding-right: 20px; /* remove extra right padding */
+  }
+
+  .filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filters select,
+  .filters input[type="date"],
+  .filters input[type="text"] {
+    width: 100%; /* full width for better touch usability */
+  }
+
+  .right-panel {
+    position: static;
+    width: 100%;
+    margin-top: 20px; /* spacing below attendance table */
+    flex-direction: row; 
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .calendar-box,
+  .stat-card {
+    flex: 1 1 calc(50% - 10px); /* two items per row on mobile */
+    padding: 15px;
+  }
+
+  .calendar-box .stats-badge {
+    flex-direction: row;
+    gap: 10px;
+    font-size: 14px;
+    justify-content: flex-start;
+  }
+
+  .calendar-box .stats-badge i {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    font-size: 14px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .right-panel {
+    flex-direction: column;
+  }
+
+  .calendar-box,
+  .stat-card {
+    flex: 1 1 100%;
+  }
+}
+
 </style>
 
+<!-- ==================== MAIN CONTENT ==================== -->
 <div class="main-content">
   <div class="attendance-wrapper">
+
     <!-- Left Section -->
     <div class="attendance-container">
       <div class="attendance-header">
@@ -292,31 +378,36 @@
         <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
       </div>
     </div>
+  </div>
 
-    <!-- Right Side -->
-    <div class="right-panel">
-      <div class="calendar-box">
-    <div class="stats-badge">
-  <i class="fas fa-calendar-day"></i>
-  <span id="current-date">{{ current_date }}</span>
-</div> </div>
+  <!-- Right Side -->
+  <div class="right-panel">
+    <div class="calendar-box">
+      <div class="stats-badge">
+        <i class="fas fa-calendar-day"></i>
+        <span id="current-date">{{ current_date }}</span>
+      </div>
+    </div>
 
-      <div class="stat-card stat-yellow">
-        <span>Total Interns</span>
-        <span class="stat-value" id="totalCount">{{ interns|length }}</span>
-      </div>
-      <div class="stat-card stat-green">
-        <span>Present Today</span>
-        <span class="stat-value" id="presentCount">0</span>
-      </div>
-      <div class="stat-card stat-red">
-        <span>Absent Today</span>
-        <span class="stat-value" id="absentCount">0</span>
-      </div>
+    <div class="stat-card stat-yellow">
+      <span>Total Interns</span>
+      <span class="stat-value" id="totalCount">{{ interns|length }}</span>
+    </div>
+
+    <div class="stat-card stat-green">
+      <span>Present Today</span>
+      <span class="stat-value" id="presentCount">0</span>
+    </div>
+
+    <div class="stat-card stat-red">
+      <span>Absent Today</span>
+      <span class="stat-value" id="absentCount">0</span>
     </div>
   </div>
 </div>
-<script>document.addEventListener("DOMContentLoaded", function() {
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
   const presentCount = document.getElementById("presentCount");
   const absentCount = document.getElementById("absentCount");
   const searchInput = document.getElementById("searchInput");
@@ -324,28 +415,16 @@
   const mainDateInput = document.querySelector('input[name="date"]');
   const currentDateElement = document.getElementById('current-date');
 
-  // Function to update dynamic date
+  // Update date
   function updateCurrentDate() {
     const now = new Date();
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    const formattedDate = now.toLocaleDateString('en-US', options);
-    
-    if (currentDateElement) {
-      currentDateElement.textContent = formattedDate;
-    }
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    currentDateElement.textContent = now.toLocaleDateString('en-US', options);
   }
 
-  // Set default date to today and update dynamic date
   const today = new Date().toISOString().split('T')[0];
   mainDateInput.value = today;
   updateCurrentDate();
-
-  // Update date every minute to keep it current
   setInterval(updateCurrentDate, 60000);
 
   function updateCounts() {
@@ -368,9 +447,7 @@
     });
   });
 
-  // Update dynamic date when main date changes
-  mainDateInput.addEventListener('change', function() {
-    updateCurrentDate();
-  });
-});</script>
+  mainDateInput.addEventListener('change', updateCurrentDate);
+});
+</script>
 {% endblock %}
