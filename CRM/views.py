@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 import io
@@ -238,6 +238,52 @@ def view_lessons(request):
         lessons = LessonFile.objects.all().order_by('-uploaded_at')
 
     return render(request, "files/view.html", {"lessons": lessons})
+
+@login_required
+def edit_lesson(request, pk):
+    lesson = get_object_or_404(LessonFile, pk=pk)
+
+    # Only the trainer who uploaded it or admin can edit
+    if request.user.role == "trainer" and lesson.trainer != request.user.trainer_profile:
+        return HttpResponseForbidden("You are not allowed to edit this lesson.")
+
+    batches = request.user.trainer_profile.assigned_batches.all() if request.user.role == "trainer" else []
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        selected_batches = request.POST.getlist("batches")
+        file = request.FILES.get("file")
+
+        lesson.title = title
+        if file:
+            lesson.file = file
+        if selected_batches:
+            lesson.batches.set(selected_batches)
+        lesson.save()
+
+        messages.success(request, "Lesson updated successfully.")
+        return redirect("view_lessons")
+
+    return render(request, "files/edit.html", {"lesson": lesson, "batches": batches})
+
+
+# =====================
+# Delete Lesson
+# =====================
+@login_required
+def delete_lesson(request, pk):
+    lesson = get_object_or_404(LessonFile, pk=pk)
+
+    # Only the trainer who uploaded it or admin can delete
+    if request.user.role == "trainer" and lesson.trainer != request.user.trainer_profile:
+        return HttpResponseForbidden("You are not allowed to delete this lesson.")
+
+    if request.method == "POST":
+        lesson.delete()
+        messages.success(request, "Lesson deleted successfully.")
+        return redirect("view_lessons")
+
+    return render(request, "files/confirm_delete.html", {"lesson": lesson})
 
 @login_required
 def secure_pdf_view(request, lesson_id):
