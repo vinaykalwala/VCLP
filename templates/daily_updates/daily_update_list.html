@@ -78,6 +78,8 @@
 .btn-warning {
     background-color: #FBBF24;
     color: #000;
+        margin: 5px;
+
 }
 
 .btn-warning:hover {
@@ -88,6 +90,7 @@
 .btn-danger {
     background-color: #EF4444;
     color: #fff;
+    margin: 5px;
 }
 
 .btn-danger:hover {
@@ -199,7 +202,7 @@
                         <td>{{ update.trainer.user.username }}</td>
                         <td>{{ update.batch.name }}</td>
                         <td>{{ update.topic_covered|truncatechars:50 }}</td>
-                        <td>{{ update.summary|truncatechars:50 }}</td>
+                        <td>{{ update.summary}}</td>
                         {% if user_role == "trainer" %}
                         <td>
                             {% if update.trainer.user == request.user %}

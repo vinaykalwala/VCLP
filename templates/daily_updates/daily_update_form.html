@@ -69,6 +69,15 @@
     flex: 1;
 }
 
+/* Labels on top */
+.unique-form-body label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    color: #2b2b2b;
+    font-size: 14px;
+}
+
 .unique-form-body input,
 .unique-form-body textarea,
 .unique-form-body select {
@@ -165,16 +174,25 @@
                 <form method="post">
                     {% csrf_token %}
 
-                    <!-- Two fields in a row -->
+                    <!-- Two fields in a row with labels on top -->
                     <div class="field-row">
-                        <div class="form-field">{{ form.field1 }}</div>
-                        <div class="form-field">{{ form.field2 }}</div>
+                        <div class="form-field">
+                            <label for="{{ form.field1.id_for_label }}">{{ form.field1.label }}</label>
+                            {{ form.field1 }}
+                        </div>
+                        <div class="form-field">
+                            <label for="{{ form.field2.id_for_label }}">{{ form.field2.label }}</label>
+                            {{ form.field2 }}
+                        </div>
                     </div>
 
-                    <!-- Other fields stacked below -->
+                    <!-- Other fields stacked below with labels -->
                     {% for field in form %}
                         {% if field.name != 'field1' and field.name != 'field2' %}
-                            <p>{{ field }}</p>
+                            <p>
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                            </p>
                         {% endif %}
                     {% endfor %}
 
