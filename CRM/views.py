@@ -2190,3 +2190,278 @@ def batch_scores(request):
         "selected_batch": selected_batch,
         "scoreboard": scoreboard,
     })
+
+
+import io
+import pdfplumber
+
+def parse_mcq_txt(file):
+    """Parses a TXT file into MCQ dicts"""
+    mcqs = []
+    content = file.read().decode("utf-8")
+    blocks = content.strip().split("\n\n")
+    for block in blocks:
+        lines = block.strip().split("\n")
+        question_text = lines[0]
+        options = lines[1:5]
+        correct_option = int(lines[5].split(":")[1].strip())
+        mcqs.append({
+            "question_text": question_text,
+            "options": options,
+            "correct_option": correct_option
+        })
+    return mcqs
+
+def parse_mcq_pdf(file):
+    """Parses PDF into MCQ dicts using pdfplumber"""
+    mcqs = []
+    with pdfplumber.open(file) as pdf:
+        text = ""
+        for page in pdf.pages:
+            text += page.extract_text() + "\n"
+        blocks = text.strip().split("\n\n")
+        for block in blocks:
+            lines = block.strip().split("\n")
+            if len(lines) < 6:  # skip invalid blocks
+                continue
+            question_text = lines[0]
+            options = lines[1:5]
+            correct_option = int(lines[5].split(":")[1].strip())
+            mcqs.append({
+                "question_text": question_text,
+                "options": options,
+                "correct_option": correct_option
+            })
+    return mcqs
+
+@login_required
+def create_assessment(request):
+    if request.user.role != "trainer":
+        return redirect("dashboard")
+
+    trainer = request.user.trainer_profile
+    batches = trainer.assigned_batches.all()
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        batch_id = request.POST.get("batch")
+        file = request.FILES.get("file")
+
+        if not title or not batch_id or not file:
+            messages.error(request, "All fields are required.")
+            return redirect("create_assessment")
+
+        # Parse file
+        if file.name.endswith(".txt"):
+            mcqs = parse_mcq_txt(file)
+        elif file.name.endswith(".pdf"):
+            mcqs = parse_mcq_pdf(file)
+        else:
+            messages.error(request, "Only TXT or PDF files are supported.")
+            return redirect("create_assessment")
+
+        # Create assessment
+        assessment = Assessment.objects.create(
+            batch_id=batch_id,
+            trainer=trainer,
+            title=title,
+            question_file=file,
+            total_marks=len(mcqs)
+        )
+
+        # Save MCQs
+        for mcq in mcqs:
+            AssessmentMCQ.objects.create(
+                assessment=assessment,
+                question_text=mcq["question_text"],
+                option_1=mcq["options"][0],
+                option_2=mcq["options"][1],
+                option_3=mcq["options"][2] if len(mcq["options"]) > 2 else "",
+                option_4=mcq["options"][3] if len(mcq["options"]) > 3 else "",
+                correct_option=mcq["correct_option"]
+            )
+
+        messages.success(request, f"Assessment '{title}' created successfully!")
+        return redirect("view_assessments")
+
+    return render(request, "assessments/create_assessment.html", {"batches": batches})
+
+
+@login_required
+def take_assessment(request, assessment_id):
+    assessment = get_object_or_404(Assessment, id=assessment_id)
+
+    # Only intern of batch can take
+    if request.user.role != "intern" or request.user.intern_profile.batch != assessment.batch:
+        return redirect("dashboard")
+
+    intern = request.user.intern_profile
+
+    # Check if submission already exists
+    submission = AssessmentSubmission.objects.filter(assessment=assessment, intern=intern).first()
+    if submission:
+        # Redirect to result if already submitted
+        messages.info(request, "You have already submitted this assessment.")
+        return redirect("assessment_result", submission.id)
+
+    mcqs = assessment.mcqs.all()
+
+    if request.method == "POST":
+        answers = {}
+        score = 0
+        for mcq in mcqs:
+            selected_option = int(request.POST.get(f"mcq_{mcq.id}", 0))
+            answers[str(mcq.id)] = selected_option
+            if selected_option == mcq.correct_option:
+                score += 1
+
+        # Create submission (no update)
+        submission = AssessmentSubmission.objects.create(
+            assessment=assessment,
+            intern=intern,
+            answers=answers,
+            score=score
+        )
+
+        messages.success(request, "Assessment submitted successfully!")
+        return redirect("assessment_result", submission.id)
+
+    return render(request, "assessments/take_assessment.html", {"assessment": assessment, "mcqs": mcqs})
+
+@login_required
+def assessment_result(request, submission_id):
+    submission = get_object_or_404(AssessmentSubmission, id=submission_id)
+    mcqs = submission.assessment.mcqs.all()
+
+    # Precompute selected answers for template
+    for mcq in mcqs:
+        # JSONField keys are strings, so cast mcq.id to string
+        mcq.selected_answer = submission.answers.get(str(mcq.id), None)
+
+    return render(request, "assessments/result.html", {
+        "submission": submission,
+        "mcqs": mcqs,
+    })
+
+@login_required
+def view_assessments(request):
+    user = request.user
+    if user.role == "trainer":
+        assessments = Assessment.objects.filter(trainer=user.trainer_profile)
+    elif user.role in ["admin", "superuser"]:
+        assessments = Assessment.objects.all()
+    else:
+        return redirect("dashboard")
+    return render(request, "assessments/view_assessments.html", {"assessments": assessments})
+
+
+@login_required
+def edit_assessment(request, pk):
+    assessment = get_object_or_404(Assessment, id=pk)
+    # Optional: only trainer or admin can edit
+    if request.user.role not in ["trainer", "admin", "superuser"]:
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        assessment.title = request.POST.get("title")
+        assessment.total_marks = request.POST.get("total_marks")
+        assessment.save()
+        messages.success(request, "Assessment updated successfully!")
+        return redirect("view_assessments")
+
+    return render(request, "assessments/edit_assessment.html", {"assessment": assessment})
+
+
+@login_required
+def delete_assessment(request, pk):
+    assessment = get_object_or_404(Assessment, id=pk)
+    if request.user.role not in ["trainer", "admin", "superuser"]:
+        return redirect("dashboard")
+
+    assessment.delete()
+    messages.success(request, "Assessment deleted successfully!")
+    return redirect("view_assessments")
+
+
+@login_required
+def view_submissions(request, assessment_id):
+    assessment = get_object_or_404(Assessment, id=assessment_id)
+    submissions = assessment.submissions.all()
+    return render(request, "assessments/view_submissions.html", {
+        "assessment": assessment,
+        "submissions": submissions,
+    })
+
+
+@login_required
+def intern_assessments(request):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+
+    intern = request.user.intern_profile
+    batch = intern.batch
+
+    # All assessments for the intern's batch
+    assessments = Assessment.objects.filter(batch=batch).order_by("-created_at")
+
+    # Collect submission info
+    assessment_data = []
+    for a in assessments:
+        submission = AssessmentSubmission.objects.filter(assessment=a, intern=intern).first()
+        assessment_data.append({
+            "assessment": a,
+            "is_submitted": bool(submission),
+            "submission": submission,
+            "score": submission.score if submission else None
+        })
+
+    return render(request, "assessments/intern_assessments.html", {"assignment_data": assessment_data})
+
+
+@login_required
+def batch_assessment_scores(request):
+    user = request.user
+    selected_batch = None
+    scoreboard = []
+    total_assessments = 0
+    total_possible_score = 0
+
+    # Determine accessible batches
+    if user.role == "intern":
+        batches = Batch.objects.filter(id=user.intern_profile.batch.id)
+    elif user.role == "trainer":
+        batches = user.trainer_profile.assigned_batches.all()
+    elif user.role in ["admin", "superuser"]:
+        batches = Batch.objects.all()
+    else:
+        return redirect("dashboard")
+
+    # If batch selected via GET
+    batch_id = request.GET.get("batch_id")
+    if batch_id:
+        selected_batch = get_object_or_404(batches, id=batch_id)
+        interns = selected_batch.interns.all()
+        assessments = Assessment.objects.filter(batch=selected_batch)
+        total_assessments = assessments.count()
+        total_possible_score = assessments.aggregate(Sum("total_marks"))["total_marks__sum"] or 0
+
+        for intern in interns:
+            submissions = AssessmentSubmission.objects.filter(
+                intern=intern, assessment__batch=selected_batch
+            )
+            submitted_count = submissions.count()
+            total_score = submissions.aggregate(Sum("score"))["score__sum"] or 0
+
+            scoreboard.append({
+                "intern": intern,
+                "total_assessments": total_assessments,
+                "submitted_count": submitted_count,
+                "total_possible_score": total_possible_score,
+                "score_secured": round(total_score, 2),
+            })
+
+    return render(request, "assessments/batch_assessment_scores.html", {
+        "batches": batches,
+        "selected_batch": selected_batch,
+        "scoreboard": scoreboard,
+    })

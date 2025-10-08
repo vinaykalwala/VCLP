@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Submissions — {{ assessment.title }}</h2>
+    {% if submissions %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Intern</th>
+                    <th>Submitted At</th>
+                    <th>Total Marks</th>
+                    <th>Secured Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in submissions %}
+                <tr>
+                    <td>{{ sub.intern.user.get_full_name|default:sub.intern.unique_id }}</td>
+                    <td>{{ sub.submitted_at|date:"d M Y H:i" }}</td>
+                    <td>{{ sub.assessment.total_marks }}</td>
+                    <td>{{ sub.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No submissions yet.</p>
+    {% endif %}
+    <a href="{% url 'view_assessments' %}" class="btn btn-secondary mt-3">Back to Assessments</a>
+</div>
+{% endblock %}

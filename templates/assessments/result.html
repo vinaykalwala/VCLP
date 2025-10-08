@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <a href="{% url 'intern_assessments' %}" class="btn btn-sm btn-secondary mb-3">← Back to Assessments</a>
+    <h2>Result — {{ submission.assessment.title }}</h2>
+    <p><strong>Your Score:</strong> {{ submission.score }} / {{ submission.assessment.total_marks }}</p>
+    <hr>
+
+   {% for mcq in mcqs %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
+
+            <p>
+                <strong>Your Answer:</strong>
+                {% if mcq.selected_answer == 1 %}{{ mcq.option_1 }}
+                {% elif mcq.selected_answer == 2 %}{{ mcq.option_2 }}
+                {% elif mcq.selected_answer == 3 %}{{ mcq.option_3 }}
+                {% elif mcq.selected_answer == 4 %}{{ mcq.option_4 }}
+                {% else %}Not Answered
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Correct Answer:</strong>
+                {% if mcq.correct_option == 1 %}{{ mcq.option_1 }}
+                {% elif mcq.correct_option == 2 %}{{ mcq.option_2 }}
+                {% elif mcq.correct_option == 3 %}{{ mcq.option_3 }}
+                {% elif mcq.correct_option == 4 %}{{ mcq.option_4 }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+{% endfor %}
+
+</div>
+{% endblock %}

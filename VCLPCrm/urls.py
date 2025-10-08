@@ -94,6 +94,15 @@ urlpatterns = [
     path("submit-assignment/<int:assignment_id>/", views.submit_assignment, name="submit_assignment"),
     path("assignments/scores/", views.batch_scores, name="batch_scores"),
 
+    path("assessments/create/", views.create_assessment, name="create_assessment"),
+    path("assessments/view/", views.view_assessments, name="view_assessments"),
+    path("assessments/edit/<int:pk>/", views.edit_assessment, name="edit_assessment"),
+    path("assessments/delete/<int:pk>/", views.delete_assessment, name="delete_assessment"),
+    path("assessments/my/", views.intern_assessments, name="intern_assessments"),
+    path("assessments/submissions/<int:assessment_id>/", views.view_submissions, name="view_submissions"),
+    path("assessments/take/<int:assessment_id>/", views.take_assessment, name="take_assessment"),
+    path("assessments/result/<int:submission_id>/", views.assessment_result, name="assessment_result"),
+    path("assessments/scores/", views.batch_assessment_scores, name="batch_assessment_scores"),
 
 
 ]

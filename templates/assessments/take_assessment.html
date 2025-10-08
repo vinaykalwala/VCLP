@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ assessment.title }}</h2>
+    <p>Total Marks: {{ assessment.total_marks }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {% for mcq in mcqs %}
+            <div class="mb-3">
+                <p><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
+                <div>
+                    <input type="radio" name="mcq_{{ mcq.id }}" value="1"> {{ mcq.option_1 }}<br>
+                    <input type="radio" name="mcq_{{ mcq.id }}" value="2"> {{ mcq.option_2 }}<br>
+                    {% if mcq.option_3 %}
+                        <input type="radio" name="mcq_{{ mcq.id }}" value="3"> {{ mcq.option_3 }}<br>
+                    {% endif %}
+                    {% if mcq.option_4 %}
+                        <input type="radio" name="mcq_{{ mcq.id }}" value="4"> {{ mcq.option_4 }}<br>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+{% endblock %}

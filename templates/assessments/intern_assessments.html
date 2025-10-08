@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>My Assessments</h2>
+    <hr>
+
+    {% for data in assignment_data %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ data.assessment.title }}</h5>
+            <p class="card-text">{{ data.assessment.question_file.name|default:"No file uploaded" }}</p>
+            <p><strong>Total Marks:</strong> {{ data.assessment.total_marks }}</p>
+            <p><strong>Deadline:</strong> {{ data.assessment.created_at|date:"d M Y, h:i A" }}</p>
+
+            {% if data.is_submitted %}
+                <p><strong>Status:</strong> ✅ Submitted</p>
+                <p>
+                    <strong>Your Score:</strong> {{ data.score }} / {{ data.assessment.total_marks }}
+                </p>
+                <a href="{% url 'assessment_result' data.submission.id %}" class="btn btn-sm btn-info">View Result</a>
+                <button class="btn btn-sm btn-secondary" disabled>Take Assessment</button>
+            {% else %}
+                <p><strong>Status:</strong> ❌ Not Submitted</p>
+                <a href="{% url 'take_assessment' data.assessment.id %}" class="btn btn-sm btn-primary">Take Assessment</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+        <p>No assessments available.</p>
+    {% endfor %}
+</div>
+{% endblock %}
