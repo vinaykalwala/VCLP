@@ -4,55 +4,141 @@
 
 {% block content %}
 <style>
-/* ======= CSS Variables ======= */
+/* ======= TYPOGRAPHY IMPORT ======= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ======= CSS VARIABLES - PREMIUM PALETTE ======= */
 :root {
-    --primary: #5932EA;
-    --primary-hover: #4521c4;
+    /* Primary Brand Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    
+    /* Success Colors */
     --success: #10B981;
-    --success-hover: #059669;
-    --success-light: #dcfce7;
-    --success-dark: #065f46;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Info Colors */
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    
+    /* Warning Colors */
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+    
+    /* Neutral Colors */
     --background: #f8fafc;
+    --background-secondary: #f1f5f9;
     --card-bg: #ffffff;
-    --text-primary: #1e293b;
+    --text-primary: #0f172a;
     --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
     --border: #e2e8f0;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --border-hover: #cbd5e1;
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
 }
 
-/* ======= Main Wrapper ======= */
+/* ======= GLOBAL RESET & BASE STYLES ======= */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(to bottom, #f8fafc 0%, #e0e7ff 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
 .doubt-wrapper {
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px 40px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
 }
 
-/* ======= Page Header ======= */
+/* ======= PAGE HEADER - HERO SECTION ======= */
 .page-header {
-    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-    border-radius: 16px;
-    padding: 40px;
-    margin-bottom: 40px;
-    box-shadow: var(--shadow-lg);
+    background: var(--primary-gradient);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-xl), var(--glow-primary);
     position: relative;
     overflow: hidden;
+    isolation: isolate;
 }
 
 .page-header::before {
     content: '';
     position: absolute;
     top: -50%;
-    right: -20%;
+    right: -15%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 20s ease-in-out infinite;
+}
+
+.page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
     width: 400px;
     height: 400px;
-    background: rgba(255, 255, 255, 0.1);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     border-radius: 50%;
+    animation: float 15s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(30px, -30px) rotate(5deg);
+    }
+    66% {
+        transform: translate(-20px, 20px) rotate(-5deg);
+    }
 }
 
 .page-header h1 {
-    font-size: 32px;
+    font-size: 2.5rem;
     font-weight: 800;
     color: #ffffff;
     margin: 0;
@@ -60,68 +146,147 @@
     z-index: 1;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-md);
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .page-header h1::before {
     content: '💡';
-    font-size: 36px;
+    font-size: 3rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    50% {
+        filter: drop-shadow(0 4px 16px rgba(255, 255, 255, 0.6));
+    }
 }
 
 .page-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
-    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.125rem;
+    margin-top: var(--spacing-sm);
     position: relative;
     z-index: 1;
+    font-weight: 400;
+    letter-spacing: -0.01em;
 }
 
-/* ======= Section Headers ======= */
-.section-header {
+/* ======= TAB BUTTONS - MODERN SEGMENTED CONTROL ======= */
+.tab-buttons {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 40px 0 24px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid var(--border);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    background: var(--card-bg);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
 }
 
-.section-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.section-icon {
-    font-size: 28px;
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 1rem;
+    font-family: inherit;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: var(--spacing-sm);
+    position: relative;
+    letter-spacing: -0.01em;
+}
+
+.tab-btn:hover {
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.tab-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+.tab-btn.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* ======= SECTION HEADERS ======= */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border);
+    position: relative;
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-full);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.02em;
 }
 
 .section-count {
-    background: var(--primary);
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 20px;
     margin-left: auto;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: var(--radius-full);
+    padding: 0.25rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    min-width: 2rem;
+    text-align: center;
 }
 
-/* ======= Doubt Card ======= */
-.doubt-card {
+/* ======= DOUBT CARDS - PREMIUM DESIGN ======= */
+.doubt-card,
+.resolved-card {
     background: var(--card-bg);
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: var(--spacing-lg);
+    transition: all var(--transition-slow);
     position: relative;
     overflow: hidden;
 }
@@ -133,260 +298,279 @@
     top: 0;
     height: 100%;
     width: 4px;
-    background: linear-gradient(180deg, var(--primary), #7c3aed);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
+    background: linear-gradient(180deg, #f59e0b 0%, #ef4444 100%);
+    opacity: 0.8;
 }
 
-.doubt-card:hover {
+.resolved-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--success-gradient);
+    opacity: 0.8;
+}
+
+.doubt-card:hover,
+.resolved-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
     border-color: var(--primary);
 }
 
-.doubt-card:hover::before {
-    transform: scaleY(1);
-}
-
-.doubt-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.doubt-card h5 {
+.doubt-card h5,
+.resolved-card h5 {
+    font-size: 1.25rem;
     font-weight: 700;
-    font-size: 18px;
     color: var(--text-primary);
-    margin: 0;
+    margin-bottom: var(--spacing-md);
     line-height: 1.5;
-    flex: 1;
+    letter-spacing: -0.01em;
+    padding-right: var(--spacing-xl);
 }
 
+/* ======= DOUBT META INFORMATION ======= */
 .doubt-meta {
     display: flex;
-    gap: 20px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
-    padding: 12px;
-    background: var(--background);
-    border-radius: 8px;
+    gap: var(--spacing-md);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-secondary);
+    padding: var(--spacing-md);
+    background: var(--background-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
 }
 
-.meta-item {
+.doubt-meta > div {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    color: var(--text-secondary);
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
 }
 
-.meta-item strong {
+.doubt-meta > div:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.doubt-meta strong {
     color: var(--text-primary);
     font-weight: 600;
 }
 
-.meta-icon {
-    font-size: 16px;
-}
-
-/* ======= Form Styling ======= */
-.doubt-form {
-    margin-top: 20px;
-}
-
+/* ======= FORM STYLING - PREMIUM INPUTS ======= */
 .form-label {
     display: block;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 8px;
-    font-size: 14px;
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
 }
 
-.doubt-card textarea {
+textarea {
     width: 100%;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 120px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    font-size: 0.9375rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     resize: vertical;
-    transition: all 0.3s ease;
-    background: var(--background);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    transition: all var(--transition-base);
+    line-height: 1.7;
+    color: var(--text-primary);
 }
 
-.doubt-card textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(89, 50, 234, 0.1);
+textarea:hover {
+    border-color: var(--border-hover);
+    background: #ffffff;
+}
+
+textarea:focus {
+    border-color: var(--success);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1), var(--shadow-md);
     outline: none;
-    background: white;
+    background: #ffffff;
+    transform: translateY(-2px);
 }
 
-.doubt-card textarea::placeholder {
-    color: #94a3b8;
+textarea::placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
 }
 
-/* ======= Buttons ======= */
+/* ======= RESOLVE BUTTON ======= */
 .btn-resolve {
-    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-    color: #fff;
+    background: var(--success-gradient);
+    color: white;
     border: none;
-    border-radius: 8px;
-    padding: 12px 28px;
-    font-size: 15px;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.5rem;
     font-weight: 600;
+    font-size: 0.9375rem;
+    margin-top: var(--spacing-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 12px;
+    gap: var(--spacing-xs);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    font-family: inherit;
+    letter-spacing: -0.01em;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-resolve::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-resolve:hover::before {
+    left: 100%;
 }
 
 .btn-resolve:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4), var(--glow-success);
 }
 
 .btn-resolve:active {
     transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-resolve::after {
-    content: '→';
-    font-size: 18px;
-    transition: transform 0.3s ease;
-}
-
-.btn-resolve:hover::after {
-    transform: translateX(4px);
-}
-
-/* ======= Resolved Doubts ======= */
-.resolved-card {
-    background: linear-gradient(to right, #f0fdf4 0%, white 50%);
-    border-left: 5px solid var(--success);
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid #d1fae5;
-    transition: all 0.3s ease;
-}
-
-.resolved-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.resolved-card h5 {
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--text-primary);
-    margin: 0 0 16px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.resolved-card h5::before {
     content: '✓';
-    background: var(--success);
-    color: white;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 1.125rem;
+    font-weight: 700;
 }
 
+/* ======= ANSWER BOX - SUCCESS STATE ======= */
 .answer-box {
-    background: linear-gradient(135deg, var(--success-light) 0%, #f0fdf4 100%);
-    border-radius: 10px;
-    padding: 18px;
-    margin-top: 16px;
-    border: 1px solid #bbf7d0;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 2px solid #86efac;
+    margin-top: var(--spacing-md);
     position: relative;
+    overflow: hidden;
 }
 
 .answer-box::before {
-    content: '💬';
+    content: '✓';
     position: absolute;
-    top: -12px;
-    left: 18px;
-    background: white;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 18px;
-    box-shadow: var(--shadow-sm);
+    top: 10px;
+    right: 10px;
+    font-size: 3rem;
+    color: var(--success);
+    opacity: 0.1;
+    font-weight: 700;
 }
 
 .answer-label {
-    font-weight: 600;
-    color: var(--success-dark);
-    display: block;
-    margin-bottom: 8px;
-    margin-top: 8px;
+    color: #047857;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.answer-label::before {
+    content: '💚';
+    font-size: 1rem;
 }
 
 .answer-text {
-    color: #047857;
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 12px;
+    color: #065f46;
+    line-height: 1.7;
+    font-size: 0.9375rem;
+    white-space: pre-wrap;
+    margin-bottom: var(--spacing-sm);
 }
 
 .resolved-time {
+    color: #059669;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid #86efac;
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: #059669;
-    font-size: 13px;
-    font-weight: 500;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #bbf7d0;
+    gap: var(--spacing-xs);
 }
 
 .resolved-time::before {
     content: '🕐';
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
-/* ======= Empty State ======= */
+/* ======= EMPTY STATE - BEAUTIFUL PLACEHOLDER ======= */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: var(--radius-xl);
     border: 2px dashed var(--border);
-    margin-top: 20px;
-}
-
-.empty-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty-text {
+    padding: var(--spacing-2xl) var(--spacing-xl);
     color: var(--text-secondary);
-    font-size: 16px;
-    margin: 0;
+    font-size: 1rem;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
 }
 
-/* ======= Animations ======= */
-@keyframes fadeIn {
+.empty-state::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.empty-state:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #fefefe 0%, #f1f5f9 100%);
+    transform: scale(1.02);
+}
+
+/* ======= TAB CONTENT TRANSITIONS ======= */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -394,145 +578,293 @@
     }
 }
 
-.doubt-card, .resolved-card {
-    animation: fadeIn 0.4s ease-out;
+/* ======= RESPONSIVE DESIGN ======= */
+@media (max-width: 1024px) {
+    .doubt-wrapper {
+        max-width: 900px;
+    }
 }
 
-/* ======= Responsive ======= */
 @media (max-width: 768px) {
+    .main-content {
+        padding: var(--spacing-lg) 0;
+    }
+
     .doubt-wrapper {
-        padding: 0 16px 32px;
+        padding: 0 var(--spacing-md);
     }
 
     .page-header {
-        padding: 30px 24px;
-        border-radius: 12px;
+        padding: var(--spacing-xl) var(--spacing-lg);
+        border-radius: var(--radius-lg);
     }
 
     .page-header h1 {
-        font-size: 26px;
+        font-size: 2rem;
+        gap: var(--spacing-sm);
+    }
+
+    .page-header h1::before {
+        font-size: 2.25rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .tab-buttons {
+        gap: var(--spacing-xs);
+        padding: 0.375rem;
+    }
+
+    .tab-btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.875rem;
+        flex-direction: column;
+        gap: 0.25rem;
     }
 
     .section-title {
-        font-size: 20px;
+        font-size: 1.25rem;
     }
 
-    .doubt-card, .resolved-card {
-        padding: 20px;
+    .doubt-card,
+    .resolved-card {
+        padding: var(--spacing-lg);
+    }
+
+    .doubt-card h5,
+    .resolved-card h5 {
+        font-size: 1.125rem;
     }
 
     .doubt-meta {
         flex-direction: column;
-        gap: 8px;
+        gap: var(--spacing-xs);
+    }
+
+    .doubt-meta > div {
+        width: 100%;
+    }
+
+    textarea {
+        min-height: 100px;
     }
 
     .btn-resolve {
         width: 100%;
         justify-content: center;
     }
-
-    .section-count {
-        position: static;
-        margin-left: auto;
-    }
 }
 
 @media (max-width: 480px) {
+    .page-header {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
     .page-header h1 {
-        font-size: 22px;
+        font-size: 1.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
     }
 
     .page-header h1::before {
-        font-size: 28px;
+        font-size: 2rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.9375rem;
+    }
+
+    .tab-buttons {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+    .tab-btn {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .section-header {
+        flex-wrap: wrap;
+    }
+
+    .section-count {
+        margin-left: 0;
+    }
+
+    .doubt-card,
+    .resolved-card {
+        padding: var(--spacing-md);
+    }
+
+    .doubt-card h5,
+    .resolved-card h5 {
+        font-size: 1rem;
+        padding-right: 0;
+    }
+
+    .answer-box {
+        padding: var(--spacing-md);
+    }
+
+    .empty-state {
+        padding: var(--spacing-xl) var(--spacing-md);
+        font-size: 0.9375rem;
     }
 }
+
+/* ======= PRINT STYLES ======= */
+@media print {
+    .page-header {
+        background: none;
+        color: var(--text-primary);
+        box-shadow: none;
+    }
+
+    .page-header h1 {
+        color: var(--text-primary);
+    }
+
+    .tab-buttons {
+        display: none;
+    }
+
+    .doubt-card,
+    .resolved-card {
+        box-shadow: none;
+        border: 1px solid var(--border);
+        page-break-inside: avoid;
+    }
+
+    .btn-resolve {
+        display: none;
+    }
+}
+
+/* ======= ACCESSIBILITY ENHANCEMENTS ======= */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.tab-btn:focus-visible,
+.btn-resolve:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ======= LOADING STATE ======= */
+.btn-resolve:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-resolve:disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ======= SMOOTH SCROLL BEHAVIOR ======= */
+html {
+    scroll-behavior: smooth;
+}
 </style>
+
 <div class="main-content">
 <div class="doubt-wrapper">
-    <!-- Page Header -->
+
+    <!-- Header -->
     <div class="page-header">
         <h1>Doubts Assigned to Me</h1>
         <p class="page-subtitle">Manage and resolve intern questions efficiently</p>
     </div>
 
-    <!-- Unresolved Doubts -->
-    <div class="section-header">
-        <div class="section-icon">⏳</div>
-        <h2 class="section-title">Unresolved Doubts</h2>
-        {% if unresolved_doubts %}
-        <span class="section-count">{{ unresolved_doubts|length }}</span>
-        {% endif %}
+    <!-- Tabs -->
+    <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="unresolved">⏳ Unresolved Doubts</button>
+        <button class="tab-btn" data-tab="resolved">✅ Resolved Doubts</button>
     </div>
 
-    {% for doubt in unresolved_doubts %}
+    <!-- Unresolved Doubts -->
+    <div id="unresolved" class="tab-content active">
+        <div class="section-header">
+            <h2 class="section-title">Unresolved Doubts</h2>
+            {% if unresolved_doubts %}
+            <span class="section-count">{{ unresolved_doubts|length }}</span>
+            {% endif %}
+        </div>
+        {% for doubt in unresolved_doubts %}
         <div class="doubt-card">
-            <div class="doubt-header">
-                <h5>{{ doubt.question }}</h5>
-            </div>
-            
+            <h5>{{ doubt.question }}</h5>
             <div class="doubt-meta">
-                <div class="meta-item">
-                    <span class="meta-icon">👤</span>
-                    <strong>Intern:</strong> {{ doubt.intern.user.username }}
-                </div>
-                <div class="meta-item">
-                    <span class="meta-icon">📚</span>
-                    <strong>Batch:</strong> {{ doubt.batch.name }}
-                </div>
+                <div><strong>Intern:</strong> {{ doubt.intern.user.username|capfirst }}</div>
+                <div><strong>Batch:</strong> {{ doubt.batch.name }}</div>
             </div>
-
-            <form method="post" action="{% url 'resolve_doubt' doubt.pk %}" class="doubt-form">
+            <form method="post" action="{% url 'resolve_doubt' doubt.pk %}">
                 {% csrf_token %}
                 <label class="form-label">Your Answer</label>
-                <textarea name="answer" placeholder="Provide a detailed answer to help the intern understand..." required></textarea>
+                <textarea name="answer" placeholder="Provide your answer..." required></textarea>
                 <button type="submit" class="btn-resolve">Resolve Doubt</button>
             </form>
         </div>
-    {% empty %}
-        <div class="empty-state">
-            <div class="empty-icon">✨</div>
-            <p class="empty-text">No unresolved doubts at the moment. Great work!</p>
-        </div>
-    {% endfor %}
-
-    <!-- Resolved Doubts -->
-    <div class="section-header">
-        <div class="section-icon">✅</div>
-        <h2 class="section-title">Resolved Doubts</h2>
-        {% if resolved_doubts %}
-        <span class="section-count">{{ resolved_doubts|length }}</span>
-        {% endif %}
+        {% empty %}
+        <div class="empty-state">✨ No unresolved doubts at the moment!</div>
+        {% endfor %}
     </div>
 
-    {% for doubt in resolved_doubts %}
+    <!-- Resolved Doubts -->
+    <div id="resolved" class="tab-content">
+        <div class="section-header">
+            <h2 class="section-title">Resolved Doubts</h2>
+            {% if resolved_doubts %}
+            <span class="section-count">{{ resolved_doubts|length }}</span>
+            {% endif %}
+        </div>
+        {% for doubt in resolved_doubts %}
         <div class="resolved-card">
             <h5>{{ doubt.question }}</h5>
-            
             <div class="doubt-meta">
-                <div class="meta-item">
-                    <span class="meta-icon">👤</span>
-                    <strong>Intern:</strong> {{ doubt.intern.user.username }}
-                </div>
-                <div class="meta-item">
-                    <span class="meta-icon">📚</span>
-                    <strong>Batch:</strong> {{ doubt.batch.name }}
-                </div>
+                <div><strong>Intern:</strong> {{ doubt.intern.user.username|capfirst }}</div>
+                <div><strong>Batch:</strong> {{ doubt.batch.name }}</div>
             </div>
-
             <div class="answer-box">
-                <span class="answer-label">Answer:</span>
+                <div class="answer-label">Answer:</div>
                 <div class="answer-text">{{ doubt.resolution.answer }}</div>
-                <div class="resolved-time">
-                    Resolved on {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}
-                </div>
+                <div class="resolved-time">Resolved on {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</div>
             </div>
         </div>
-    {% empty %}
-        <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <p class="empty-text">No resolved doubts yet. Start resolving questions above!</p>
-        </div>
-    {% endfor %}
+        {% empty %}
+        <div class="empty-state">📝 No resolved doubts yet.</div>
+        {% endfor %}
+    </div>
+
 </div>
 </div>
+
+<!-- JS for Tab Switching -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll(".tab-btn");
+    const contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            contents.forEach(c => c.classList.remove("active"));
+            tab.classList.add("active");
+            document.getElementById(tab.dataset.tab).classList.add("active");
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -2,169 +2,184 @@
 {% block content %}
 
 <style>
+/* ===== CSS Variables - Design System ===== */
+:root {
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
 
+    --success: #10B981;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+/* ===== Page Title ===== */
 .page-title-wrapper {
     display: flex;
-    justify-content: center; /* centers horizontally */
-    margin-bottom: 20px;
+    justify-content: center;
+    margin-bottom: var(--spacing-2xl);
+    flex-wrap: wrap;
 }
 
-/* The title itself */
 .page-title {
-    background-color: #5932EA;
+    background: var(--primary-gradient);
     color: #fff;
-    padding: 10px 15px;
-    border-radius: 5px;
-    width: fit-content;
-    font-size: 25px;
-    font-weight: 500;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    font-size: 28px;
+    font-weight: 700;
     text-align: center;
+    box-shadow: var(--shadow-xl), var(--glow-primary);
+    transition: all var(--transition-base);
+    width: 100%;
+    max-width: 600px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 576px) {
-    .page-title {
-        padding: 10px 15px;
-        font-size: 1.1rem;
-    }
-} 
+/* ===== Table Styling ===== */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
 .table thead th {
-    background-color: #5932EA !important;
+    background: var(--primary-gradient);
     color: #fff;
+    padding: var(--spacing-md);
     text-align: center;
-    vertical-align: middle;
-    font-size: 0.95rem;
-    padding: 10px 8px;
+    font-weight: 600;
+    font-size: 14px;
     white-space: nowrap;
+    text-transform: uppercase;
 }
 
 .table tbody td {
-    vertical-align: middle;
-    padding: 8px;
-    word-wrap: break-word;
+    padding: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
-/* Alignments */
-.table tbody td:first-child,
-.table tbody td:nth-child(6),
-.table tbody td:nth-child(7) {
-    text-align: center; /* counter, date, status */
+.table tbody tr:hover {
+    background-color: var(--primary-light);
 }
 
-.table tbody td:nth-child(2),
-.table tbody td:nth-child(3),
-.table tbody td:nth-child(4),
-.table tbody td:nth-child(5) {
-    text-align: left; /* intern, batch, trainer, question */
+/* ===== Badges ===== */
+.badge {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    font-weight: 600;
 }
 
-/* Striped Rows */
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f2f2f2;
+/* ===== Alert Boxes ===== */
+.alert-success, .alert-info {
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 14px;
 }
 
-/* Table Borders */
-.table-bordered {
-    border: 1px solid #dee2e6;
-}
-
-.table-bordered th,
-.table-bordered td {
-    border: 1px solid #dee2e6;
-}
-
-/* Status Badges */
-.badge-success, .badge-warning {
-    font-weight: 500;
-    padding: 0.4em 0.6em;
-    font-size: 0.85rem;
-}
-
-/* Resolution Box */
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    font-size: 0.85rem;
-    padding: 6px 8px;
-    margin-bottom: 0;
-    border-radius: 5px;
-}
-
-/* Responsive Table */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Page Header */
-h2 {
-    color: #5932EA;
-    font-weight: 700;
-    font-size: 1.8rem;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* ===== Media Queries for Smaller Screens ===== */
+/* ===== Responsive ===== */
 @media (max-width: 1200px) {
-    .table thead th,
-    .table tbody td {
-        font-size: 0.85rem;
-        padding: 6px 5px;
-    }
-
-    h2 {
-        font-size: 1.6rem;
-    }
+    .page-title { font-size: 24px; padding: 1rem 2rem; }
+    .table thead th, .table tbody td { font-size: 13px; padding: 0.5rem; }
 }
 
 @media (max-width: 992px) {
-    .table thead th,
-    .table tbody td {
-        font-size: 0.8rem;
-        padding: 5px 4px;
-    }
-
-    h2 {
-        font-size: 1.5rem;
-    }
+    .page-title { font-size: 22px; }
+    .table { min-width: 600px; }
 }
 
 @media (max-width: 768px) {
-    .table thead th,
+    .page-title { font-size: 20px; padding: 0.75rem 1.5rem; }
+    .table { min-width: 100%; }
+    .table thead { display: none; }
     .table tbody td {
-        font-size: 0.75rem;
-        padding: 4px 3px;
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        text-align: right;
+        position: relative;
+        border-bottom: 1px solid var(--border);
     }
-
-    h2 {
-        font-size: 1.3rem;
+    .table tbody td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
     }
 }
 
 @media (max-width: 576px) {
-    .table thead th,
-    .table tbody td {
-        font-size: 0.7rem;
-        padding: 3px 2px;
-    }
-
-    h2 {
-        font-size: 1.1rem;
-    }
-
-    /* On very small screens, align all text left except counter, status, and date */
-    .table tbody td {
-        text-align: left;
-    }
-
-    .table tbody td:first-child,
-    .table tbody td:nth-child(6),
-    .table tbody td:nth-child(7) {
-        text-align: center;
-    }
+    .page-title { font-size: 18px; padding: 0.5rem 1rem; }
+    .badge { font-size: 10px; padding: 3px 6px; }
+    .alert-success, .alert-info { font-size: 12px; padding: 8px 12px; }
 }
 </style>
+
 <div class="main-content">
     <div class="container">
         <div class="page-title-wrapper">
@@ -172,56 +187,57 @@ h2 {
         </div>
 
         {% if doubts %}
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Intern</th>
-                            <th>Batch</th>
-                            <th>Trainer</th>
-                            <th>Question</th>
-                            <th>Created On</th>
-                            <th>Status</th>
-                            <th>Resolution</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for doubt in doubts %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ doubt.intern.user.username }}</td>
-                                <td>{{ doubt.batch.name }}</td>
-                                <td>{{ doubt.trainer.user.username }}</td>
-                                <td style="white-space: pre-wrap;">{{ doubt.question }}</td>
-                                <td>{{ doubt.created_at|date:"d M Y, H:i" }}</td>
-                                <td>
-                                    {% if doubt.resolved %}
-                                        <span class="badge bg-success">Resolved</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if doubt.resolved %}
-                                        <div class="alert alert-success p-2 mb-0">
-                                            <strong>{{ doubt.resolution.answer }}</strong><br>
-                                            <small>Resolved at: {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
-                                        </div>
-                                    {% else %}
-                                        <em>No resolution yet</em>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Intern</th>
+                        <th>Batch</th>
+                        <th>Trainer</th>
+                        <th>Question</th>
+                        <th>Created On</th>
+                        <th>Status</th>
+                        <th>Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doubt in doubts %}
+                    <tr>
+                        <td data-label="#">{{ forloop.counter }}</td>
+                        <td data-label="Intern">{{ doubt.intern.user.username }}</td>
+                        <td data-label="Batch">{{ doubt.batch.name }}</td>
+                        <td data-label="Trainer">{{ doubt.trainer.user.username }}</td>
+                        <td data-label="Question">{{ doubt.question|truncatechars:100 }}</td>
+                        <td data-label="Created On">{{ doubt.created_at|date:"d M Y, H:i" }}</td>
+                        <td data-label="Status">
+                            {% if doubt.resolved %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Resolution">
+                            {% if doubt.resolved %}
+                                <div class="alert alert-success">
+                                    <strong>{{ doubt.resolution.answer }}</strong><br>
+                                    <small>Resolved at: {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
+                                </div>
+                            {% else %}
+                                <em>No resolution yet</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="alert alert-info text-center">
-                No doubts found in the system.
-            </div>
+        <div class="alert alert-info text-center">
+            No doubts found in the system.
+        </div>
         {% endif %}
     </div>
 </div>
+
 {% endblock %}
