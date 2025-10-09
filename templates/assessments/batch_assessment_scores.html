@@ -1,47 +1,217 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Batch Assessment Scores</h2>
+<style>
+/* --- Fonts & General --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f6fa;
+}
+.page-title {
+    font-weight: 700;
+    color: #5932EA;
+    font-size: 1.8rem;
+}
 
-    <!-- Batch selection -->
-    <form method="get" class="mb-4">
-        <label for="batch">Select Batch:</label>
-        <select name="batch_id" id="batch" class="form-select w-auto d-inline-block">
-            <option value="">-- Select Batch --</option>
-            {% for b in batches %}
-                <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
-                    {{ b.name }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary">View Scores</button>
-    </form>
+/* Batch Selection Card */
+.batch-card {
+    border-radius: 20px;
+    background: rgba(255,255,255,0.9);
+    padding: 25px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+}
 
-    {% if scoreboard %}
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Intern</th>
-                <th>Total Assessments</th>
-                <th>Submitted</th>
-                <th>Total Score</th>
-                <th>Score Secured</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in scoreboard %}
-            <tr>
-                <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
-                <td>{{ row.total_assessments }}</td>
-                <td>{{ row.submitted_count }}</td>
-                <td>{{ row.total_possible_score }}</td>
-                <td>{{ row.score_secured }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% elif selected_batch %}
-        <p>No submissions found for this batch.</p>
-    {% endif %}
+/* Buttons */
+.btn-primary {
+    background-color: #5932EA;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+.btn-primary:hover {
+    background-color: #4727B2;
+}
+
+/* Scoreboard Card */
+.scoreboard-card {
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+}
+
+/* Table */
+.scoreboard-card table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 600px;
+}
+
+.scoreboard-card thead th {
+    background: linear-gradient(90deg, #5932EA, #4727B2);
+    color: #fff;
+    font-weight: 700;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.scoreboard-card tbody td {
+    padding: 14px;
+    text-align: center;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: 0.3s;
+}
+
+.scoreboard-card tbody tr:hover td {
+    background: rgba(89,50,234,0.08);
+    transform: scale(1.02);
+}
+
+/* Badges */
+.badge {
+    padding: 6px 14px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge-total { background-color: #5932EA; }
+.badge-secured { background-color: #27AE60; }
+.badge-submitted { background-color: #F39C12; }
+
+/* Progress Bars */
+.progress-wrapper {
+    background: #e0e0e0;
+    border-radius: 12px;
+    height: 18px;
+    position: relative;
+    margin: 6px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 12px 0 0 12px;
+    background: #5932EA;
+    transition: width 0.7s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Default Box */
+.default-box {
+    border-radius: 12px;
+    border: 2px dashed #5932EA;
+    background-color: #fff;
+    padding: 40px 20px;
+    margin-top: 20px;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .batch-card form .col-md-4, .batch-card form .col-md-2 {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    .scoreboard-card table {
+        display: block;
+        overflow-x: auto;
+    }
+    .page-title{
+        text-align: center;
+    }
+}
+</style>
+
+<div class="main-content">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h2 class="page-title">Batch Assessment Scores</h2>
+            <p class="text-muted">Professional insights into intern submissions and scores</p>
+        </div>
+
+        <!-- Batch Selection -->
+        <div class="card batch-card text-center">
+            <form method="get" class="row g-3 align-items-center justify-content-center">
+                <div class="col-md-4">
+                    <select name="batch_id" id="batch" class="form-select" required>
+                        <option value="">-- Select Batch --</option>
+                        {% for b in batches %}
+                            <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
+                                {{ b.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary btn-block">View Scores</button>
+                </div>
+            </form>
+        </div>
+
+        {% if selected_batch %}
+        {% if scoreboard %}
+        <!-- Scoreboard Table -->
+        <div class="card scoreboard-card">
+            <div class="card-header text-center" style="padding: 20px; color:#5932EA; font-weight:700;">
+                Scores for Batch: {{ selected_batch.name }}
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Intern</th>
+                            <th>Total Assessments</th>
+                            <th>Submitted</th>
+                            <th>Total Score</th>
+                            <th>Score Secured</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in scoreboard %}
+                        <tr>
+                            <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
+                            <td><span class="badge badge-total">{{ row.total_assessments }}</span></td>
+                            <td>
+                                <span class="badge badge-submitted">{{ row.submitted_count }}</span>
+                               
+                            </td>
+                            <td><span class="badge badge-total">{{ row.total_possible_score }}</span></td>
+                            <td><span class="badge badge-secured">{{ row.score_secured }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="default-box">No submissions found for this batch.</div>
+        {% endif %}
+        {% else %}
+ <div class="card shadow-sm text-center default-box">
+            <div class="card-body">
+                <h5 class="card-title">Please select a batch to view scores</h5>
+                <p class="text-muted">The scoreboard will appear here once a batch is selected.</p>
+            </div>
+        </div>        {% endif %}
+
+    </div>
 </div>
 {% endblock %}
