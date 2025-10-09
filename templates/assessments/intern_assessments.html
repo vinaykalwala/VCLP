@@ -1,32 +1,272 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-4">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Primary Brand Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    
+    /* Success Colors */
+    --success: #10B981;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Info Colors */
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    
+    /* Warning Colors */
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+    
+    /* Neutral Colors */
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin-bottom: var(--spacing-xl);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-xl);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-body {
+    padding: var(--spacing-lg);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.card p {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.card p strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.status-submitted {
+    color: var(--success);
+    font-weight: 500;
+}
+
+.status-not-submitted {
+    color: var(--warning);
+    font-weight: 500;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color var(--transition-base), transform var(--transition-fast);
+    cursor: pointer;
+    margin-right: var(--spacing-sm);
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-info {
+    background-color: var(--info);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-info:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: var(--background-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:disabled {
+    background-color: var(--border);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.empty-state {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: var(--spacing-xl);
+    background-color: var(--background-secondary);
+    border-radius: var(--radius-md);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    .card {
+        padding: var(--spacing-md);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.125rem;
+    }
+
+    .btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        padding: var(--spacing-md);
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: var(--spacing-sm);
+        margin-right: 0;
+    }
+}
+</style>
+
+<div class="container">
     <h2>My Assessments</h2>
     <hr>
-
     {% for data in assignment_data %}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">{{ data.assessment.title }}</h5>
-            <p class="card-text">{{ data.assessment.question_file.name|default:"No file uploaded" }}</p>
-            <p><strong>Total Marks:</strong> {{ data.assessment.total_marks }}</p>
-            <p><strong>Deadline:</strong> {{ data.assessment.created_at|date:"d M Y, h:i A" }}</p>
-
-            {% if data.is_submitted %}
-                <p><strong>Status:</strong> ✅ Submitted</p>
-                <p>
-                    <strong>Your Score:</strong> {{ data.score }} / {{ data.assessment.total_marks }}
-                </p>
-                <a href="{% url 'assessment_result' data.submission.id %}" class="btn btn-sm btn-info">View Result</a>
-                <button class="btn btn-sm btn-secondary" disabled>Take Assessment</button>
-            {% else %}
-                <p><strong>Status:</strong> ❌ Not Submitted</p>
-                <a href="{% url 'take_assessment' data.assessment.id %}" class="btn btn-sm btn-primary">Take Assessment</a>
-            {% endif %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ data.assessment.title }}</h5>
+                <p class="card-text">{{ data.assessment.question_file.name|default:"No file uploaded" }}</p>
+                <p><strong>Total Marks:</strong> {{ data.assessment.total_marks }}</p>
+                <p><strong>Deadline:</strong> {{ data.assessment.created_at|date:"d M Y, h:i A" }}</p>
+                {% if data.is_submitted %}
+                    <p><strong>Status:</strong> <span class="status-submitted">✅ Submitted</span></p>
+                    <p><strong>Your Score:</strong> {{ data.score }} / {{ data.assessment.total_marks }}</p>
+                    <a href="{% url 'assessment_result' data.submission.id %}" class="btn btn-info">View Result</a>
+                    <button class="btn btn-secondary" disabled>Take Assessment</button>
+                {% else %}
+                    <p><strong>Status:</strong> <span class="status-not-submitted">❌ Not Submitted</span></p>
+                    <a href="{% url 'take_assessment' data.assessment.id %}" class="btn btn-primary">Take Assessment</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
     {% empty %}
-        <p>No assessments available.</p>
+        <p class="empty-state">No assessments available.</p>
     {% endfor %}
 </div>
 {% endblock %}

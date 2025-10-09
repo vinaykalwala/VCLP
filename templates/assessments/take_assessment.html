@@ -1,26 +1,260 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>{{ assessment.title }}</h2>
-    <p>Total Marks: {{ assessment.total_marks }}</p>
-    <form method="post">
-        {% csrf_token %}
-        {% for mcq in mcqs %}
-            <div class="mb-3">
-                <p><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
-                <div>
-                    <input type="radio" name="mcq_{{ mcq.id }}" value="1"> {{ mcq.option_1 }}<br>
-                    <input type="radio" name="mcq_{{ mcq.id }}" value="2"> {{ mcq.option_2 }}<br>
-                    {% if mcq.option_3 %}
-                        <input type="radio" name="mcq_{{ mcq.id }}" value="3"> {{ mcq.option_3 }}<br>
-                    {% endif %}
-                    {% if mcq.option_4 %}
-                        <input type="radio" name="mcq_{{ mcq.id }}" value="4"> {{ mcq.option_4 }}<br>
-                    {% endif %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Primary Brand Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    
+    /* Success Colors */
+    --success: #10B981;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Info Colors */
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    
+    /* Warning Colors */
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+    
+    /* Neutral Colors */
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-xl);
+    transition: box-shadow var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.total-marks {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.mcq-group {
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-md);
+    background-color: var(--background-secondary);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-base);
+}
+
+.mcq-group:hover {
+    background-color: var(--primary-light);
+}
+
+.mcq-question {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.mcq-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.mcq-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 1rem;
+    color: var(--text-primary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-base);
+}
+
+.mcq-option:hover {
+    background-color: var(--primary-light);
+}
+
+.mcq-option input[type="radio"] {
+    accent-color: var(--primary);
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.mcq-option label {
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color var(--transition-base), transform var(--transition-fast);
+    cursor: pointer;
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-success:hover {
+    background: var(--success);
+    transform: translateY(-1px);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    .card {
+        padding: var(--spacing-lg);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .mcq-question {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .mcq-option {
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+</style>
+
+<div class="container">
+    <div class="card">
+        <h2>{{ assessment.title }}</h2>
+        <p class="total-marks">Total Marks: {{ assessment.total_marks }}</p>
+        <form method="post">
+            {% csrf_token %}
+            {% for mcq in mcqs %}
+                <div class="mcq-group">
+                    <p class="mcq-question"><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
+                    <div class="mcq-options">
+                        <div class="mcq-option">
+                            <input type="radio" name="mcq_{{ mcq.id }}" value="1" id="mcq_{{ mcq.id }}_1">
+                            <label for="mcq_{{ mcq.id }}_1">{{ mcq.option_1 }}</label>
+                        </div>
+                        <div class="mcq-option">
+                            <input type="radio" name="mcq_{{ mcq.id }}" value="2" id="mcq_{{ mcq.id }}_2">
+                            <label for="mcq_{{ mcq.id }}_2">{{ mcq.option_2 }}</label>
+                        </div>
+                        {% if mcq.option_3 %}
+                            <div class="mcq-option">
+                                <input type="radio" name="mcq_{{ mcq.id }}" value="3" id="mcq_{{ mcq.id }}_3">
+                                <label for="mcq_{{ mcq.id }}_3">{{ mcq.option_3 }}</label>
+                            </div>
+                        {% endif %}
+                        {% if mcq.option_4 %}
+                            <div class="mcq-option">
+                                <input type="radio" name="mcq_{{ mcq.id }}" value="4" id="mcq_{{ mcq.id }}_4">
+                                <label for="mcq_{{ mcq.id }}_4">{{ mcq.option_4 }}</label>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-success">Submit</button>
-    </form>
+            {% endfor %}
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

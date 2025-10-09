@@ -1,29 +1,471 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Assessment — {{ assessment.title }}</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ assessment.title }}" required>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+        /* Primary Brand Colors */
+        --sub-primary: #6366f1;
+        --sub-primary-hover: #4f46e5;
+        --sub-primary-light: #eef2ff;
+        --sub-primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+        
+        /* Success Colors */
+        --sub-success: #10B981;
+        --sub-success-hover: #10B981;
+        --sub-success-light: #d1fae5;
+        --sub-success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        
+        /* Info Colors */
+        --sub-info: #3b82f6;
+        --sub-info-light: #dbeafe;
+        
+        /* Warning Colors */
+        --sub-warning: #FBBF24;
+        --sub-warning-light: #fef3c7;
+        
+        /* Neutral Colors */
+        --sub-background: #f8fafc;
+        --sub-background-secondary: #f1f5f9;
+        --sub-card-bg: #ffffff;
+        --sub-text-primary: #0f172a;
+        --sub-text-secondary: #64748b;
+        --sub-text-tertiary: #94a3b8;
+        --sub-border: #e2e8f0;
+        --sub-border-hover: #cbd5e1;
+        
+        /* Shadows */
+        --sub-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --sub-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        --sub-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        --sub-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        --sub-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        --sub-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        
+        /* Glow Effects */
+        --sub-glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+        --sub-glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+        
+        /* Transitions */
+        --sub-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --sub-transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        --sub-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        
+        /* Spacing */
+        --sub-spacing-xs: 0.5rem;
+        --sub-spacing-sm: 0.75rem;
+        --sub-spacing-md: 1rem;
+        --sub-spacing-lg: 1.5rem;
+        --sub-spacing-xl: 2rem;
+        --sub-spacing-2xl: 3rem;
+        
+        /* Border Radius */
+        --sub-radius-sm: 0.5rem;
+        --sub-radius-md: 0.75rem;
+        --sub-radius-lg: 1rem;
+        --sub-radius-xl: 1.5rem;
+        --sub-radius-full: 9999px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--sub-background);
+        color: var(--sub-text-primary);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .sub-page-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 200px);
+    }
+
+    .sub-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: var(--sub-spacing-xl) var(--sub-spacing-lg);
+        animation: subFadeIn 0.4s ease-out;
+    }
+
+    @keyframes subFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .sub-page-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center; /* Changed from flex-start to center for better vertical alignment */
+        margin-bottom: var(--sub-spacing-2xl);
+        padding: var(--sub-spacing-lg) var(--sub-spacing-xl);
+        background: var(--sub-card-bg);
+        border-radius: var(--sub-radius-xl);
+        box-shadow: var(--sub-shadow-md);
+        border: 1px solid var(--sub-border);
+        position: relative;
+        overflow: hidden;
+        gap: var(--sub-spacing-md); /* Added gap to ensure spacing between header content and button */
+    }
+
+    .sub-page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--sub-primary-gradient);
+    }
+
+    .sub-header-content {
+        flex: 1;
+        min-width: 0; /* Prevent content from overflowing */
+    }
+
+    .sub-page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        background: var(--sub-primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        margin-bottom: var(--sub-spacing-xs);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; /* Prevent title from wrapping and overlapping */
+    }
+
+    .sub-assessment-meta {
+        color: var(--sub-text-secondary);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: var(--sub-spacing-xs);
+    }
+
+    .sub-assessment-meta::before {
+        content: '📝';
+        font-size: 1.1rem;
+    }
+
+    .sub-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--sub-spacing-xs);
+        padding: var(--sub-spacing-sm) var(--sub-spacing-lg);
+        background: var(--sub-card-bg);
+        color: var(--sub-text-secondary);
+        text-decoration: none;
+        border: 2px solid var(--sub-border);
+        border-radius: var(--sub-radius-lg);
+        font-weight: 600;
+        transition: all var(--sub-transition-base);
+        box-shadow: var(--sub-shadow-sm);
+        position: relative;
+        overflow: hidden;
+        white-space: nowrap; /* Prevent button text from wrapping */
+        flex-shrink: 0; /* Prevent button from shrinking too much */
+    }
+
+    .sub-back-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--sub-primary-light);
+        transition: left var(--sub-transition-base);
+        z-index: 0;
+    }
+
+    .sub-back-btn:hover::before {
+        left: 0;
+    }
+
+    .sub-back-btn:hover {
+        color: var(--sub-primary);
+        border-color: var(--sub-primary);
+        box-shadow: var(--sub-shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .sub-back-btn span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sub-card {
+        background: var(--sub-card-bg);
+        border-radius: var(--sub-radius-xl);
+        box-shadow: var(--sub-shadow-lg);
+        padding: var(--sub-spacing-xl);
+        transition: box-shadow var(--sub-transition-base);
+        border: 1px solid var(--sub-border);
+    }
+
+    .sub-card:hover {
+        box-shadow: var(--sub-shadow-xl);
+    }
+
+    .sub-form-group {
+        margin-bottom: var(--sub-spacing-lg);
+    }
+
+    .sub-form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--sub-text-secondary);
+        margin-bottom: var(--sub-spacing-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .sub-form-control {
+        width: 100%;
+        padding: var(--sub-spacing-sm) var(--sub-spacing-md);
+        border: 1px solid var(--sub-border);
+        border-radius: var(--sub-radius-md);
+        font-size: 1rem;
+        background-color: var(--sub-background-secondary);
+        transition: border-color var(--sub-transition-base), box-shadow var(--sub-transition-base);
+    }
+
+    .sub-form-control:focus {
+        border-color: var(--sub-primary);
+        box-shadow: 0 0 0 3px var(--sub-primary-light);
+        outline: none;
+    }
+
+    .sub-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--sub-spacing-sm) var(--sub-spacing-lg);
+        border-radius: var(--sub-radius-md);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all var(--sub-transition-base);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sub-btn-success {
+        background: var(--sub-success-gradient);
+        color: #ffffff;
+        border: none;
+        box-shadow: var(--sub-shadow-sm);
+    }
+
+    .sub-btn-success::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--sub-success);
+        transition: left var(--sub-transition-base);
+        z-index: 0;
+    }
+
+    .sub-btn-success:hover::before {
+        left: 0;
+    }
+
+    .sub-btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--sub-shadow-md);
+    }
+
+    .sub-btn-success:active {
+        transform: translateY(0);
+    }
+
+    .sub-btn-success span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sub-btn-secondary {
+        background-color: var(--sub-background-secondary);
+        color: var(--sub-text-secondary);
+        border: 2px solid var(--sub-border);
+        box-shadow: var(--sub-shadow-sm);
+    }
+
+    .sub-btn-secondary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--sub-primary-light);
+        transition: left var(--sub-transition-base);
+        z-index: 0;
+    }
+
+    .sub-btn-secondary:hover::before {
+        left: 0;
+    }
+
+    .sub-btn-secondary:hover {
+        color: var(--sub-primary);
+        border-color: var(--sub-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--sub-shadow-md);
+    }
+
+    .sub-btn-secondary:active {
+        transform: translateY(0);
+    }
+
+    .sub-btn-secondary span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .sub-file-link {
+        color: var(--sub-primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color var(--sub-transition-base);
+    }
+
+    .sub-file-link:hover {
+        color: var(--sub-primary-hover);
+        text-decoration: underline;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 768px) {
+        .sub-container {
+            padding: var(--sub-spacing-lg) var(--sub-spacing-md);
+        }
+
+        .sub-page-header {
+            flex-direction: column;
+            align-items: flex-start; /* Align items to start for better stacking */
+            gap: var(--sub-spacing-md);
+            padding: var(--sub-spacing-lg);
+        }
+
+        .sub-page-title {
+            font-size: 1.5rem;
+        }
+
+        .sub-back-btn {
+            align-self: stretch;
+            justify-content: center;
+        }
+
+        .sub-card {
+            padding: var(--sub-spacing-lg);
+        }
+
+        .sub-btn {
+            padding: var(--sub-spacing-xs) var(--sub-spacing-md);
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .sub-page-title {
+            font-size: 1.25rem;
+        }
+
+        .sub-assessment-meta {
+            font-size: 0.85rem;
+        }
+
+        .sub-form-control {
+            font-size: 0.875rem;
+        }
+
+        .sub-btn {
+            width: 100%;
+            margin-bottom: var(--sub-spacing-sm);
+        }
+
+        .sub-btn-secondary {
+            margin-left: 0;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .sub-back-btn {
+            display: none;
+        }
+
+        .sub-card {
+            box-shadow: none;
+            border: 1px solid var(--sub-border);
+        }
+    }
+</style>
+
+<div class="sub-page-wrapper">
+    <div class="sub-container">
+        <div class="sub-page-header">
+            <div class="sub-header-content">
+                <h1 class="sub-page-title">Edit Assessment — {{ assessment.title }}</h1>
+                <div class="sub-assessment-meta">
+                    Update assessment details
+                </div>
+            </div>
+            <a href="{% url 'view_assessments' %}" class="sub-back-btn">
+                <span>← Back to Assessments</span>
+            </a>
         </div>
 
-        <div class="mb-3">
-            <label for="total_marks" class="form-label">Total Marks</label>
-            <input type="number" class="form-control" id="total_marks" name="total_marks" value="{{ assessment.total_marks }}" required>
-        </div>
+        <div class="sub-card">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="sub-form-group">
+                    <label for="title" class="sub-form-label">Title</label>
+                    <input type="text" class="sub-form-control" id="title" name="title" value="{{ assessment.title }}" required>
+                </div>
 
-        <div class="mb-3">
-            <label for="question_file" class="form-label">Question File (Optional)</label>
-            {% if assessment.question_file %}
-                <p>Current File: <a href="{{ assessment.question_file.url }}" target="_blank">View</a></p>
-            {% endif %}
-            <input type="file" class="form-control" id="question_file" name="question_file">
-        </div>
+                <div class="sub-form-group">
+                    <label for="total_marks" class="sub-form-label">Total Marks</label>
+                    <input type="number" class="sub-form-control" id="total_marks" name="total_marks" value="{{ assessment.total_marks }}" required>
+                </div>
 
-        <button type="submit" class="btn btn-success">Update Assessment</button>
-        <a href="{% url 'view_assessments' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+                <div class="sub-form-group">
+                    <label for="question_file" class="sub-form-label">Question File (Optional)</label>
+                    {% if assessment.question_file %}
+                        <p>Current File: <a href="{{ assessment.question_file.url }}" target="_blank" class="sub-file-link">View</a></p>
+                    {% endif %}
+                    <input type="file" class="sub-form-control" id="question_file" name="question_file">
+                </div>
+
+                <div class="sub-form-group">
+                    <button type="submit" class="sub-btn sub-btn-success"><span>Update Assessment</span></button>
+                    <a href="{% url 'view_assessments' %}" class="sub-btn sub-btn-secondary"><span>Cancel</span></a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,37 +1,243 @@
-{% extends "base.html" %}
+{% extends 'login_base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-4">
-    <a href="{% url 'intern_assessments' %}" class="btn btn-sm btn-secondary mb-3">← Back to Assessments</a>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Primary Brand Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    
+    /* Success Colors */
+    --success: #10B981;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Info Colors */
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    
+    /* Warning Colors */
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+    
+    /* Neutral Colors */
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: var(--spacing-lg) 0;
+}
+
+.score {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.score strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-body {
+    padding: var(--spacing-lg);
+}
+
+.card-body p {
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-body p strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.question-text {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.answer-text {
+    color: var(--text-secondary);
+}
+
+.correct-answer {
+    color: var(--success);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color var(--transition-base), transform var(--transition-fast);
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: var(--background-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .card-body {
+        padding: var(--spacing-md);
+    }
+
+    .question-text {
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-body p {
+        font-size: 0.875rem;
+    }
+
+    .btn {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+</style>
+
+<div class="container">
+    <a href="{% url 'intern_assessments' %}" class="btn btn-secondary mb-3">← Back to Assessments</a>
     <h2>Result — {{ submission.assessment.title }}</h2>
-    <p><strong>Your Score:</strong> {{ submission.score }} / {{ submission.assessment.total_marks }}</p>
+    <p class="score"><strong>Your Score:</strong> {{ submission.score }} / {{ submission.assessment.total_marks }}</p>
     <hr>
 
-   {% for mcq in mcqs %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <p><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
-
-            <p>
-                <strong>Your Answer:</strong>
-                {% if mcq.selected_answer == 1 %}{{ mcq.option_1 }}
-                {% elif mcq.selected_answer == 2 %}{{ mcq.option_2 }}
-                {% elif mcq.selected_answer == 3 %}{{ mcq.option_3 }}
-                {% elif mcq.selected_answer == 4 %}{{ mcq.option_4 }}
-                {% else %}Not Answered
-                {% endif %}
-            </p>
-
-            <p>
-                <strong>Correct Answer:</strong>
-                {% if mcq.correct_option == 1 %}{{ mcq.option_1 }}
-                {% elif mcq.correct_option == 2 %}{{ mcq.option_2 }}
-                {% elif mcq.correct_option == 3 %}{{ mcq.option_3 }}
-                {% elif mcq.correct_option == 4 %}{{ mcq.option_4 }}
-                {% endif %}
-            </p>
+    {% for mcq in mcqs %}
+        <div class="card">
+            <div class="card-body">
+                <p class="question-text"><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
+                <p class="answer-text">
+                    <strong>Your Answer:</strong>
+                    {% if mcq.selected_answer == 1 %}{{ mcq.option_1 }}
+                    {% elif mcq.selected_answer == 2 %}{{ mcq.option_2 }}
+                    {% elif mcq.selected_answer == 3 %}{{ mcq.option_3 }}
+                    {% elif mcq.selected_answer == 4 %}{{ mcq.option_4 }}
+                    {% else %}Not Answered
+                    {% endif %}
+                </p>
+                <p class="correct-answer">
+                    <strong>Correct Answer:</strong>
+                    {% if mcq.correct_option == 1 %}{{ mcq.option_1 }}
+                    {% elif mcq.correct_option == 2 %}{{ mcq.option_2 }}
+                    {% elif mcq.correct_option == 3 %}{{ mcq.option_3 }}
+                    {% elif mcq.correct_option == 4 %}{{ mcq.option_4 }}
+                    {% endif %}
+                </p>
+            </div>
         </div>
-    </div>
-{% endfor %}
-
+    {% endfor %}
 </div>
 {% endblock %}

@@ -1,12 +1,256 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container mt-4">
-    <h2>Batch Assessment Scores</h2>
+{% extends 'login_base.html' %}
+{% load static %}
 
-    <!-- Batch selection -->
-    <form method="get" class="mb-4">
-        <label for="batch">Select Batch:</label>
-        <select name="batch_id" id="batch" class="form-select w-auto d-inline-block">
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Primary Brand Colors */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    
+    /* Success Colors */
+    --success: #10B981;
+    --success-hover: #10B981;
+    --success-light: #d1fae5;
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Info Colors */
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    
+    /* Warning Colors */
+    --warning: #FBBF24;
+    --warning-light: #fef3c7;
+    
+    /* Neutral Colors */
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.form-select {
+    width: 200px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    background-color: var(--background-secondary);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-sm) center;
+    background-size: 1.5rem;
+}
+
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    outline: none;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color var(--transition-base), transform var(--transition-fast);
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    background-color: var(--card-bg);
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: var(--primary-gradient);
+    color: #ffffff;
+}
+
+.table thead th {
+    font-weight: 500;
+    padding: var(--spacing-md);
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+.table tbody tr {
+    transition: background-color var(--transition-base);
+}
+
+.table tbody tr:hover {
+    background-color: var(--primary-light);
+}
+
+.table tbody td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-state {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: var(--spacing-xl);
+    background-color: var(--background-secondary);
+    border-radius: var(--radius-md);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .form-select {
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: var(--spacing-sm);
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: var(--spacing-xs);
+    }
+}
+</style>
+
+<div class="container">
+    <h2>Batch Assessment Scores</h2>
+    <form method="get" class="form-group">
+        <label for="batch" class="form-label">Select Batch:</label>
+        <select name="batch_id" id="batch" class="form-select">
             <option value="">-- Select Batch --</option>
             {% for b in batches %}
                 <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
@@ -18,30 +262,32 @@
     </form>
 
     {% if scoreboard %}
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Intern</th>
-                <th>Total Assessments</th>
-                <th>Submitted</th>
-                <th>Total Score</th>
-                <th>Score Secured</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in scoreboard %}
-            <tr>
-                <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
-                <td>{{ row.total_assessments }}</td>
-                <td>{{ row.submitted_count }}</td>
-                <td>{{ row.total_possible_score }}</td>
-                <td>{{ row.score_secured }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Intern</th>
+                        <th>Total Assessments</th>
+                        <th>Submitted</th>
+                        <th>Total Score</th>
+                        <th>Score Secured</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in scoreboard %}
+                        <tr>
+                            <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
+                            <td>{{ row.total_assessments }}</td>
+                            <td>{{ row.submitted_count }}</td>
+                            <td>{{ row.total_possible_score }}</td>
+                            <td>{{ row.score_secured }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% elif selected_batch %}
-        <p>No submissions found for this batch.</p>
+        <p class="empty-state">No submissions found for this batch.</p>
     {% endif %}
 </div>
 {% endblock %}
