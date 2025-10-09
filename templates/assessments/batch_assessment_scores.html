@@ -1,27 +1,62 @@
 {% extends "login_base.html" %}
 {% block content %}
+{% load static %}
+
 <style>
 /* --- Fonts & General --- */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f5f6fa;
+    margin: 0;
+    padding: 0;
 }
+.container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 2%;
+    box-sizing: border-box;
+}
+
 .page-title {
     font-weight: 700;
     color: #5932EA;
     font-size: 1.8rem;
 }
 
+/* Header + Filter in one row */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+.header-row h2 {
+    margin: 0;
+}
+
 /* Batch Selection Card */
 .batch-card {
     border-radius: 20px;
     background: rgba(255,255,255,0.9);
-    padding: 25px;
-    margin-bottom: 30px;
+    padding: 10px 25px;
     backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+    flex-grow: 1;
+    max-width: 600px;
 }
 
-/* Buttons */
+/* Select and Button Styling */
+select.form-select {
+    border-radius: 12px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    flex-grow: 1;
+}
 .btn-primary {
     background-color: #5932EA;
     border: none;
@@ -29,6 +64,7 @@ body {
     font-weight: 600;
     border-radius: 12px;
     transition: 0.3s;
+    font-size: 14px;
 }
 .btn-primary:hover {
     background-color: #4727B2;
@@ -41,6 +77,8 @@ body {
     margin-bottom: 30px;
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(12px);
+    width: 100%;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
 /* Table */
@@ -48,9 +86,7 @@ body {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 600px;
 }
-
 .scoreboard-card thead th {
     background: linear-gradient(90deg, #5932EA, #4727B2);
     color: #fff;
@@ -59,7 +95,6 @@ body {
     text-align: center;
     font-size: 14px;
 }
-
 .scoreboard-card tbody td {
     padding: 14px;
     text-align: center;
@@ -67,10 +102,9 @@ body {
     border-bottom: 1px solid #eee;
     transition: 0.3s;
 }
-
 .scoreboard-card tbody tr:hover td {
     background: rgba(89,50,234,0.08);
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 /* Badges */
@@ -81,36 +115,9 @@ body {
     font-weight: 600;
     font-size: 0.85rem;
 }
-
 .badge-total { background-color: #5932EA; }
 .badge-secured { background-color: #27AE60; }
 .badge-submitted { background-color: #F39C12; }
-
-/* Progress Bars */
-.progress-wrapper {
-    background: #e0e0e0;
-    border-radius: 12px;
-    height: 18px;
-    position: relative;
-    margin: 6px 0;
-}
-
-.progress-bar {
-    height: 100%;
-    border-radius: 12px 0 0 12px;
-    background: #5932EA;
-    transition: width 0.7s ease;
-}
-
-.progress-text {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.75rem;
-    color: #fff;
-    font-weight: 500;
-}
 
 /* Default Box */
 .default-box {
@@ -121,48 +128,110 @@ body {
     margin-top: 20px;
 }
 
+/* Analytics Section */
+.analytics {
+    margin-top: 40px;
+    width: 100%;
+}
+.analytics h4 {
+    color: #5932EA;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
 
-/* Responsive */
-@media (max-width: 768px) {
-    .batch-card form .col-md-4, .batch-card form .col-md-2 {
-        width: 100%;
-        margin-bottom: 12px;
-    }
-    .scoreboard-card table {
-        display: block;
+/* Chart Layout */
+.chart-full {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.chart-row-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+    width: 100%;
+}
+.chart-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+
+}
+
+/* Default Analytics Image */
+.analytics-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+.analytics-placeholder img {
+    max-width: 420px;
+    width: 100%;
+    opacity: 0.9;
+}
+.analytics-placeholder p {
+    color: #666;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* Scrollable table only on smaller screens */
+.table-responsive-wrapper {
+    width: 100%;
+}
+@media (max-width: 992px) {
+    .table-responsive-wrapper {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
-    .page-title{
+    .table-responsive-wrapper table {
+        min-width: 700px;
+    }
+}
+
+/* Responsive Fixes */
+@media (max-width: 992px) {
+    .header-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .batch-card {
+        width: 100%;
+        justify-content: center;
+    }
+    .page-title {
         text-align: center;
     }
 }
+
 </style>
 
 <div class="main-content">
     <div class="container">
 
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h2 class="page-title">Batch Assessment Scores</h2>
-            <p class="text-muted">Professional insights into intern submissions and scores</p>
-        </div>
-
-        <!-- Batch Selection -->
-        <div class="card batch-card text-center">
-            <form method="get" class="row g-3 align-items-center justify-content-center">
-                <div class="col-md-4">
-                    <select name="batch_id" id="batch" class="form-select" required>
-                        <option value="">-- Select Batch --</option>
-                        {% for b in batches %}
-                            <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
-                                {{ b.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2 d-grid">
-                    <button type="submit" class="btn btn-primary btn-block">View Scores</button>
-                </div>
+        <!-- Page Header + Filter -->
+        <div class="header-row">
+            <div>
+                <h2 class="page-title">Batch Assessment Scores</h2>
+                <p class="text-muted mb-0">Professional insights into intern submissions and scores</p>
+            </div>
+            <form method="get" class="batch-card">
+                <select name="batch_id" id="batch" class="form-select" required>
+                    <option value="">-- Select Batch --</option>
+                    {% for b in batches %}
+                        <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
+                            {{ b.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">View</button>
             </form>
         </div>
 
@@ -173,7 +242,7 @@ body {
             <div class="card-header text-center" style="padding: 20px; color:#5932EA; font-weight:700;">
                 Scores for Batch: {{ selected_batch.name }}
             </div>
-            <div class="card-body p-0">
+            <div class="table-responsive-wrapper">
                 <table class="table mb-0">
                     <thead>
                         <tr>
@@ -189,10 +258,7 @@ body {
                         <tr>
                             <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
                             <td><span class="badge badge-total">{{ row.total_assessments }}</span></td>
-                            <td>
-                                <span class="badge badge-submitted">{{ row.submitted_count }}</span>
-                               
-                            </td>
+                            <td><span class="badge badge-submitted">{{ row.submitted_count }}</span></td>
                             <td><span class="badge badge-total">{{ row.total_possible_score }}</span></td>
                             <td><span class="badge badge-secured">{{ row.score_secured }}</span></td>
                         </tr>
@@ -201,17 +267,153 @@ body {
                 </table>
             </div>
         </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics">
+            <h4>Performance Analytics</h4>
+
+            <!-- Bar Chart Full Row -->
+            <div class="chart-full">
+                <div class="chart-box">
+                    <h6>Top Performer</h6>
+                    <canvas id="topPerformerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Two Pie Charts -->
+            <!-- Two Pie Charts -->
+<div class="chart-row-2">
+    <div class="chart-box" style="max-height: 400px;margin: 0 auto; ">
+        <h6>Score Completion Rate</h6>
+        <canvas id="completionChart" style="margin: 0 auto;"></canvas>
+    </div>
+    <div class="chart-box" style="max-height: 400px;">
+        <h6>Submission Rate</h6>
+        <canvas id="submissionChart" style="margin: 0 auto;"></canvas>
+    </div>
+</div>
+        </div>
+
         {% else %}
         <div class="default-box">No submissions found for this batch.</div>
         {% endif %}
         {% else %}
- <div class="card shadow-sm text-center default-box">
+        <div class="card shadow-sm text-center default-box">
             <div class="card-body">
                 <h5 class="card-title">Please select a batch to view scores</h5>
                 <p class="text-muted">The scoreboard will appear here once a batch is selected.</p>
             </div>
-        </div>        {% endif %}
+        </div>
+        <div class="analytics-placeholder">
+                        <p>Analytics will appear here once available.</p>
 
+            <img src="{% static 'images/analytics.png' %}" alt="Analytics Placeholder">
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<!-- Chart.js + plugin -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+<script>
+{% if scoreboard %}
+    // --- Top Performer Bar Chart with different colors ---
+    const topPerformerLabels = [{% for row in scoreboard %}'{{ row.intern.user.get_full_name|default:row.intern.unique_id }}',{% endfor %}];
+
+    const colors = [
+        '#5932EA', '#27AE60', '#F39C12', '#E74C3C', '#3498DB', '#9B59B6', '#1ABC9C', '#F1C40F'
+    ];
+    const barColors = topPerformerLabels.map((_, index) => colors[index % colors.length]);
+
+    const topPerformerData = {
+        labels: topPerformerLabels,
+        datasets: [{
+            label: 'Scores',
+            data: [{% for row in scoreboard %}{{ row.score_secured }},{% endfor %}],
+            backgroundColor: barColors
+        }]
+    };
+
+    new Chart(document.getElementById('topPerformerChart'), {
+        type: 'bar',
+        data: topPerformerData,
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // --- Calculate Totals ---
+    let totalScoreSecured = 0;
+    let totalPossibleScore = 0;
+    let totalSubmitted = 0;
+    let totalAssessments = 0;
+    {% for row in scoreboard %}
+        totalScoreSecured += {{ row.score_secured }};
+        totalPossibleScore += {{ row.total_possible_score }};
+        totalSubmitted += {{ row.submitted_count }};
+        totalAssessments += {{ row.total_assessments }};
+    {% endfor %}
+    let scoreRemaining = totalPossibleScore - totalScoreSecured;
+    let totalPending = totalAssessments - totalSubmitted;
+
+    // --- Score Completion Rate Pie Chart ---
+    new Chart(document.getElementById('completionChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Secured', 'Remaining'],
+            datasets: [{
+                data: [totalScoreSecured, scoreRemaining],
+                backgroundColor: ['#1ABC9C', '#E67E22'] // Green for secured, Orange for remaining
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => {
+                        let sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        return ((value / sum) * 100).toFixed(1) + '%';
+                    },
+                    font: { weight: 'bold', size: 12 }
+                },
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // --- Submission Rate Pie Chart ---
+    new Chart(document.getElementById('submissionChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Submitted', 'Pending'],
+            datasets: [{
+                data: [totalSubmitted, totalPending],
+                backgroundColor: ['#3498DB', '#E74C3C'] // Blue for submitted, Red for pending
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => {
+                        let sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        return ((value / sum) * 100).toFixed(1) + '%';
+                    },
+                    font: { weight: 'bold', size: 12 }
+                },
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+{% endif %}
+</script>
+
 {% endblock %}

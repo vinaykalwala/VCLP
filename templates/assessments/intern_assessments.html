@@ -1,32 +1,648 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>My Assessments</h2>
-    <hr>
+<style>
+/* Modern CSS Reset and Variables */
+:root {
+    --primary:  #5932EA;
+    --primary-dark: #4F46E5;
+    --primary-light: #8B5CF6;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius: 12px;
+    --radius-lg: 16px;
+}
 
-    {% for data in assignment_data %}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">{{ data.assessment.title }}</h5>
-            <p class="card-text">{{ data.assessment.question_file.name|default:"No file uploaded" }}</p>
-            <p><strong>Total Marks:</strong> {{ data.assessment.total_marks }}</p>
-            <p><strong>Deadline:</strong> {{ data.assessment.created_at|date:"d M Y, h:i A" }}</p>
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding:0 1.5rem;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
 
-            {% if data.is_submitted %}
-                <p><strong>Status:</strong> ✅ Submitted</p>
-                <p>
-                    <strong>Your Score:</strong> {{ data.score }} / {{ data.assessment.total_marks }}
-                </p>
-                <a href="{% url 'assessment_result' data.submission.id %}" class="btn btn-sm btn-info">View Result</a>
-                <button class="btn btn-sm btn-secondary" disabled>Take Assessment</button>
-            {% else %}
-                <p><strong>Status:</strong> ❌ Not Submitted</p>
-                <a href="{% url 'take_assessment' data.assessment.id %}" class="btn btn-sm btn-primary">Take Assessment</a>
-            {% endif %}
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: var(--gray-600);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Controls Section - Filters and Search in one line */
+.controls-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+/* Filter Buttons */
+.filter-container {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.filter-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--gray-200);
+    background: white;
+    color: var(--gray-600);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Search Bar */
+.search-container {
+    flex: 0 0 350px;
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-600);
+    z-index: 2;
+}
+
+/* Assessment Grid - Optimized for 2 cards on normal screens, 3 on large screens */
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Assessment Card */
+.assessment-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.assessment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
+
+.assessment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.assessment-card.submitted {
+    border-left: 4px solid var(--success);
+}
+
+.assessment-card.not-submitted {
+    border-left: 4px solid var(--danger);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.4;
+    flex: 1;
+    margin: 0;
+    /* Allow text to wrap naturally */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.score-badge {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.status-submitted {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-not-submitted {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Card Content */
+.card-content {
+    margin-bottom: 1.75rem;
+    flex: 1;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--gray-600);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.info-text {
+    /* Allow text to wrap to multiple lines */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    flex: 1;
+    min-width: 0; /* Important for flexbox text wrapping */
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.btnn {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 120px;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-200);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Empty State */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--gray-600);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .assessment-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .controls-section {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .search-container {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .assessment-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    .assessment-card {
+        padding: 1.5rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .btnn {
+        min-width: auto;
+    }
+    
+    .filter-container {
+        justify-content: center;
+    }
+    
+    .filter-btn {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .search-input {
+        padding: 0.75rem 0.75rem 0.75rem 2.75rem;
+    }
+    
+    .filter-container {
+        gap: 0.5rem;
+    }
+    
+    .filter-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .assessment-card {
+        padding: 1.25rem;
+    }
+    
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+    }
+}
+
+/* Large screens optimization - 3 cards for 1500px+ */
+@media (min-width: 1500px) {
+    .assessment-grid {
+        grid-template-columns: repeat(3, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+    
+    .container {
+        max-width: 1600px;
+        padding: 2rem 2.5rem;
+    }
+}
+
+/* Extra large screens optimization */
+@media (min-width: 1800px) {
+    .assessment-grid {
+        grid-template-columns: repeat(3, minmax(450px, 1fr));
+        gap: 2.5rem;
+    }
+    
+    .container {
+        max-width: 1700px;
+    }
+}
+@media (min-width: 1500px) {
+    .assessment-grid {
+        grid-template-columns: repeat(3, minmax(300px, 1fr));
+        gap: 2rem;
+        justify-content: center; /* Center the entire grid */
+    }
+    
+    .container {
+        max-width: 1600px;
+        padding: 0 2.5rem;
+    }
+    
+    .assessment-card {
+        max-width: 420px; /* Slightly larger cards for big screens */
+    }
+}
+
+</style>
+
+<div class="main-content">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">My Assessments</h1>
+            <p class="page-subtitle">Track and manage all your assessments in one place</p>
+        </div>
+
+        <!-- Controls Section - Filters and Search in one line -->
+        <div class="controls-section">
+            <!-- Filter Buttons -->
+            <div class="filter-container">
+                <button class="filter-btn active" data-filter="all">
+                    📊 All Assessments
+                </button>
+                <button class="filter-btn" data-filter="submitted">
+                    ✅ Submitted
+                </button>
+                <button class="filter-btn" data-filter="not-submitted">
+                    ⏳ Pending
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search assessments by title...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Grid -->
+        <div class="assessment-grid" id="assessmentList">
+            {% for data in assignment_data %}
+            <div class="assessment-card {% if data.is_submitted %}submitted{% else %}not-submitted{% endif %}" 
+                 data-status="{% if data.is_submitted %}submitted{% else %}not-submitted{% endif %}">
+                
+                <!-- Card Header -->
+                <div class="card-header">
+                    <h3 class="card-title">{{ data.assessment.title }}</h3>
+                    {% if data.is_submitted %}
+                    <div class="score-badge">{{ data.score }} / {{ data.assessment.total_marks }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Status Badge -->
+                {% if data.is_submitted %}
+                <div class="status-badge status-submitted">
+                    <span>✅</span>
+                    Submitted
+                </div>
+                {% else %}
+                <div class="status-badge status-not-submitted">
+                    <span>⏳</span>
+                    Not Submitted
+                </div>
+                {% endif %}
+
+                <!-- Card Content -->
+                <div class="card-content">
+                    <div class="info-row">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                        </svg>
+                        <span class="info-text">{{ data.assessment.question_file.name|default:"No file uploaded" }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                        <span class="info-text">Total Marks: {{ data.assessment.total_marks }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12,6 12,12 16,14"></polyline>
+                        </svg>
+                        <span class="info-text">Deadline: {{ data.assessment.created_at|date:"d M Y, h:i A" }}</span>
+                    </div>
+                </div>
+
+                <!-- Card Actions -->
+                <div class="card-actions">
+                    {% if data.is_submitted %}
+                    <a href="{% url 'assessment_result' data.submission.id %}" class="btnn btn-primary">
+                        📊 View Result
+                    </a>
+                    <button class="btnn btn-secondary" disabled>
+                        ✅ Completed
+                    </button>
+                    {% else %}
+                    <a href="{% url 'take_assessment' data.assessment.id %}" class="btnn btn-primary">
+                        🚀 Take Assessment
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>No assessments available</h3>
+                <p>You don't have any assessments assigned at the moment.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
-    {% empty %}
-        <p>No assessments available.</p>
-    {% endfor %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const assessmentList = document.getElementById('assessmentList');
+    const cards = assessmentList.getElementsByClassName('assessment-card');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    // Search Functionality
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase();
+        Array.from(cards).forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            card.style.display = title.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Filter Functionality
+    filterBtns.forEach(btnn => {
+        btnn.addEventListener('click', () => {
+            // Update active state
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btnn.classList.add('active');
+            
+            const filter = btnn.getAttribute('data-filter');
+            Array.from(cards).forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = '';
+                } else {
+                    const status = card.getAttribute('data-status');
+                    card.style.display = status === filter ? '' : 'none';
+                }
+            });
+        });
+    });
+
+    // Add subtle animation to cards on load
+    Array.from(cards).forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
 {% endblock %}
