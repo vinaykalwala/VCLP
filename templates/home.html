@@ -46,7 +46,7 @@
 /* Left Content */
 .vindus-banner__content {
   flex: 1;
-  min-width: 320px;
+  min-width: 300px;
   padding-right: 3rem;
   position: relative;
   z-index: 2;
@@ -74,6 +74,41 @@
   font-size: 1.1rem;
   margin-bottom: 1.8rem;
   line-height: 1.7;
+}
+
+/* Desktop adjustment */
+.vindus-banner__content h1,
+.vindus-banner__content p {
+  margin-left: -2rem;
+}
+
+/* ✅ Responsive Fix */
+@media (max-width: 768px) {
+  .vindus-banner__content h1 {
+    font-size: 2.2rem;
+    margin-left: 0;
+  }
+
+  .vindus-banner__content p {
+    font-size: 1rem;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 425px) {
+  .vindus-banner__content h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .vindus-banner__content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0 1rem; /* add breathing room on mobile */
+  }
 }
 
 /* Button */
@@ -218,7 +253,7 @@
 }
 
 .section-content h2 {
-  font-size: 2.4rem;
+  font-size: 36px;
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: var(--dark);
@@ -257,7 +292,7 @@
 }
 
 .programs-container h2 {
-  font-size: 2.4rem;
+  font-size: 36px;
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--dark);
@@ -337,7 +372,7 @@
   background: var(--gradient); /* Updated gradient */
   color: white;
   text-align: center;
-  padding: 5rem 10%;
+  padding: 1rem 10%;
   position: relative;
   overflow: hidden;
 }
@@ -361,7 +396,7 @@
 
 .cta h2 {
   color: white;
-  font-size: 2.8rem;
+  font-size: 36px;
   font-weight: 800;
   margin-bottom: 1.5rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -388,6 +423,18 @@
   display: inline-block;
   backdrop-filter: blur(10px);
   max-width: 600px;
+}
+.cta h2 {
+  margin-bottom: 1rem; /* was 1.5rem */
+}
+
+.cta p {
+  margin-bottom: 1rem; /* was 1.5rem */
+}
+
+.cta-contact {
+  margin-top: 1rem; /* was 2rem */
+  padding: 1rem; /* was 1.5rem */
 }
 
 /* === CAREER PATHWAY SECTION === */
@@ -426,7 +473,7 @@
 }
 
 .career-pathway__content h2 {
-  font-size: 2.4rem;
+  font-size: 36px;
   font-weight: 700;
   margin-bottom: 1.2rem;
   color: var(--dark);
@@ -500,11 +547,11 @@
   background: #5932EA;
   color: white;
   text-align: center;
-  padding: 5rem 10%;
+  padding: 1rem 10%;
 }
 
 .internship-section h2 {
-  font-size: 2.4rem;
+  font-size: 36px;
   font-weight: 800;
   margin-bottom: 1rem;
 }
@@ -527,7 +574,7 @@
 }
 
 .internship-section h2 {
-  font-size: 2.4rem;
+  font-size: 36px;
   font-weight: 800;
   margin-bottom: 1rem;
 }
@@ -548,6 +595,7 @@
   gap: 2rem;
   justify-content: center;
   align-items: stretch;
+  
 }
 
 
@@ -568,7 +616,7 @@
 }
 
 .internship-header h2 {
-  font-size: 2.5rem;
+  font-size: 36px;
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -647,6 +695,7 @@
   overflow: visible; /* ✅ Hex visible */
   width: 100%;
   max-width: 280px;
+  margin: 1px solid #ccc;
 }
 
 .internship-card:hover {
@@ -778,9 +827,10 @@
 
 
 /* === LMS SECTION === */
+/* === LMS SECTION === */
 .lms-section {
   position: relative;
-  padding: 6rem 10%;
+  padding: 4rem 10%;
   background: linear-gradient(135deg, #f3f0ff, #e0dbff);
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
@@ -818,37 +868,54 @@
 }
 
 .lms-header h2 {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  color: #2e1a73;
+  color: #333;
   margin-bottom: 1rem;
 }
 
 .lms-header p {
   font-size: 1.1rem;
-  color: #4b3ca7;
+  color: #333;
   line-height: 1.7;
 }
 
-/* === GRID / FEATURES === */
+/* === GRID === */
 .lms-features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
   position: relative;
   z-index: 2;
 }
 
-/* === CARD DESIGN === */
+/* Top row uses grid */
+.lms-row.top {
+  display: contents;
+}
+
+/* Bottom row uses flex for 3 cards */
+.lms-row.bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap; /* ✅ allow wrapping for smaller screens */
+}
+
+/* === CARD === */
 .lms-card {
   background: #fff;
   border-radius: 25px;
-  padding: 2.5rem 1.5rem 3rem 1.5rem;
+  padding: 2.5rem 1.5rem 3rem;
   text-align: center;
   box-shadow: 0 20px 40px rgba(75, 42, 227, 0.08);
   position: relative;
   overflow: hidden;
   transition: all 0.4s ease;
+  flex: 1 1 22%;
+  max-width: 250px;
 }
 
 .lms-card:hover {
@@ -856,7 +923,7 @@
   box-shadow: 0 25px 50px rgba(75, 42, 227, 0.2);
 }
 
-/* === ICONS === */
+/* === ICON === */
 .lms-icon {
   width: 70px;
   height: 70px;
@@ -876,7 +943,7 @@
   background: linear-gradient(135deg, #ff7e5f, #ffb347);
 }
 
-/* === CARD TEXT === */
+/* === TEXT === */
 .lms-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -891,15 +958,46 @@
 }
 
 /* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .lms-header h2 {
-    font-size: 2rem;
+@media (max-width: 1200px) {
+  .lms-features {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .lms-row.bottom {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .lms-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lms-row.bottom {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .lms-card {
-    padding: 2rem 1.2rem 2.5rem 1.2rem;
+    max-width: 300px;
   }
 }
+
+@media (max-width: 600px) {
+  .lms-features {
+    grid-template-columns: 1fr;
+  }
+
+  .lms-row.bottom {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lms-card {
+    max-width: 90%;
+  }
+}
+
 
 
 .section.our-trainers {
@@ -1231,49 +1329,56 @@
   </div>
 
   <div class="lms-features">
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-chart-line"></i></div>
-      <h3>Progress Tracking</h3>
-      <p>Monitor course completion and performance metrics effortlessly.</p>
+    <!-- === TOP 4 CARDS === -->
+    <div class="lms-row top">
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>Progress Tracking</h3>
+        <p>Monitor course completion and performance metrics effortlessly.</p>
+      </div>
+
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-user-check"></i></div>
+        <h3>Attendance & Analytics</h3>
+        <p>Comprehensive attendance and performance insights for better planning.</p>
+      </div>
+
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-tasks"></i></div>
+        <h3>Assignments & Assessments</h3>
+        <p>Submit and evaluate tasks seamlessly through an integrated system.</p>
+      </div>
+
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-comments"></i></div>
+        <h3>Doubt Resolution</h3>
+        <p>Instantly connect with trainers for clarifications and discussions.</p>
+      </div>
     </div>
 
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-user-check"></i></div>
-      <h3>Attendance & Analytics</h3>
-      <p>Comprehensive attendance and performance insights for better planning.</p>
-    </div>
+    <!-- === BOTTOM 3 CARDS === -->
+    <div class="lms-row bottom">
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-file-shield"></i></div>
+        <h3>Secure Documents</h3>
+        <p>Upload, access, and manage certifications and files safely.</p>
+      </div>
 
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-tasks"></i></div>
-      <h3>Assignments & Assessments</h3>
-      <p>Submit and evaluate tasks seamlessly through an integrated system.</p>
-    </div>
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-laptop-code"></i></div>
+        <h3>Trainer Dashboards</h3>
+        <p>Track daily updates, assignments, and learning insights easily.</p>
+      </div>
 
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-comments"></i></div>
-      <h3>Doubt Resolution</h3>
-      <p>Instantly connect with trainers for clarifications and discussions.</p>
-    </div>
-
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-file-shield"></i></div>
-      <h3>Secure Documents</h3>
-      <p>Upload, access, and manage certifications and files safely.</p>
-    </div>
-
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-laptop-code"></i></div>
-      <h3>Trainer Dashboards</h3>
-      <p>Track daily updates, assignments, and learning insights easily.</p>
-    </div>
-
-    <div class="lms-card">
-      <div class="lms-icon"><i class="fas fa-video"></i></div>
-      <h3>Recorded Sessions</h3>
-      <p>Access recorded lessons anytime for revision and clarity.</p>
+      <div class="lms-card">
+        <div class="lms-icon"><i class="fas fa-video"></i></div>
+        <h3>Recorded Sessions</h3>
+        <p>Access recorded lessons anytime for revision and clarity.</p>
+      </div>
     </div>
   </div>
 </section>
+
 
 
 
@@ -1325,7 +1430,7 @@
     <h2>Get Started Today</h2>
     <p>Join the Vindus Career Launch Program and take the next step toward a successful career. Our team is here to support you through every stage of your learning journey.</p>
     <div class="cta-contact">
-      <p>📍 Vindus Career Launch Program, Hyderabad, India &nbsp;|&nbsp; 📧 <a href="mailto:info.vindus@gmail.com" style="color:#fff;text-decoration:underline;">info.vindus@gmail.com</a> &nbsp;|&nbsp; 📱 +91 9876543210</p>
+      <p>📍 Vindus Career Launch Program, Hyderabad, India &nbsp;|&nbsp; 📧 <a href="mailto:info.vindus@gmail.com" style="color:#fff;">info.vindus@gmail.com</a> &nbsp;|&nbsp; 📱 +91 9876543210</p>
     </div>
     <div>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0Q9aBoHLdwAkpaCH1RNdo3DQKOQzfxGVGKChm4PjLMHtzUw/viewform?usp=preview" class="btn-primary" target="_blank" style="margin-right: 1rem;">Apply Now</a>
