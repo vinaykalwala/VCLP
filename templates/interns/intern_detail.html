@@ -2,79 +2,249 @@
 {% block title %}Intern Details{% endblock %}
 {% block content %}
 {% load static %}
+
+<style>
+/* === Base === */
+body {
+  background: #e5e7eb;
+  font-family: 'Poppins', sans-serif;
+  color: #1f2937;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Resume Container === */
+.resume-wrapper {
+  max-width: 1000px;
+  margin: 2rem auto;
+  background: #fff;
+  display: flex;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  height: 85vh;
+}
+
+/* === Scrollbars for Both Sides === */
+.resume-sidebar, .resume-main {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #a5b4fc transparent;
+}
+.resume-sidebar::-webkit-scrollbar,
+.resume-main::-webkit-scrollbar {
+  width: 6px;
+}
+.resume-sidebar::-webkit-scrollbar-thumb,
+.resume-main::-webkit-scrollbar-thumb {
+  background-color: #a5b4fc;
+  border-radius: 10px;
+}
+
+/* === Sidebar === */
+.resume-sidebar {
+  flex: 1 1 30%;
+  background: linear-gradient(180deg, #4338ca, #3730a3);
+  color: #fff;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.resume-sidebar img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+.resume-sidebar h2 {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+.resume-sidebar p.role {
+  color: #c7d2fe;
+  font-size: 0.95rem;
+  margin-bottom: 1.8rem;
+}
+.sidebar-section {
+  text-align: left;
+  margin-bottom: 1.8rem;
+}
+.sidebar-section h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 0.7rem;
+  padding-bottom: 4px;
+  color: #e0e7ff;
+  letter-spacing: 0.5px;
+}
+.sidebar-section p,
+.sidebar-section a {
+  font-size: 0.9rem;
+  color: #f3f4f6;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.sidebar-section a:hover { text-decoration: underline; }
+
+/* === Main Section === */
+.resume-main {
+  flex: 1 1 70%;
+  padding: 2.5rem 3rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.section {
+  margin-bottom: 2rem;
+}
+.section h3 {
+  color: #4338ca;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.section p {
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+.section span {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* === Buttons === */
+.resume-actions {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.resume-actions a {
+  display: inline-block;
+  margin: 0 0.5rem;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.btn-edit { background: #fbbf24; }
+.btn-edit:hover { background: #f59e0b; }
+.btn-back { background: #4338ca; }
+.btn-back:hover { background: #312e81; }
+
+/* === Responsive === */
+@media (max-width: 900px) {
+  .resume-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+  .resume-sidebar, .resume-main {
+    width: 100%;
+    overflow-y: visible;
+  }
+  .resume-main {
+    padding: 2rem;
+  }
+}
+</style>
+
 <div class="main-content">
-<h1>Intern Details</h1>
+  <div class="resume-wrapper">
 
-<h2>Basic Info</h2>
-<p><strong>Full Name:</strong> {{ intern.user.get_full_name }}</p>
-<p><strong>Username:</strong> {{ intern.user.username }}</p>
-<p><strong>Email:</strong> {{ intern.user.email }}</p>
-<p><strong>Gender:</strong> {{ intern.gender }}</p>
-<p><strong>Date of Birth:</strong> {{ intern.date_of_birth }}</p>
-<p><strong>Address:</strong> {{ intern.address }}</p>
-{% if intern.profile_photo %}
-    <p><strong>Profile Photo:</strong> <img src="{{ intern.profile_photo.url }}" alt="Profile Photo" width="150"></p>
-{% endif %}
+```
+<!-- Sidebar -->
+<div class="resume-sidebar">
+  {% if intern.profile_photo %}
+    <img src="{{ intern.profile_photo.url }}" alt="Profile Photo">
+  {% else %}
+    <img src="{% static 'images/default-avatar.png' %}" alt="Default">
+  {% endif %}
+  <h2>{{ intern.user.get_full_name|default:intern.user.username }}</h2>
+  <p class="role">{{ intern.qualification|default:"Intern" }}</p>
 
-<h2>Academic Info</h2>
-<p><strong>Qualification:</strong> {{ intern.qualification }}</p>
-<p><strong>Specialization:</strong> {{ intern.specialization }}</p>
-<p><strong>College:</strong> {{ intern.college }}</p>
-<p><strong>University:</strong> {{ intern.university }}</p>
-<p><strong>Graduation Year:</strong> {{ intern.graduation_year }}</p>
-<p><strong>Aggregate Percentage:</strong> {{ intern.aggregate_percentage }}%</p>
+  <div class="sidebar-section">
+    <h3>Contact</h3>
+    <p><i class="fas fa-envelope"></i> {{ intern.user.email }}</p>
+    <p><i class="fas fa-phone"></i> {{ intern.emergency_contact_phone }}</p>
+    <p><i class="fas fa-map-marker-alt"></i> {{ intern.address }}</p>
+  </div>
 
-<h2>Skills & Experience</h2>
-<p><strong>Skills:</strong> {{ intern.skills }}</p>
-<p><strong>Prior Experience:</strong> {{ intern.prior_experience }}</p>
+  <div class="sidebar-section">
+    <h3>Education</h3>
+    <p><strong>{{ intern.qualification }}</strong></p>
+    <p>{{ intern.college }}</p>
+    <p>{{ intern.university }}</p>
+    <p>Graduation: {{ intern.graduation_year }}</p>
+    <p>Aggregate: {{ intern.aggregate_percentage }}%</p>
+  </div>
 
-<h2>Internship Motivation</h2>
-<p><strong>Why Choose:</strong> {{ intern.why_choose }}</p>
-<p><strong>Expectations:</strong> {{ intern.expectations }}</p>
-<p><strong>Career Goals:</strong> {{ intern.career_goals }}</p>
+  <div class="sidebar-section">
+    <h3>Skills</h3>
+    <p>{{ intern.skills }}</p>
+  </div>
 
-<h2>Internship Details</h2>
-<p><strong>Batch:</strong> {{ intern.batch }}</p>
-<p><strong>Project Title:</strong> {{ intern.project_title }}</p>
-
-<h2>Device & Documents</h2>
-<p><strong>Device Access:</strong> {{ intern.device_access|yesno:"Yes,No" }}</p>
-{% if intern.resume %}
-    <p><strong>Resume:</strong> <a href="{{ intern.resume.url }}" target="_blank">Download</a></p>
-{% endif %}
-{% if intern.cover_letter %}
-    <p><strong>Cover Letter:</strong> <a href="{{ intern.cover_letter.url }}" target="_blank">Download</a></p>
-{% endif %}
-{% if intern.college_id_card %}
-    <p><strong>College ID Card:</strong> <a href="{{ intern.college_id_card.url }}" target="_blank">Download</a></p>
-{% endif %}
-
-<h2>Emergency & Guardian Info</h2>
-<p><strong>Emergency Contact Name:</strong> {{ intern.emergency_contact_name }}</p>
-<p><strong>Emergency Contact Phone:</strong> {{ intern.emergency_contact_phone }}</p>
-<p><strong>Guardian Name:</strong> {{ intern.guardian_name }}</p>
-<p><strong>Guardian Contact:</strong> {{ intern.guardian_contact }}</p>
-
-<h2>Links</h2>
-{% if intern.linkedin_profile %}
-    <p><strong>LinkedIn Profile:</strong> <a href="{{ intern.linkedin_profile }}" target="_blank">{{ intern.linkedin_profile }}</a></p>
-{% endif %}
-{% if intern.portfolio_link %}
-    <p><strong>Portfolio Link:</strong> <a href="{{ intern.portfolio_link }}" target="_blank">{{ intern.portfolio_link }}</a></p>
-{% endif %}
-
-<h2>Reference</h2>
-<p><strong>Reference:</strong> {{ intern.reference }}</p>
-
-<h2>Certificates & Status</h2>
-<p><strong>Undertaking Generated:</strong> {{ intern.undertaking_generated|yesno:"Yes,No" }}</p>
-<p><strong>Completion Certificate Generated:</strong> {{ intern.completion_certificate_generated|yesno:"Yes,No" }}</p>
-<p><strong>LOR Generated:</strong> {{ intern.lor_generated|yesno:"Yes,No" }}</p>
-<p><strong>Internship Status:</strong> {{ intern.internship_status }}</p>
-
-<p><strong>Created At:</strong> {{ intern.created_at }}</p>
-
-<a href="{% url 'intern_update' intern.pk %}">Edit</a> |
-<a href="{% url 'intern_list' %}">Back to List</a>
+  {% if intern.linkedin_profile or intern.portfolio_link %}
+  <div class="sidebar-section">
+    <h3>Links</h3>
+    {% if intern.linkedin_profile %}
+      <p><a href="{{ intern.linkedin_profile }}" target="_blank">LinkedIn</a></p>
+    {% endif %}
+    {% if intern.portfolio_link %}
+      <p><a href="{{ intern.portfolio_link }}" target="_blank">Portfolio</a></p>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
+
+<!-- Main Content -->
+<div class="resume-main">
+  <div class="section">
+    <h3>Profile Summary</h3>
+    <p>{{ intern.specialization|default:"General" }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Experience & Projects</h3>
+    <p><span>Experience:</span> {{ intern.prior_experience }}</p>
+    <p><span>Project Title:</span> {{ intern.project_title }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Motivation & Goals</h3>
+    <p><span>Why Choose:</span> {{ intern.why_choose }}</p>
+    <p><span>Expectations:</span> {{ intern.expectations }}</p>
+    <p><span>Career Goals:</span> {{ intern.career_goals }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Documents</h3>
+    {% if intern.resume %}
+      <p><span>Resume:</span> <a href="{{ intern.resume.url }}" target="_blank">Download</a></p>
+    {% endif %}
+    {% if intern.cover_letter %}
+      <p><span>Cover Letter:</span> <a href="{{ intern.cover_letter.url }}" target="_blank">Download</a></p>
+    {% endif %}
+    {% if intern.college_id_card %}
+      <p><span>College ID:</span> <a href="{{ intern.college_id_card.url }}" target="_blank">Download</a></p>
+    {% endif %}
+  </div>
+</div>
+```
+
+  </div>
+
+  <div class="resume-actions">
+    <a href="{% url 'intern_update' intern.pk %}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+    <a href="{% url 'intern_list' %}" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
