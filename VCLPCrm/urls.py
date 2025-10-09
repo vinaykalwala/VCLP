@@ -105,6 +105,9 @@ urlpatterns = [
     path("assessments/scores/", views.batch_assessment_scores, name="batch_assessment_scores"),
 
 
+
+path('intern-overview/', views.intern_overview, name='intern_overview'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
