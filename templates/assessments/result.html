@@ -1,176 +1,428 @@
 {% extends "login_base.html" %}
 {% block content %}
 <style>
+/* Modern CSS Variables */
+:root {
+    --primary: #5932EA;
+    --primary-dark: #4727B2;
+    --primary-light: #8C5CFF;
+    --primary-ultralight: #F0EDFF;
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --danger: #EF4444;
+    --danger-light: #FEE2E2;
+    --warning: #F59E0B;
+    --warning-light: #FEF3C7;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius: 12px;
+    --radius-lg: 16px;
+}
+
 /* Container */
 .result-container {
-    margin-top: 30px;
-    margin-bottom: 50px;
     font-family: 'Inter', sans-serif;
+}
+
+/* Button Row */
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
 }
 
 /* Back Button */
 .back-btn {
-    display: block;           /* makes it block level */
-    width: fit-content;       /* button width fits content */
-    margin: 10px auto;        /* centers horizontally and adds top/bottom spacing */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-ultralight);
+    color: var(--primary);
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: var(--radius);
     text-decoration: none;
-    color: #5932EA;
-    font-weight: 500;
-    padding: 8px 16px;
-    border: 1px solid #5932EA;
-    border-radius: 8px;
-    transition: all 0.2s;
-    text-align: center;
+    border: 1px solid #9a94b3;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .back-btn:hover {
-    background-color: #5932EA;
-    color: #fff;
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-dark);
 }
 
+/* Filter Buttons Container */
+.filter-btn-container {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 8px 16px;  /* increased padding */
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    min-width: 300px;   /* optional: ensures minimum width */
+}
+
+
+.filter-btn {
+    padding: 10px 18px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    border: 2px solid var(--primary);
+    background: #ffffff;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
 
 /* Header Section */
 .result-header {
-    background-color: #5932EA;
-    border-radius: 15px;
-    padding: 25px 25px 20px 25px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
-    flex-wrap: wrap;
+    box-shadow: var(--shadow-xl);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.result-header:hover::before {
+    transform: translateX(100%);
 }
 
 .result-header h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     margin: 0;
-    color: #fff;
+    color: white;
+    letter-spacing: -0.025em;
+    position: relative;
+    z-index: 1;
 }
 
 .result-score {
-    background-color: #fff;
-    color: #5932EA;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
     font-weight: 700;
-    font-size: 1.1rem;
-    padding: 10px 18px;
-    border-radius: 10px;
-    margin-top: 10px;
+    font-size: 1.25rem;
+    padding: 1rem 2rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
 }
 
 /* Question Card */
 .result-card {
-    background-color: #fff;
-    border-radius: 15px;
-    padding: 20px 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary), var(--primary-light));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.result-card:hover::before {
+    transform: scaleY(1);
 }
 
 .result-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-ultralight);
 }
 
 /* Question Text */
 .result-question {
     font-weight: 700;
-    font-size: 1.05rem;
-    color: #222;
-    margin-bottom: 12px;
+    font-size: 1.2rem;
+    color: var(--gray-900);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    letter-spacing: -0.025em;
+}
+
+.question-number {
+    color: var(--primary);
+    font-weight: 800;
+    margin-right: 0.5rem;
 }
 
 /* Answer Boxes Container */
 .answer-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Answer Boxes */
 .answer-box {
-    flex: 1 1 45%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    font-weight: 500;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 600;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.answer-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+}
+
+.answer-box:hover::before {
+    left: 100%;
 }
 
 /* Correct / Wrong / Not Answered */
 .correct {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: var(--success-light);
+    color: #065F46;
+    border-color: var(--success);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
 }
 
 .wrong {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: var(--danger-light);
+    color: #7F1D1D;
+    border-color: var(--danger);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
 }
 
 .not-answered {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+    background: var(--warning-light);
+    color: #78350F;
+    border-color: var(--warning);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+/* Status Icons */
+.status-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.correct .status-icon {
+    background: var(--success);
+    color: white;
+}
+
+.wrong .status-icon {
+    background: var(--danger);
+    color: white;
+}
+
+.not-answered .status-icon {
+    background: var(--warning);
+    color: white;
 }
 
 /* Labels */
 .answer-label {
     font-weight: 700;
-    margin-right: 6px;
+    margin-right: 0.5rem;
+    color: inherit;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.answer-content {
+    flex: 1;
+    line-height: 1.4;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .result-header {
+    .button-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
     }
-
-    .result-score {
-        align-self: flex-start;
-    }
-
-    .answer-box {
-        flex: 1 1 100%;
-    }
-
-    .back-btn {
-        display: block;
-        margin: 20px auto;
+    .filter-btn-container {
+        justify-content: center;
     }
 }
 
-@media (max-width: 480px) {
+/* Animation for cards */
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+    animation: slideInUp 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.result-card:nth-child(1) { animation-delay: 0.1s; }
+.result-card:nth-child(2) { animation-delay: 0.2s; }
+.result-card:nth-child(3) { animation-delay: 0.3s; }
+.result-card:nth-child(4) { animation-delay: 0.4s; }
+.result-card:nth-child(5) { animation-delay: 0.5s; }
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .button-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .back-btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .filter-btn-container {
+        width: 100%;
+        justify-content: space-between;
+        padding: 10px 12px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .filter-btn {
+        flex: 1;
+        margin: 0 2px;
+        padding: 10px 0;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 780px) {
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem 1.5rem;
+    }
+
     .result-header h2 {
         font-size: 1.5rem;
     }
 
     .result-score {
         font-size: 1rem;
-        padding: 8px 14px;
+        padding: 0.75rem 1.25rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    .answer-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .result-card {
-        padding: 18px 20px;
+        padding: 1.25rem;
     }
 
     .result-question {
-        font-size: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .answer-box {
+        padding: 1rem;
+    }
+
+    .answer-label {
+        font-size: 0.85rem;
     }
 }
+
 </style>
 
 <div class="main-content">
-            <a href="{% url 'intern_assessments' %}" class="back-btn" style="text-align: center;">← Back to Assessments</a>
-
     <div class="container result-container">
+
+        <!-- Button Row -->
+        <div class="button-row">
+            <!-- Back Button -->
+            <a href="{% url 'intern_assessments' %}" class="back-btn">
+                <span>←</span> Back to Assessments
+            </a>
+
+            <!-- Filter Buttons -->
+            <div class="filter-btn-container">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="correct">Correct</button>
+                <button class="filter-btn" data-filter="wrong">Incorrect</button>
+            </div>
+        </div>
 
         <!-- Header -->
         <div class="result-header">
@@ -180,34 +432,72 @@
             </div>
         </div>
 
-        <!-- Back Button -->
-
         <!-- Questions -->
         {% for mcq in mcqs %}
-        <div class="result-card">
-            <p class="result-question">{{ forloop.counter }}. {{ mcq.question_text }}</p>
+        <div class="result-card {% if mcq.selected_answer == mcq.correct_option %}correct-card{% elif mcq.selected_answer %}wrong-card{% else %}not-answered-card{% endif %}">
+            <p class="result-question">
+                <span class="question-number">{{ forloop.counter }}.</span>
+                {{ mcq.question_text }}
+            </p>
 
             <div class="answer-container">
                 <div class="answer-box {% if mcq.selected_answer == mcq.correct_option %}correct{% elif mcq.selected_answer %}wrong{% else %}not-answered{% endif %}">
-                    <span class="answer-label">Your Answer:</span>
-                    {% if mcq.selected_answer == 1 %}{{ mcq.option_1 }}
-                    {% elif mcq.selected_answer == 2 %}{{ mcq.option_2 }}
-                    {% elif mcq.selected_answer == 3 %}{{ mcq.option_3 }}
-                    {% elif mcq.selected_answer == 4 %}{{ mcq.option_4 }}
-                    {% else %}Not Answered{% endif %}
+                    <div class="status-icon">
+                        {% if mcq.selected_answer == mcq.correct_option %}✓
+                        {% elif mcq.selected_answer %}✗
+                        {% else %}?{% endif %}
+                    </div>
+                    <div class="answer-content">
+                        <span class="answer-label">Your Answer:</span>
+                        {% if mcq.selected_answer == 1 %}{{ mcq.option_1 }}
+                        {% elif mcq.selected_answer == 2 %}{{ mcq.option_2 }}
+                        {% elif mcq.selected_answer == 3 %}{{ mcq.option_3 }}
+                        {% elif mcq.selected_answer == 4 %}{{ mcq.option_4 }}
+                        {% else %}Not Answered{% endif %}
+                    </div>
                 </div>
 
                 <div class="answer-box correct">
-                    <span class="answer-label">Correct Answer:</span>
-                    {% if mcq.correct_option == 1 %}{{ mcq.option_1 }}
-                    {% elif mcq.correct_option == 2 %}{{ mcq.option_2 }}
-                    {% elif mcq.correct_option == 3 %}{{ mcq.option_3 }}
-                    {% elif mcq.correct_option == 4 %}{{ mcq.option_4 }}
-                    {% endif %}
+                    <div class="status-icon">✓</div>
+                    <div class="answer-content">
+                        <span class="answer-label">Correct Answer:</span>
+                        {% if mcq.correct_option == 1 %}{{ mcq.option_1 }}
+                        {% elif mcq.correct_option == 2 %}{{ mcq.option_2 }}
+                        {% elif mcq.correct_option == 3 %}{{ mcq.option_3 }}
+                        {% elif mcq.correct_option == 4 %}{{ mcq.option_4 }}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
+
     </div>
 </div>
+
+<script>
+// Filter Questions
+const filterButtons = document.querySelectorAll('.filter-btn');
+const resultCards = document.querySelectorAll('.result-card');
+
+filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        resultCards.forEach(card => {
+            if(filter === 'all') {
+                card.style.display = 'block';
+            } else if(filter === 'correct') {
+                card.style.display = card.classList.contains('correct-card') ? 'block' : 'none';
+            } else if(filter === 'wrong') {
+                card.style.display = card.classList.contains('wrong-card') ? 'block' : 'none';
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}

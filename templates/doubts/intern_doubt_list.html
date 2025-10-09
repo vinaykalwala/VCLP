@@ -64,6 +64,14 @@
     --radius-lg: 1rem;
     --radius-xl: 1.5rem;
     --radius-full: 9999px;
+    
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
 }
 
 /* ===== Import Modern Font ===== */
@@ -178,6 +186,9 @@
     border-left: 4px solid var(--primary);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure all cards have equal height */
 }
 
 .card:hover {
@@ -225,6 +236,45 @@
     color: var(--text-primary);
     font-weight: 600;
     min-width: 80px;
+}
+
+/* ====== Question Text with Read More ====== */
+.question-text {
+    margin-bottom: var(--spacing-md);
+    position: relative;
+}
+
+.question-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+    max-height: 4.5em; /* 3 lines * 1.5 line-height */
+    transition: max-height var(--transition-base);
+}
+
+.question-content.expanded {
+    -webkit-line-clamp: unset;
+    max-height: none;
+}
+
+.read-more-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: var(--spacing-xs);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color var(--transition-base);
+}
+
+.read-more-btn:hover {
+    color: var(--primary-hover);
 }
 
 /* ====== Status Badge ====== */
@@ -297,6 +347,143 @@
     margin-top: var(--spacing-xs);
 }
 
+/* ====== Modal Styles ====== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+}
+
+.modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2xl);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform var(--transition-slow);
+    position: relative;
+}
+
+.modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color var(--transition-base);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.close-btn:hover {
+    color: var(--text-primary);
+    background: var(--background-secondary);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+}
+
+.modal-question {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    white-space: pre-wrap;
+}
+
+.modal-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.modal-detail-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.modal-detail-value {
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.modal-answer {
+    background: var(--success-light);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.modal-answer h4 {
+    font-size: var(--font-size-base);
+    color: var(--primary);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.modal-answer p {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+.modal-answer small {
+    display: block;
+    margin-top: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
 /* ====== Empty State ====== */
 .empty-state {
     grid-column: 1 / -1;
@@ -360,6 +547,10 @@
     .card p strong {
         min-width: auto;
     }
+    
+    .modal-details {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 576px) {
@@ -397,6 +588,14 @@
     .empty-state::before {
         font-size: 40px;
     }
+    
+    .modal-content {
+        width: 95%;
+    }
+    
+    .modal-header, .modal-body {
+        padding: var(--spacing-md);
+    }
 }
 
 /* ====== Smooth Scrolling ====== */
@@ -426,7 +625,15 @@ html {
     <div class="cards-wrapper">
     {% for doubt in doubts %}
     <div class="card">
-        <p><strong>Question:</strong> {{ doubt.question }}</p>
+        <div class="question-text">
+            <strong>Question:</strong>
+            <div class="question-content" id="question-{{ doubt.id }}">
+                {{ doubt.question }}
+            </div>
+            <button class="read-more-btn" onclick="openModal({{ doubt.id }})">
+                View Full Question
+            </button>
+        </div>
         <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
         <p><strong>Created:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
         <p>
@@ -451,4 +658,105 @@ html {
     </div>
   </div>
 </div>
+
+<!-- Modal for viewing full question -->
+<div class="modal" id="questionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Question Details</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-question" id="modalQuestion"></div>
+            
+            <div class="modal-details">
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Trainer</span>
+                    <span class="modal-detail-value" id="modalTrainer"></span>
+                </div>
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Created</span>
+                    <span class="modal-detail-value" id="modalCreated"></span>
+                </div>
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Status</span>
+                    <span class="modal-detail-value" id="modalStatus"></span>
+                </div>
+            </div>
+            
+            <div class="modal-answer" id="modalAnswer" style="display: none;">
+                <h4>Answer</h4>
+                <p id="modalAnswerText"></p>
+                <small id="modalResolvedAt"></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store doubt data for modal access
+const doubtData = {
+    {% for doubt in doubts %}
+    {{ doubt.id }}: {
+        question: `{{ doubt.question|escapejs }}`,
+        trainer: `{{ doubt.trainer.user.username|escapejs }}`,
+        created: `{{ doubt.created_at|date:"d M Y, H:i" }}`,
+        status: `{% if doubt.resolved %}Resolved{% else %}Pending{% endif %}`,
+        {% if doubt.resolved %}
+        resolved: true,
+        answer: `{{ doubt.resolution.answer|escapejs }}`,
+        resolvedAt: `{{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}`
+        {% else %}
+        resolved: false
+        {% endif %}
+    },
+    {% endfor %}
+};
+
+// Open modal with doubt details
+function openModal(doubtId) {
+    const data = doubtData[doubtId];
+    if (!data) return;
+    
+    // Set modal content
+    document.getElementById('modalQuestion').textContent = data.question;
+    document.getElementById('modalTrainer').textContent = data.trainer;
+    document.getElementById('modalCreated').textContent = data.created;
+    document.getElementById('modalStatus').textContent = data.status;
+    
+    // Handle answer display
+    const answerSection = document.getElementById('modalAnswer');
+    if (data.resolved) {
+        document.getElementById('modalAnswerText').textContent = data.answer;
+        document.getElementById('modalResolvedAt').textContent = `Resolved at ${data.resolvedAt}`;
+        answerSection.style.display = 'block';
+    } else {
+        answerSection.style.display = 'none';
+    }
+    
+    // Show modal
+    document.getElementById('questionModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+}
+
+// Close modal
+function closeModal() {
+    document.getElementById('questionModal').classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+}
+
+// Close modal when clicking outside content
+document.getElementById('questionModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>
 {% endblock %}

@@ -1,32 +1,250 @@
 {% extends 'login_base.html' %}
 {% block content %}
+{% load static %}
+
+<style>
+/* ======= Page Layout ======= */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top left, #F8F7FF, #E9E8FF, #F5F6FA);
+  color: #1E1E2F;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1250px;
+  margin: 0 auto;
+}
+
+/* ======= Header Section ======= */
+.header-section {
+  background: linear-gradient(135deg, #5932EA, #4727B2);
+  color: white;
+  border-radius: 20px;
+  padding: 35px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 15px 35px rgba(89, 50, 234, 0.25);
+  margin-bottom: 35px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-section::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 250px;
+}
+
+.header-left h3 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.header-left p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Button - Create New Assignment */
+.btn-create {
+  background: white;
+  color: #4727B2;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-create:hover {
+  transform: translateY(-3px);
+  background: #F1EEFF;
+}
+
+/* ======= Table Container ======= */
+.table-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======= Table ======= */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.table thead {
+  background: linear-gradient(90deg, #5932EA, #4727B2);
+  color: white;
+}
+
+.table th, .table td {
+  padding: 16px 14px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+/* Vertical lines between table headers */
+.table th {
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+.table th:last-child {
+  border-right: none;
+}
+
+.table tbody tr {
+  background: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.table tbody tr:hover {
+  background: rgba(89, 50, 234, 0.08);
+  box-shadow: 0 6px 14px rgba(89, 50, 234, 0.1);
+  transform: scale(1.01);
+}
+
+/* ======= Buttons in Table ======= */
+.action-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 7px 14px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-right: 5px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-edit {
+  background: linear-gradient(90deg, #F8E17D, #F7C948);
+  color: #4727B2;
+}
+.btn-edit:hover { transform: translateY(-2px); }
+
+.btn-delete {
+  background: linear-gradient(90deg, #FF7D7D, #FF4D4D);
+}
+.btn-delete:hover { transform: translateY(-2px); }
+
+.btn-view {
+  background: linear-gradient(90deg, #5932EA, #4727B2);
+}
+.btn-view:hover { transform: translateY(-2px); }
+
+/* ======= Empty State ======= */
+.empty-state {
+  text-align: center;
+  padding: 50px;
+  color: #4727B2;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .btn-create {
+    width: 100%;
+  }
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
+  .table th, .table td {
+    white-space: nowrap;
+  }
+}
+</style>
+
 <div class="main-content">
-<div class="container">
-    <h3>Your Assignments</h3>
-    <a href="{% url 'create_assignment' %}" class="btn btn-primary mb-3">Create New</a>
-    <table class="table table-bordered">
+  <div class="container">
+    
+    <!-- ===== Header Section ===== -->
+    <div class="header-section">
+      <div class="header-left">
+        <h3>📘 Your Assignments</h3>
+        <p>Track, manage, and review your assignment progress at a glance.</p>
+      </div>
+      <a href="{% url 'create_assignment' %}" class="btn-create">+ Create New Assignment</a>
+    </div>
+
+    <!-- ===== Table Section ===== -->
+    {% if assignments %}
+    <div class="table-card">
+      <table class="table">
         <thead>
-            <tr>
-                <th>Title</th><th>Batch</th><th>Deadline</th><th>Created</th><th>Actions</th>
-            </tr>
+          <tr>
+            <th>Title</th>
+            <th>Batch</th>
+            <th>Deadline</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody>
-            {% for a in assignments %}
-            <tr>
-                <td>{{ a.title }}</td>
-                <td>{{ a.batch.name }}</td>
-                <td>{{ a.deadline|date:"d M Y H:i" }}</td>
-                <td>{{ a.created_at|date:"d M Y" }}</td>
-                <td>
-                    <a href="{% url 'edit_assignment' a.id %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'delete_assignment' a.id %}" class="btn btn-sm btn-danger">Delete</a>
-                       
-                    <a href="{% url 'view_submissions' a.id %}" class="btn btn-sm btn-info">View Submissions</a>
-                </td>
-            </tr>
-            {% endfor %}
+          {% for a in assignments %}
+          <tr>
+            <td>{{ a.title }}</td>
+            <td>{{ a.batch.name }}</td>
+            <td>{{ a.deadline|date:"d M Y, h:i A" }}</td>
+            <td>{{ a.created_at|date:"d M Y" }}</td>
+            <td>
+              <a href="{% url 'edit_assignment' a.id %}" class="action-btn btn-edit">✏️ Edit</a>
+              <a href="{% url 'delete_assignment' a.id %}" class="action-btn btn-delete">🗑️ Delete</a>
+              <a href="{% url 'view_submissions' a.id %}" class="action-btn btn-view">📁 Submissions</a>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <h4>No Assignments Found</h4>
+      <p>Start by creating your first assignment to manage submissions easily.</p>
+      <a href="{% url 'create_assignment' %}" class="btn-create" style="margin-top: 15px;">+ Create Assignment</a>
+    </div>
+    {% endif %}
+  </div>
 </div>
-</div>
+
 {% endblock %}

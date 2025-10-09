@@ -573,51 +573,55 @@ from xhtml2pdf import pisa
 
 def generate_pdf_for_intern(intern):
     """
-    Renders an HTML template for a single intern's certificate and returns it as PDF bytes using xhtml2pdf.
+    Renders an HTML template for a single intern's certificate and returns it as PDF bytes.
     """
-    from datetime import date
-    
-    # ✅ Get absolute path to logo
+    # Get absolute path to logo
     logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'vinduslogo.jpg')
     
     context = {
         'intern': intern,
         'today_date': date.today().strftime("%d-%m-%Y"),
-        'logo_path': logo_path  # ✅ Add logo path here inside the context dict
+        'logo_path': logo_path
     }
     
     html_string = render_to_string('certificates/certificate_template.html', context)
-
-    # Create a BytesIO buffer to hold PDF
     result = io.BytesIO()
-
-    # Convert HTML to PDF
     pisa_status = pisa.CreatePDF(io.StringIO(html_string), dest=result)
 
-    # Check for errors
     if pisa_status.err:
         raise Exception('Error generating PDF')
 
-    # Get PDF bytes
     pdf_bytes = result.getvalue()
     result.close()
     return pdf_bytes
 
+def render_to_pdf(template_path, context_dict):
+    """
+    Utility function to render an HTML template to PDF bytes.
+    """
+    html = render_to_string(template_path, context_dict)
+    result = io.BytesIO()
+    pdf = pisa.CreatePDF(html, dest=result)
+    
+    if not pdf.err:
+        return result.getvalue()
+    return None
+
 # ================================
-# Certificate Management View (Admin)
+# Certificate Management Views
 # ================================
+
 @login_required
 def manage_certificates_view(request):
     """
-    Allows an admin to filter by course/batch, search, and download certificates.
+    Allows an admin to filter, search, and download certificates for interns
+    who have not yet received one.
     """
     if not (request.user.is_superuser or request.user.role == 'admin'):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('dashboard')
 
     interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
-    
-    # Use the new form
     filter_form = InternFilterForm(request.GET)
     selected_batch = None
 
@@ -628,12 +632,9 @@ def manage_certificates_view(request):
 
         if selected_course:
             interns_qs = interns_qs.filter(batch__course=selected_course)
-            # Dynamically update the batch dropdown to show only batches from the selected course
             filter_form.fields['batch'].queryset = Batch.objects.filter(course=selected_course)
-
         if selected_batch:
             interns_qs = interns_qs.filter(batch=selected_batch)
-
         if query:
             interns_qs = interns_qs.filter(
                 Q(unique_id__icontains=query) |
@@ -641,45 +642,52 @@ def manage_certificates_view(request):
                 Q(user__last_name__icontains=query)
             )
 
-    # The POST logic for downloading remains the same
     if request.method == 'POST':
-        # ... (Your existing POST logic for downloading certificates does not need to change)
         action = request.POST.get('action')
-        selected_interns = None
+        interns_to_process = None
 
+        # ✅ MODIFIED: Added 'completion_certificate_generated=False' to filters
         if action == 'download_selected':
             intern_ids = request.POST.getlist('intern_ids')
             if not intern_ids:
                 messages.error(request, "Please select at least one intern.")
                 return redirect(request.get_full_path())
-            selected_interns = InternProfile.objects.filter(id__in=intern_ids, internship_status='Completed')
+            interns_to_process = InternProfile.objects.filter(
+                id__in=intern_ids, 
+                internship_status='Completed', 
+                completion_certificate_generated=False
+            )
 
         elif action == 'download_batch':
             batch_id = request.POST.get('batch_id')
             if not batch_id:
                 messages.error(request, "Please filter by a batch first.")
                 return redirect(request.get_full_path())
-            selected_interns = InternProfile.objects.filter(batch_id=batch_id, internship_status='Completed')
+            interns_to_process = InternProfile.objects.filter(
+                batch_id=batch_id, 
+                internship_status='Completed', 
+                completion_certificate_generated=False
+            )
 
-        if selected_interns and selected_interns.exists():
+        if interns_to_process and interns_to_process.exists():
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-                for intern in selected_interns:
+                for intern in interns_to_process:
                     pdf_bytes = generate_pdf_for_intern(intern)
                     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
                     zf.writestr(filename, pdf_bytes)
             
-            selected_interns.update(completion_certificate_generated=True)
+            interns_to_process.update(completion_certificate_generated=True)
             
             zip_buffer.seek(0)
             response = HttpResponse(zip_buffer, content_type='application/zip')
             response['Content-Disposition'] = 'attachment; filename="certificates.zip"'
-            messages.success(request, f"Successfully generated {selected_interns.count()} certificates.")
+            messages.success(request, f"Successfully generated {interns_to_process.count()} new certificates.")
             return response
         else:
-            messages.warning(request, "No completed interns were found for the selected action.")
+            # ✅ MODIFIED: Improved warning message
+            messages.warning(request, "No new certificates to generate. All selected interns are either not 'Completed' or already have a certificate.")
             return redirect(request.get_full_path())
-
 
     context = {
         'interns': interns_qs,
@@ -687,6 +695,35 @@ def manage_certificates_view(request):
         'selected_batch': selected_batch,
     }
     return render(request, 'certificates/manage_certificates.html', context)
+
+@login_required
+def download_certificate_view(request, intern_id):
+    """
+    Generates a single PDF certificate, but only if one hasn't been generated before.
+    """
+    if not (request.user.is_superuser or request.user.role == 'admin'):
+        messages.error(request, "You do not have permission to perform this action.")
+        return redirect('dashboard')
+
+    intern = get_object_or_404(InternProfile, id=intern_id)
+
+    # ✅ ADDED: Check if certificate was already generated
+    if intern.completion_certificate_generated:
+        messages.warning(request, f"Certificate for {intern.user.get_full_name()} has already been generated.")
+        return redirect('manage_certificates')
+
+    if intern.internship_status != 'Completed':
+        messages.error(request, f"Cannot generate certificate. {intern.user.get_full_name()}'s internship is not marked as completed.")
+        return redirect('manage_certificates')
+
+    pdf_bytes = generate_pdf_for_intern(intern)
+    intern.completion_certificate_generated = True
+    intern.save()
+    
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
+    filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
 
 
 # ================================
@@ -901,68 +938,64 @@ def render_to_pdf(template_path, context_dict):
 @login_required
 def manage_lor_view(request):
     """
-    Allows an admin to filter by course/batch, search, and download Letters of Recommendation (LORs).
+    Allows an admin to filter, search, and download LORs for interns
+    who have not yet received one.
     """
     if not (request.user.is_superuser or request.user.role == 'admin'):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('dashboard')
 
     interns_qs = InternProfile.objects.select_related('user', 'batch', 'batch__course').order_by('user__first_name')
-
-    # Using the same filter form as certificates view
     filter_form = InternFilterForm(request.GET)
     selected_batch = None
 
     if filter_form.is_valid():
+        # (Filtering logic remains the same as manage_certificates_view)
         selected_course = filter_form.cleaned_data.get('course')
         selected_batch = filter_form.cleaned_data.get('batch')
         query = filter_form.cleaned_data.get('q')
 
         if selected_course:
             interns_qs = interns_qs.filter(batch__course=selected_course)
-            # Dynamically update the batch dropdown to show only batches from the selected course
             filter_form.fields['batch'].queryset = Batch.objects.filter(course=selected_course)
-
         if selected_batch:
             interns_qs = interns_qs.filter(batch=selected_batch)
-
         if query:
             interns_qs = interns_qs.filter(
                 Q(unique_id__icontains=query) |
                 Q(user__first_name__icontains=query) |
                 Q(user__last_name__icontains=query)
             )
-
-    # POST: Handle LOR downloads
+            
     if request.method == 'POST':
         action = request.POST.get('action')
-        selected_interns = None
+        interns_to_process = None
+        
+        # ✅ MODIFIED: Added 'lor_generated=False' and project title checks to filters
+        base_filters = {
+            'internship_status': 'Completed',
+            'lor_generated': False
+        }
 
         if action == 'download_selected':
             intern_ids = request.POST.getlist('intern_ids')
             if not intern_ids:
                 messages.error(request, "Please select at least one intern.")
                 return redirect(request.get_full_path())
-            selected_interns = InternProfile.objects.filter(
-                id__in=intern_ids, internship_status='Completed'
-            )
+            interns_to_process = InternProfile.objects.filter(id__in=intern_ids, **base_filters).exclude(project_title__isnull=True).exclude(project_title__exact='')
 
         elif action == 'download_batch':
             batch_id = request.POST.get('batch_id')
             if not batch_id:
                 messages.error(request, "Please filter by a batch first.")
                 return redirect(request.get_full_path())
-            selected_interns = InternProfile.objects.filter(
-                batch_id=batch_id, internship_status='Completed'
-            )
+            interns_to_process = InternProfile.objects.filter(batch_id=batch_id, **base_filters).exclude(project_title__isnull=True).exclude(project_title__exact='')
 
-        # Generate ZIP of LOR PDFs
-        if selected_interns and selected_interns.exists():
+        if interns_to_process and interns_to_process.exists():
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
                 logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
-
-                for intern in selected_interns:
+                for intern in interns_to_process:
                     context = {
                         'intern': intern,
                         "company": {
@@ -972,24 +1005,24 @@ def manage_lor_view(request):
                             "phone": "+914049525396",
                             "website": "www.vindusenvironment.com"
                         },
-                        "today_date": datetime.date.today().strftime("%d-%m-%Y"),
+                        "today_date": date.today().strftime("%d-%m-%Y"),
                         "logo_path": logo_path
                     }
-
                     pdf_bytes = render_to_pdf('lors/lor_template.html', context)
                     if pdf_bytes:
                         filename = f"LOR_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
                         zf.writestr(filename, pdf_bytes)
 
-            selected_interns.update(lor_generated=True)
+            interns_to_process.update(lor_generated=True)
 
             zip_buffer.seek(0)
             response = HttpResponse(zip_buffer, content_type='application/zip')
             response['Content-Disposition'] = 'attachment; filename="Letters_of_Recommendation.zip"'
-            messages.success(request, f"Successfully generated {selected_interns.count()} LORs.")
+            messages.success(request, f"Successfully generated {interns_to_process.count()} new LORs.")
             return response
         else:
-            messages.warning(request, "No completed interns were found for the selected action.")
+            # ✅ MODIFIED: Improved warning message
+            messages.warning(request, "No new LORs to generate. All selected interns are either not 'Completed', have no project title, or already have an LOR.")
             return redirect(request.get_full_path())
 
     context = {
@@ -999,27 +1032,26 @@ def manage_lor_view(request):
     }
     return render(request, 'lors/manage_lors.html', context)
 
-from datetime import datetime
-
 @login_required
 def download_lor_view(request, intern_id):
     """
-    Download a Letter of Recommendation for a specific intern,
-    only if internship is completed and project_title is filled.
+    Downloads a single LOR, but only if conditions are met and one hasn't been generated before.
     """
     intern = get_object_or_404(InternProfile, id=intern_id)
 
-    # Check internship completion
+    # ✅ ADDED: Check if LOR was already generated
+    if intern.lor_generated:
+        messages.warning(request, f"Letter of Recommendation for {intern.user.get_full_name()} has already been generated.")
+        return redirect('manage_lor')
+
     if intern.internship_status != 'Completed':
-        messages.error(request, "LOR not available for this intern yet.")
+        messages.error(request, "LOR is not available as the internship is not complete.")
         return redirect('manage_lor')
 
-    # Check if project_title is filled
     if not intern.project_title or intern.project_title.strip() == "":
-        messages.error(request, "The student hasn't completed the project yet.")
+        messages.error(request, "LOR cannot be generated because the project title is missing.")
         return redirect('manage_lor')
 
-    # Generate PDF only when both conditions are met
     logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
     context = {
         'intern': intern,
@@ -1043,9 +1075,8 @@ def download_lor_view(request, intern_id):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
 
-    messages.error(request, "Error generating LOR PDF.")
+    messages.error(request, "An unexpected error occurred while generating the LOR PDF.")
     return redirect('manage_lor')
-
 
 @login_required
 def intern_list(request):
