@@ -1,115 +1,214 @@
 {% extends "login_base.html" %}
 {% block content %}
 <style>
-/* --- General Styling --- */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f5f6fa;
+    color: #333;
 }
 
 /* Page Title */
 h2 {
-    font-weight: 700;
     color: #5932EA;
-    margin-bottom: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
-/* Grid Layout for Cards */
+/* Assignment Grid: 2 wide cards per row */
 .assignment-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 25px;
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row on desktop */
+    justify-items: stretch;
 }
 
-/* Card Styling */
-.card {
-    border-radius: 20px;
+/* Assignment Card */
+.assignment-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.07);
     transition: transform 0.3s, box-shadow 0.3s;
+    width: 100%;
+}
+
+.assignment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0,0,0,0.12);
+}
+
+/* Header */
+.assignment-header {
+    background-color:#5932EA;
+    padding: 15px 20px;
     display: flex;
     flex-direction: column;
 }
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 30px rgba(0,0,0,0.12);
-}
 
-/* Card Body */
-.card-body {
-    padding: 0px 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex-grow: 1;
-    padding-bottom: 20px;
-    padding-top: 0;
-}
-
-/* Paragraphs inside cards with transparent background */
-.card-body p {
-    background: rgba(89, 50, 234, 0.05); /* subtle purple */
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin: 0;
-    color: #333;
-}
-
-/* Card Title */
-.card-title {
+.assignment-title {
+    font-size: 1.4rem;
     font-weight: 700;
-    color: #4727B2;
-    margin-bottom: 12px;
-    font-size: 1.25rem;
+    color: #fff;
 }
 
-/* Links inside cards */
-.card-body a {
-    text-decoration: none;
-    color: #5932EA;
-    font-weight: 500;
-    transition: 0.3s;
+/* Middle Body */
+.assignment-body {
+    background-color: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
-.card-body a:hover {
-    color: #4727B2;
+
+.assignment-desc {
+    font-size: 1rem;
+    color: #555;
+}
+
+.assignment-meta {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.assignment-file a {
+    color: #5932EA;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.assignment-file a:hover {
     text-decoration: underline;
 }
 
-/* Buttons */
-.btn-primary {
-    background-color: #5932EA;
-    border: none;
-    padding: 8px 18px;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: 0.3s;
-    align-self: flex-start;
-}
-.btn-primary:hover {
-    background-color: #4727B2;
+/* Footer Section */
+.assignment-footer {
+    background-color: #eef5ff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-/* Responsive */
-@media(max-width: 576px){
-    .card-body {
-        padding: 0px 12px;
-        padding-bottom: 10px;
-    }
+/* Progress Bar in Footer */
+.footer-progress-wrapper {
+    flex: 1 1 150px;
+    min-width: 120px;
+    height: 35px;
+    background-color: #e0e0e0;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-progress-bar {
+    height: 100%;
+    border-radius: 14px;
+    transition: width 0.5s ease-in-out;
+}
+
+.footer-progress-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Buttons */
+.assignment-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.assignment-actions a.btn {
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Submit Button */
+.btn-submit {
+    background: #5932EA;
+}
+
+.btn-submit:hover {
+    background: #4727B2;
+    transform: translateY(-2px);
+}
+
+/* View Submission Button */
+.btn-view {
+    background: #27AE60;
+}
+
+.btn-view:hover {
+    background: #1e8449;
+    transform: translateY(-2px);
+}
+
+/* Responsive: below 770px, single column */
+@media (max-width: 770px) {
     .assignment-grid {
-        grid-template-columns: 1fr;
-    }
-    .container h2{
-        text-align: center;
+        grid-template-columns: 1fr; /* single column */
     }
 }
-.card-title {
-    background: linear-gradient(90deg, #5932EA, #4727B2); /* beautiful purple gradient */
-    color: #fff;
-    padding: 12px 15px; /* add vertical and horizontal padding */
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin: 0 -25px 10px -25px; /* stretch to card edges */
-    text-align: center;
+
+/* Responsive: below 440px, stack footer bar above buttons */
+@media (max-width: 440px) {
+    .assignment-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .footer-progress-wrapper {
+        width: 100%;
+        margin-bottom: 10px;
+        height: 30px;
+    }
+
+    .assignment-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .assignment-actions a.btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .footer-progress-text {
+        font-size: 0.75rem;
+    }
+}
+
+/* Extremely small screens <= 350px */
+@media (max-width: 350px) {
+    .footer-progress-wrapper {
+        display: none; /* hide bar */
+    }
+    .assignment-footer::after {
+        content: attr(data-status);
+        display: block;
+        text-align: center;
+        font-weight: 600;
+        color: #555;
+        margin-top: 6px;
+    }
 }
 </style>
 
@@ -121,41 +220,58 @@ h2 {
     {% if assignment_data %}
     <div class="assignment-grid">
         {% for data in assignment_data %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ data.assignment.title }}</h5>
+        <div class="assignment-card">
+            <!-- Header -->
+            <div class="assignment-header">
+                <div class="assignment-title">{{ data.assignment.title }}</div>
+            </div>
 
-                <p class="card-text">{{ data.assignment.description }}</p>
-                <p><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</p>
-
+            <!-- Middle Body -->
+            <div class="assignment-body">
+                <div class="assignment-desc">{{ data.assignment.description }}</div>
+                <div class="assignment-meta"><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</div>
                 {% if data.assignment.file %}
-                    <p><strong>Assignment File:</strong> 
-                        <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
-                    </p>
+                <div class="assignment-file">
+                    <strong>File:</strong> <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
+                </div>
                 {% endif %}
+                {% if data.is_submitted and data.is_graded %}
+                <div class="assignment-meta"><strong>Score:</strong> {{ data.score }} | <strong>Feedback:</strong> {{ data.feedback }}</div>
+                {% endif %}
+            </div>
 
-                {% if data.is_submitted %}
-                    <p style="background-color: rgb(214, 255, 218);"><strong>Status:</strong> ✅ Submitted</p>
-                    <p><strong>Your Submission:</strong> 
-                        <a href="{{ data.submission.file.url }}" target="_blank">View File</a>
-                    </p>
-                    
-                    {% if data.is_graded %}
-                        <p style="background-color: #f7ecb9;"><strong>Score:</strong> {{ data.score }}</p>
-                        <p><strong>Feedback:</strong> {{ data.feedback }}</p>
+            <!-- Footer: Progress Bar + Buttons -->
+            <div class="assignment-footer"
+                 data-status="{% if data.is_submitted %}{% if data.is_graded %}Graded ✅{% else %}Submitted, Awaiting Grading ⏳{% endif %}{% else %}Not Submitted ❌{% endif %}">
+
+                <div class="footer-progress-wrapper">
+                    {% if data.is_submitted %}
+                        {% if data.is_graded %}
+                            <div class="footer-progress-bar" style="width:100%; background:#27AE60;"></div>
+                            <div class="footer-progress-text">Graded ✅</div>
+                        {% else %}
+                            <div class="footer-progress-bar" style="width:50%; background:#F39C12;"></div>
+                            <div class="footer-progress-text">Submitted, Awaiting Grading ⏳</div>
+                        {% endif %}
                     {% else %}
-                        <p style="background-color: rgb(255, 255, 171);"><strong>Status:</strong> ⏳ Submitted, awaiting grading.</p>
+                        <div class="footer-progress-bar" style="width:0%; background:#E74C3C;"></div>
+                        <div class="footer-progress-text">Not Submitted ❌</div>
                     {% endif %}
-                {% else %}
-                    <p style="background-color:rgb(255, 236, 236) ;"><strong>Status:</strong> ❌ Not Submitted</p>
-                    <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-primary mt-2" style="color: #f5f6fa;text-decoration: none;">Submit Assignment</a>
-                {% endif %}
+                </div>
+
+                <div class="assignment-actions">
+                    {% if data.is_submitted %}
+                        <a href="{{ data.submission.file.url }}" target="_blank" class="btn btn-view">View Submission</a>
+                    {% else %}
+                        <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-submit">Submit</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-        <p>No assignments found.</p>
+        <p style="text-align:center; color:#666; font-weight:500; margin-top:40px;">No assignments found.</p>
     {% endif %}
 </div>
 </div>
