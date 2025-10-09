@@ -1,293 +1,419 @@
-{% extends 'login_base.html' %}
+{% extends "login_base.html" %}
+{% block content %}
 {% load static %}
 
-{% block content %}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-:root {
-    /* Primary Brand Colors */
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-light: #eef2ff;
-    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
-    
-    /* Success Colors */
-    --success: #10B981;
-    --success-hover: #10B981;
-    --success-light: #d1fae5;
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    
-    /* Info Colors */
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-    
-    /* Warning Colors */
-    --warning: #FBBF24;
-    --warning-light: #fef3c7;
-    
-    /* Neutral Colors */
-    --background: #f8fafc;
-    --background-secondary: #f1f5f9;
-    --card-bg: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --text-tertiary: #94a3b8;
-    --border: #e2e8f0;
-    --border-hover: #cbd5e1;
-    
-    /* Shadows */
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    
-    /* Glow Effects */
-    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
-    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
-    
-    /* Transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 0.75rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-    
-    /* Border Radius */
-    --radius-sm: 0.5rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-}
-
+/* --- Fonts & General --- */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--background);
-    color: var(--text-primary);
+    background-color: #f5f6fa;
     margin: 0;
-    line-height: 1.6;
+    padding: 0;
 }
-
 .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: var(--spacing-2xl) var(--spacing-md);
+    width: 100%;
+    max-width: 100%;
+    padding: 0 2%;
+    box-sizing: border-box;
 }
 
-h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-lg);
+.page-title {
+    font-weight: 700;
+    color: #5932EA;
+    font-size: 1.8rem;
 }
 
-.form-group {
+/* Header + Filter in one row */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+.header-row h2 {
+    margin: 0;
+}
+
+/* Batch Selection Card */
+.batch-card {
+    border-radius: 20px;
+    background: rgba(255,255,255,0.9);
+    padding: 10px 25px;
+    backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
+    gap: 15px;
+    justify-content: flex-end;
+    flex-grow: 1;
+    max-width: 600px;
 }
 
-.form-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 0;
+/* Select and Button Styling */
+select.form-select {
+    border-radius: 12px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    flex-grow: 1;
 }
-
-.form-select {
-    width: 200px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    background-color: var(--background-secondary);
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right var(--spacing-sm) center;
-    background-size: 1.5rem;
-}
-
-.form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
-    outline: none;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color var(--transition-base), transform var(--transition-fast);
-    cursor: pointer;
-}
-
 .btn-primary {
-    background: var(--primary-gradient);
-    color: #ffffff;
+    background-color: #5932EA;
     border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: 0.3s;
+    font-size: 14px;
 }
-
 .btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
+    background-color: #4727B2;
 }
 
-.btn-primary:active {
-    transform: translateY(0);
+/* Scoreboard Card */
+.scoreboard-card {
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    width: 100%;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
-.table-responsive {
-    overflow-x: auto;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    background-color: var(--card-bg);
-}
-
-.table {
+/* Table */
+.scoreboard-card table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: 0;
 }
-
-.table thead {
-    background: var(--primary-gradient);
-    color: #ffffff;
-}
-
-.table thead th {
-    font-weight: 500;
-    padding: var(--spacing-md);
-    text-align: left;
-    font-size: 0.875rem;
-}
-
-.table tbody tr {
-    transition: background-color var(--transition-base);
-}
-
-.table tbody tr:hover {
-    background-color: var(--primary-light);
-}
-
-.table tbody td {
-    padding: var(--spacing-md);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.875rem;
-    color: var(--text-primary);
-}
-
-.table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.empty-state {
-    font-size: 1rem;
-    color: var(--text-secondary);
+.scoreboard-card thead th {
+    background: linear-gradient(90deg, #5932EA, #4727B2);
+    color: #fff;
+    font-weight: 700;
+    padding: 16px;
     text-align: center;
-    padding: var(--spacing-xl);
-    background-color: var(--background-secondary);
-    border-radius: var(--radius-md);
+    font-size: 14px;
+}
+.scoreboard-card tbody td {
+    padding: 14px;
+    text-align: center;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: 0.3s;
+}
+.scoreboard-card tbody tr:hover td {
+    background: rgba(89,50,234,0.08);
+    transform: scale(1.01);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: var(--spacing-lg) var(--spacing-sm);
-    }
+/* Badges */
+.badge {
+    padding: 6px 14px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.badge-total { background-color: #5932EA; }
+.badge-secured { background-color: #27AE60; }
+.badge-submitted { background-color: #F39C12; }
 
-    h2 {
-        font-size: 1.5rem;
-    }
+/* Default Box */
+.default-box {
+    border-radius: 12px;
+    border: 2px dashed #5932EA;
+    background-color: #fff;
+    padding: 40px 20px;
+    margin-top: 20px;
+}
 
-    .form-group {
+/* Analytics Section */
+.analytics {
+    margin-top: 40px;
+    width: 100%;
+}
+.analytics h4 {
+    color: #5932EA;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Chart Layout */
+.chart-full {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.chart-row-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+    width: 100%;
+}
+.chart-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 100%;
+
+}
+
+/* Default Analytics Image */
+.analytics-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+.analytics-placeholder img {
+    max-width: 420px;
+    width: 100%;
+    opacity: 0.9;
+}
+.analytics-placeholder p {
+    color: #666;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* Scrollable table only on smaller screens */
+.table-responsive-wrapper {
+    width: 100%;
+}
+@media (max-width: 992px) {
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table-responsive-wrapper table {
+        min-width: 700px;
+    }
+}
+
+/* Responsive Fixes */
+@media (max-width: 992px) {
+    .header-row {
         flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-sm);
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
     }
-
-    .form-select {
+    .batch-card {
         width: 100%;
+        justify-content: center;
     }
-
-    .btn {
-        width: 100%;
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-
-    .table thead th,
-    .table tbody td {
-        padding: var(--spacing-sm);
-        font-size: 0.75rem;
+    .page-title {
+        text-align: center;
     }
 }
 
-@media (max-width: 576px) {
-    .table-responsive {
-        font-size: 0.75rem;
-    }
-
-    .table thead th,
-    .table tbody td {
-        padding: var(--spacing-xs);
-    }
-}
 </style>
 
-<div class="container">
-    <h2>Batch Assessment Scores</h2>
-    <form method="get" class="form-group">
-        <label for="batch" class="form-label">Select Batch:</label>
-        <select name="batch_id" id="batch" class="form-select">
-            <option value="">-- Select Batch --</option>
-            {% for b in batches %}
-                <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
-                    {{ b.name }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary">View Scores</button>
-    </form>
+<div class="main-content">
+    <div class="container">
 
-    {% if scoreboard %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Intern</th>
-                        <th>Total Assessments</th>
-                        <th>Submitted</th>
-                        <th>Total Score</th>
-                        <th>Score Secured</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in scoreboard %}
+        <!-- Page Header + Filter -->
+        <div class="header-row">
+            <div>
+                <h2 class="page-title">Batch Assessment Scores</h2>
+                <p class="text-muted mb-0">Professional insights into intern submissions and scores</p>
+            </div>
+            <form method="get" class="batch-card">
+                <select name="batch_id" id="batch" class="form-select" required>
+                    <option value="">-- Select Batch --</option>
+                    {% for b in batches %}
+                        <option value="{{ b.id }}" {% if selected_batch and b.id == selected_batch.id %}selected{% endif %}>
+                            {{ b.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">View</button>
+            </form>
+        </div>
+
+        {% if selected_batch %}
+        {% if scoreboard %}
+        <!-- Scoreboard Table -->
+        <div class="card scoreboard-card">
+            <div class="card-header text-center" style="padding: 20px; color:#5932EA; font-weight:700;">
+                Scores for Batch: {{ selected_batch.name }}
+            </div>
+            <div class="table-responsive-wrapper">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Intern</th>
+                            <th>Total Assessments</th>
+                            <th>Submitted</th>
+                            <th>Total Score</th>
+                            <th>Score Secured</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in scoreboard %}
                         <tr>
                             <td>{{ row.intern.user.get_full_name|default:row.intern.unique_id }}</td>
-                            <td>{{ row.total_assessments }}</td>
-                            <td>{{ row.submitted_count }}</td>
-                            <td>{{ row.total_possible_score }}</td>
-                            <td>{{ row.score_secured }}</td>
+                            <td><span class="badge badge-total">{{ row.total_assessments }}</span></td>
+                            <td><span class="badge badge-submitted">{{ row.submitted_count }}</span></td>
+                            <td><span class="badge badge-total">{{ row.total_possible_score }}</span></td>
+                            <td><span class="badge badge-secured">{{ row.score_secured }}</span></td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    {% elif selected_batch %}
-        <p class="empty-state">No submissions found for this batch.</p>
-    {% endif %}
+
+        <!-- Analytics Section -->
+        <div class="analytics">
+            <h4>Performance Analytics</h4>
+
+            <!-- Bar Chart Full Row -->
+            <div class="chart-full">
+                <div class="chart-box">
+                    <h6>Top Performer</h6>
+                    <canvas id="topPerformerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Two Pie Charts -->
+            <!-- Two Pie Charts -->
+<div class="chart-row-2">
+    <div class="chart-box" style="max-height: 400px;margin: 0 auto; ">
+        <h6>Score Completion Rate</h6>
+        <canvas id="completionChart" style="margin: 0 auto;"></canvas>
+    </div>
+    <div class="chart-box" style="max-height: 400px;">
+        <h6>Submission Rate</h6>
+        <canvas id="submissionChart" style="margin: 0 auto;"></canvas>
+    </div>
 </div>
+        </div>
+
+        {% else %}
+        <div class="default-box">No submissions found for this batch.</div>
+        {% endif %}
+        {% else %}
+        <div class="card shadow-sm text-center default-box">
+            <div class="card-body">
+                <h5 class="card-title">Please select a batch to view scores</h5>
+                <p class="text-muted">The scoreboard will appear here once a batch is selected.</p>
+            </div>
+        </div>
+        <div class="analytics-placeholder">
+                        <p>Analytics will appear here once available.</p>
+
+            <img src="{% static 'images/analytics.png' %}" alt="Analytics Placeholder">
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Chart.js + plugin -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+<script>
+{% if scoreboard %}
+    // --- Top Performer Bar Chart with different colors ---
+    const topPerformerLabels = [{% for row in scoreboard %}'{{ row.intern.user.get_full_name|default:row.intern.unique_id }}',{% endfor %}];
+
+    const colors = [
+        '#5932EA', '#27AE60', '#F39C12', '#E74C3C', '#3498DB', '#9B59B6', '#1ABC9C', '#F1C40F'
+    ];
+    const barColors = topPerformerLabels.map((_, index) => colors[index % colors.length]);
+
+    const topPerformerData = {
+        labels: topPerformerLabels,
+        datasets: [{
+            label: 'Scores',
+            data: [{% for row in scoreboard %}{{ row.score_secured }},{% endfor %}],
+            backgroundColor: barColors
+        }]
+    };
+
+    new Chart(document.getElementById('topPerformerChart'), {
+        type: 'bar',
+        data: topPerformerData,
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // --- Calculate Totals ---
+    let totalScoreSecured = 0;
+    let totalPossibleScore = 0;
+    let totalSubmitted = 0;
+    let totalAssessments = 0;
+    {% for row in scoreboard %}
+        totalScoreSecured += {{ row.score_secured }};
+        totalPossibleScore += {{ row.total_possible_score }};
+        totalSubmitted += {{ row.submitted_count }};
+        totalAssessments += {{ row.total_assessments }};
+    {% endfor %}
+    let scoreRemaining = totalPossibleScore - totalScoreSecured;
+    let totalPending = totalAssessments - totalSubmitted;
+
+    // --- Score Completion Rate Pie Chart ---
+    new Chart(document.getElementById('completionChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Secured', 'Remaining'],
+            datasets: [{
+                data: [totalScoreSecured, scoreRemaining],
+                backgroundColor: ['#1ABC9C', '#E67E22'] // Green for secured, Orange for remaining
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => {
+                        let sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        return ((value / sum) * 100).toFixed(1) + '%';
+                    },
+                    font: { weight: 'bold', size: 12 }
+                },
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // --- Submission Rate Pie Chart ---
+    new Chart(document.getElementById('submissionChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Submitted', 'Pending'],
+            datasets: [{
+                data: [totalSubmitted, totalPending],
+                backgroundColor: ['#3498DB', '#E74C3C'] // Blue for submitted, Red for pending
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    formatter: (value, context) => {
+                        let sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        return ((value / sum) * 100).toFixed(1) + '%';
+                    },
+                    font: { weight: 'bold', size: 12 }
+                },
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+{% endif %}
+</script>
+
 {% endblock %}

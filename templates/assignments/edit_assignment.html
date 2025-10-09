@@ -1,45 +1,247 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Assignment</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label>Title</label>
-            <input type="text" name="title" value="{{ assignment.title }}" class="form-control" required>
+{% load static %}
+
+<style>
+/* === Global Reset & Base === */
+* { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background: #f5f6fa; margin: 0; padding: 0; }
+
+/* === Form Container === */
+.assignment-form-container {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* === Card === */
+.assignment-card {
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    display: flex;
+    flex-wrap: wrap;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.assignment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.12);
+}
+
+/* === Left (Form Section) === */
+.assignment-card-left {
+    flex: 1 1 55%;
+    padding: 45px 35px;
+}
+
+/* === Header === */
+.assignment-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    background-color: #5932EA;
+    padding: 15px 20px;
+    border-radius: 12px;
+    color: white;
+}
+.assignment-card-header i {
+    font-size: 32px;
+}
+.assignment-card-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* === Form Fields === */
+.assignment-card-left form p {
+    position: relative;
+    margin-bottom: 22px;
+    width: 100%;
+}
+.assignment-card-left form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+.assignment-card-left form input,
+.assignment-card-left form select,
+.assignment-card-left form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #fafafa;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.assignment-card-left form input:focus,
+.assignment-card-left form select:focus,
+.assignment-card-left form textarea:focus {
+    border-color: #5932EA;
+    box-shadow: 0 0 12px rgba(89,50,234,0.15);
+    outline: none;
+}
+
+/* === File Wrapper === */
+.file-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: #f3f4f6;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+.file-wrapper span {
+    flex: 1 1 auto;
+    word-break: break-word;
+    font-size: 14px;
+    color: #555;
+}
+
+/* === Buttons === */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+.btn-update {
+    background: #5932EA;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 130px;
+}
+.btn-update:hover {
+    background: #4c28d1;
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    flex: 1 1 auto;
+    min-width: 130px;
+}
+.btn-cancel:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+.assignment-card-right {
+    flex: 1 1 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+/* Make image taller and responsive */
+
+@media (max-width: 768px) {
+    .assignment-card {
+        flex-direction: column; /* stack form + image vertically */
+    }
+    .assignment-card-left {
+        flex: 1 1 100%;
+        padding: 30px 20px;
+    }
+    .assignment-card-right {
+        flex: 1 1 100%;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+}
+</style>
+
+<div class="main-content">
+<div class="assignment-form-container">
+    <div class="assignment-card">
+        
+        <!-- Left Side (Form) -->
+        <div class="assignment-card-left">
+            <div class="assignment-card-header">
+                <i class="fas fa-tasks"></i>
+                <h2>Edit Assignment</h2>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <p>
+                    <label>Title</label>
+                    <input type="text" name="title" value="{{ assignment.title }}" required>
+                </p>
+
+                <p>
+                    <label>Description</label>
+                    <textarea name="description">{{ assignment.description }}</textarea>
+                </p>
+
+                <p>
+                    <label>Batch</label>
+                    <select name="batch" required>
+                        {% for batch in batches %}
+                            <option value="{{ batch.id }}" {% if batch.id == assignment.batch.id %}selected{% endif %}>
+                                {{ batch.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </p>
+
+                <p>
+                    <label>Deadline</label>
+                    <input type="datetime-local" name="deadline" value="{{ assignment.deadline|date:'Y-m-d\\TH:i' }}" required>
+                </p>
+
+                <p>
+                    <label>File (Optional)</label>
+                    {% if assignment.file %}
+                        <div class="file-wrapper">
+                            <span>Current file: <a href="{{ assignment.file.url }}" target="_blank">View</a></span>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="file">
+                </p>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn-update">Update</button>
+                    <a href="{% url 'view_assignments' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
         </div>
 
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea name="description" class="form-control">{{ assignment.description }}</textarea>
-        </div>
+        <!-- Right Side (Image) -->
+        
 
-        <div class="mb-3">
-            <label>Batch</label>
-            <select name="batch" class="form-select" required>
-                {% for batch in batches %}
-                    <option value="{{ batch.id }}" {% if batch.id == assignment.batch.id %}selected{% endif %}>
-                        {{ batch.name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Deadline</label>
-            <input type="datetime-local" name="deadline" value="{{ assignment.deadline|date:'Y-m-d\\TH:i' }}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>File (Optional)</label>
-            {% if assignment.file %}
-                <p>Current file: <a href="{{ assignment.file.url }}" target="_blank">View</a></p>
-            {% endif %}
-            <input type="file" name="file" class="form-control">
-        </div>
-
-        <button type="submit" class="btn btn-success">Update</button>
-        <a href="{% url 'view_assignments' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
+</div>
 </div>
 {% endblock %}

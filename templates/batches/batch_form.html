@@ -188,6 +188,29 @@
             line-height: 1.6;
         }
         
+        /* Date input specific styling */
+        input[type="date"].form-control-modern {
+            position: relative;
+            padding-right: 45px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        /* Remove default calendar icon in some browsers */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            color: transparent;
+            background: transparent;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
         .field-icon {
             position: absolute;
             right: 15px;
@@ -195,7 +218,8 @@
             color: var(--dark-gray);
             font-size: 1rem;
             transition: all 0.3s ease;
-            z-index: 3;
+            z-index: 1; /* Lower z-index to not interfere with date picker */
+            pointer-events: none; /* Make icon non-interactive */
         }
         
         .form-control-modern:focus + .field-icon {
@@ -497,6 +521,8 @@
                 
                 if (input.type === 'date') {
                     input.classList.add('form-control-modern');
+                    // Ensure date inputs have proper padding for calendar icon
+                    input.style.paddingRight = '45px';
                 }
             });
             
@@ -526,6 +552,27 @@
                         this.style.borderColor = '#e2e8f0';
                     }
                 });
+            });
+            
+            // Fix for date input fields - ensure calendar picker is fully clickable
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                // Create a wrapper to ensure the calendar picker is fully accessible
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.display = 'inline-block';
+                wrapper.style.width = '100%';
+                
+                // Wrap the input
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+                
+                // Make sure the calendar icon doesn't interfere with date picker
+                const icon = input.nextElementSibling;
+                if (icon && icon.classList.contains('field-icon')) {
+                    icon.style.zIndex = '1';
+                    icon.style.pointerEvents = 'none';
+                }
             });
         });
     </script>

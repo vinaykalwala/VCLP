@@ -1,260 +1,421 @@
-{% extends 'login_base.html' %}
-{% load static %}
-
+{% extends "login_base.html" %}
 {% block content %}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-:root {
-    /* Primary Brand Colors */
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-light: #eef2ff;
-    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
-    
-    /* Success Colors */
-    --success: #10B981;
-    --success-hover: #10B981;
-    --success-light: #d1fae5;
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    
-    /* Info Colors */
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-    
-    /* Warning Colors */
-    --warning: #FBBF24;
-    --warning-light: #fef3c7;
-    
-    /* Neutral Colors */
-    --background: #f8fafc;
-    --background-secondary: #f1f5f9;
-    --card-bg: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --text-tertiary: #94a3b8;
-    --border: #e2e8f0;
-    --border-hover: #cbd5e1;
-    
-    /* Shadows */
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    
-    /* Glow Effects */
-    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
-    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
-    
-    /* Transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 0.75rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-    
-    /* Border Radius */
-    --radius-sm: 0.5rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
+/* Header Card */
+.mcq-header-card {
+    background: linear-gradient(135deg, #5932EA, #8C5CFF);
+    color: #fff;
+    padding: 20px 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background);
-    color: var(--text-primary);
+.mcq-header-card h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
     margin: 0;
-    line-height: 1.6;
 }
 
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: var(--spacing-2xl) var(--spacing-md);
-}
-
-.card {
-    background-color: var(--card-bg);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    padding: var(--spacing-xl);
-    transition: box-shadow var(--transition-base);
-}
-
-.card:hover {
-    box-shadow: var(--shadow-lg);
-}
-
-h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.total-marks {
+.mcq-header-card .marks-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
     font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-lg);
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.mcq-group {
-    margin-bottom: var(--spacing-xl);
-    padding: var(--spacing-md);
-    background-color: var(--background-secondary);
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-base);
+/* MCQ Form */
+.mcq-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
-.mcq-group:hover {
-    background-color: var(--primary-light);
+/* MCQ Card */
+.mcq-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 5px solid #5932EA;
 }
 
+.mcq-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* Question Text */
 .mcq-question {
-    font-size: 1.125rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #222;
+    margin-bottom: 18px;
 }
 
+/* Options */
 .mcq-options {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 12px;
 }
 
 .mcq-option {
+    background-color: #f5f5f5;
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, border 0.2s;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 1rem;
-    color: var(--text-primary);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    transition: background-color var(--transition-base);
+    gap: 10px;
+    border: 1px solid transparent;
 }
 
 .mcq-option:hover {
-    background-color: var(--primary-light);
+    background-color: #eef0ff;
+    transform: translateY(-1px);
+    border-color: #5932EA;
 }
 
+/* Radio Button */
 .mcq-option input[type="radio"] {
-    accent-color: var(--primary);
-    width: 1.25rem;
-    height: 1.25rem;
-    margin: 0;
-    cursor: pointer;
+    accent-color: #5932EA;
+    width: 18px;
+    height: 18px;
 }
 
+/* Selected Option */
+.mcq-option input[type="radio"]:checked + label {
+    font-weight: 600;
+    color: #5932EA;
+    background-color: #eef0ff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    flex: 1;
+}
+
+/* Label Styling */
 .mcq-option label {
+    font-size: 0.95rem;
+    color: #555;
     cursor: pointer;
-    flex-grow: 1;
+    flex: 1;
+    margin: 0;
 }
 
-.btn {
-    display: inline-flex;
+/* Submit Button */
+.mcq-submit-btn {
+    background-color: #5932EA;
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 30px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    align-self: flex-start;
+    margin-top: 10px;
+}
+
+.mcq-submit-btn:hover {
+    background-color: #4727B2;
+    transform: translateY(-2px);
+}
+
+/* Warning Modal */
+.warning-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background-color var(--transition-base), transform var(--transition-fast);
-    cursor: pointer;
 }
 
-.btn-success {
-    background: var(--success-gradient);
-    color: #ffffff;
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+.modal-message {
+    color: #555;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-btn {
+    background-color: #5932EA;
+    color: white;
     border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.btn-success:hover {
-    background: var(--success);
-    transform: translateY(-1px);
+.modal-btn:hover {
+    background-color: #4727B2;
 }
 
-.btn-success:active {
-    transform: translateY(0);
+/* Attempt Counter */
+.attempt-counter {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 15px;
+    font-weight: 500;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: var(--spacing-lg) var(--spacing-sm);
-    }
-
-    .card {
-        padding: var(--spacing-lg);
-    }
-
-    h2 {
-        font-size: 1.5rem;
+/* Responsive */
+@media (max-width: 480px) {
+    .mcq-card {
+        padding: 20px;
     }
 
     .mcq-question {
         font-size: 1rem;
     }
 
-    .btn {
-        padding: var(--spacing-xs) var(--spacing-md);
-        font-size: 0.875rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .mcq-option {
-        font-size: 0.875rem;
+    .mcq-option label {
+        font-size: 0.9rem;
     }
 
-    .btn {
+    .mcq-submit-btn {
         width: 100%;
-        padding: var(--spacing-sm) var(--spacing-md);
+        text-align: center;
+    }
+
+    .mcq-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .mcq-header-card .marks-badge {
+        align-self: flex-start;
+    }
+
+    .modal-content {
+        padding: 20px;
+        margin: 20px;
     }
 }
 </style>
 
-<div class="container">
-    <div class="card">
-        <h2>{{ assessment.title }}</h2>
-        <p class="total-marks">Total Marks: {{ assessment.total_marks }}</p>
-        <form method="post">
+<div class="main-content">
+    <div class="container">
+        <!-- Header -->
+        <div class="mcq-header-card">
+            <h2>{{ assessment.title }}</h2>
+            <div class="marks-badge">Total Marks: {{ assessment.total_marks }}</div>
+        </div>
+
+        <!-- MCQ Form -->
+        <form method="post" class="mcq-form" id="mcqForm">
             {% csrf_token %}
             {% for mcq in mcqs %}
-                <div class="mcq-group">
-                    <p class="mcq-question"><strong>{{ forloop.counter }}. {{ mcq.question_text }}</strong></p>
+                <div class="mcq-card">
+                    <p class="mcq-question">{{ forloop.counter }}. {{ mcq.question_text }}</p>
                     <div class="mcq-options">
+                        {% if mcq.option_1 %}
                         <div class="mcq-option">
-                            <input type="radio" name="mcq_{{ mcq.id }}" value="1" id="mcq_{{ mcq.id }}_1">
+                            <input type="radio" id="mcq_{{ mcq.id }}_1" name="mcq_{{ mcq.id }}" value="1" required>
                             <label for="mcq_{{ mcq.id }}_1">{{ mcq.option_1 }}</label>
                         </div>
+                        {% endif %}
+                        {% if mcq.option_2 %}
                         <div class="mcq-option">
-                            <input type="radio" name="mcq_{{ mcq.id }}" value="2" id="mcq_{{ mcq.id }}_2">
+                            <input type="radio" id="mcq_{{ mcq.id }}_2" name="mcq_{{ mcq.id }}" value="2" required>
                             <label for="mcq_{{ mcq.id }}_2">{{ mcq.option_2 }}</label>
                         </div>
+                        {% endif %}
                         {% if mcq.option_3 %}
-                            <div class="mcq-option">
-                                <input type="radio" name="mcq_{{ mcq.id }}" value="3" id="mcq_{{ mcq.id }}_3">
-                                <label for="mcq_{{ mcq.id }}_3">{{ mcq.option_3 }}</label>
-                            </div>
+                        <div class="mcq-option">
+                            <input type="radio" id="mcq_{{ mcq.id }}_3" name="mcq_{{ mcq.id }}" value="3" required>
+                            <label for="mcq_{{ mcq.id }}_3">{{ mcq.option_3 }}</label>
+                        </div>
                         {% endif %}
                         {% if mcq.option_4 %}
-                            <div class="mcq-option">
-                                <input type="radio" name="mcq_{{ mcq.id }}" value="4" id="mcq_{{ mcq.id }}_4">
-                                <label for="mcq_{{ mcq.id }}_4">{{ mcq.option_4 }}</label>
-                            </div>
+                        <div class="mcq-option">
+                            <input type="radio" id="mcq_{{ mcq.id }}_4" name="mcq_{{ mcq.id }}" value="4" required>
+                            <label for="mcq_{{ mcq.id }}_4">{{ mcq.option_4 }}</label>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="mcq-submit-btn">Submit Assessment</button>
+            <div class="attempt-counter" id="attemptCounter">
+                Tab Switch Attempts: <span id="attemptCount">0</span>/3
+            </div>
         </form>
     </div>
 </div>
+
+<!-- Warning Modal -->
+<div class="warning-modal" id="warningModal">
+    <div class="modal-content">
+        <div class="modal-icon">⚠️</div>
+        <h3 class="modal-title">Warning</h3>
+        <p class="modal-message" id="modalMessage">
+            You are not allowed to perform this action during the assessment. This is your first warning.
+        </p>
+        <button type="button" class="modal-btn" id="understandBtn">I Understand</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('mcqForm');
+    const warningModal = document.getElementById('warningModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const understandBtn = document.getElementById('understandBtn');
+    const attemptCountElement = document.getElementById('attemptCount');
+    
+    let tabSwitchCount = 0;
+    let isSubmitting = false;
+
+    function showWarning(message) {
+        tabSwitchCount++;
+        attemptCountElement.textContent = tabSwitchCount;
+
+        modalMessage.textContent = message;
+        warningModal.style.display = 'flex';
+
+        if (tabSwitchCount >= 3 && !isSubmitting) {
+            setTimeout(() => {
+                isSubmitting = true;
+                form.submit();
+            }, 2000);
+        }
+    }
+
+    // Disable back button
+    history.pushState(null, null, location.href);
+    window.onpopstate = function(event) {
+        history.go(1);
+        showWarning(tabSwitchCount === 0 ? 
+            'Back navigation is not allowed during the assessment. This is your first warning.' :
+            tabSwitchCount === 1 ? 
+            'Second warning! Going back is prohibited. One more attempt will result in automatic submission.' :
+            'Final warning! The assessment will be automatically submitted due to multiple navigation attempts.'
+        );
+    };
+// Warn on any link clicks
+document.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        if (!isSubmitting) {
+            e.preventDefault();
+            showWarning(tabSwitchCount === 0 ? 
+                'Navigation to another page is disabled during the assessment. This is your first warning.' :
+                tabSwitchCount === 1 ? 
+                'Second warning! Navigation is prohibited. One more attempt will result in automatic submission.' :
+                'Final warning! The assessment will be automatically submitted due to multiple prohibited actions.'
+            );
+        }
+    });
+});
+
+    // Tab switch detection
+    function handleVisibilityChange() {
+        if (document.hidden && !isSubmitting) {
+            showWarning(tabSwitchCount === 0 ? 
+                'You are not allowed to switch tabs or open other applications during the assessment. This is your first warning.' :
+                tabSwitchCount === 1 ? 
+                'Second warning! Switching tabs is prohibited. One more attempt will result in automatic submission.' :
+                'Final warning! The assessment will be automatically submitted due to multiple tab switch attempts.'
+            );
+        }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleVisibilityChange);
+
+    // Modal close
+    understandBtn.addEventListener('click', function() {
+        warningModal.style.display = 'none';
+    });
+
+    // Form submit
+    form.addEventListener('submit', function(e) {
+        isSubmitting = true;
+        const totalQuestions = document.querySelectorAll('.mcq-card').length;
+        const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+
+        if (answeredQuestions < totalQuestions) {
+            e.preventDefault();
+            showWarning(`Please answer all questions before submitting. You have answered ${answeredQuestions} out of ${totalQuestions} questions.`);
+            isSubmitting = false;
+            return false;
+        }
+    });
+
+    // Prevent navigation away
+    window.addEventListener('beforeunload', function(e) {
+        if (!isSubmitting) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    // Disable right-click
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showWarning(tabSwitchCount === 0 ? 
+            'Right-click is disabled during the assessment. This is your first warning.' :
+            tabSwitchCount === 1 ? 
+            'Second warning! Right-click is prohibited. One more attempt will result in automatic submission.' :
+            'Final warning! The assessment will be automatically submitted due to multiple prohibited actions.'
+        );
+    });
+
+    // Disable navigation keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (['F5'].includes(e.key) || (e.ctrlKey && e.key.toLowerCase() === 'r') || 
+            (e.key === 'Backspace' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName))) {
+            e.preventDefault();
+            showWarning(tabSwitchCount === 0 ? 
+                'Keyboard shortcut is disabled during the assessment. This is your first warning.' :
+                tabSwitchCount === 1 ? 
+                'Second warning! Keyboard shortcuts are prohibited. One more attempt will result in automatic submission.' :
+                'Final warning! The assessment will be automatically submitted due to multiple prohibited actions.'
+            );
+        }
+    });
+
+    // Prevent form resubmission
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+});
+</script>
 {% endblock %}

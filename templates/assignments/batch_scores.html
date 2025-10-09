@@ -1,5 +1,6 @@
 {% extends "login_base.html" %}
 {% block content %}
+{% load static %}
 <style>
 /* --- General Page Styling --- */
 .page-title {
@@ -33,35 +34,29 @@
     font-weight: 600;
     text-align: center;
     padding: 12px;
-    border: 1px solid #d0d0d0; /* vertical + horizontal lines */
+    border: 1px solid #d0d0d0;
     vertical-align: middle;
     font-size: 14px;
 }
 
 .scoreboard-card tbody td {
     padding: 12px;
-    border: 1px solid #e0e0e0; /* vertical + horizontal lines */
+    border: 1px solid #e0e0e0;
     vertical-align: middle;
     font-size: 13px;
 }
 
-/* Align numeric columns right */
-
-
-/* Table row striping for even/odd with higher specificity */
 .scoreboard-card tbody tr:nth-child(odd) td {
-    background-color: #fffff !important; /* light gray for odd rows */
+    background-color: #ffffff !important;
 }
 
 .scoreboard-card tbody tr:nth-child(even) td {
-    background-color: #f9f9f9 !important; /* white for even rows */
+    background-color: #f9f9f9 !important;
 }
 
-/* Hover effect */
 .scoreboard-card tbody tr:hover td {
-    background-color: rgba(89, 50, 234, 0.1) !important; /* purple translucent overlay */
+    background-color: rgba(89, 50, 234, 0.1) !important;
 }
-
 
 .progress-wrapper {
     background-color: #e9e9e9;
@@ -73,7 +68,6 @@
 
 .progress-bar {
     height: 100%;
-    background: #5932EA; /* default color, overridden dynamically */
     border-radius: 12px 0 0 12px;
 }
 
@@ -93,7 +87,6 @@
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
-
 /* Default Box */
 .default-box {
     border-radius: 12px;
@@ -101,11 +94,6 @@
     background-color: #fff;
     padding: 40px 20px;
     margin-top: 20px;
-}
-
-/* Text Purple Accent */
-.text-purple {
-    color: #5932EA;
 }
 
 /* Buttons */
@@ -117,6 +105,44 @@
 .btn-primary:hover {
     background-color: #4727B2;
     border-color: #4727B2;
+}
+
+/* Analytics Section */
+.analytics {
+    margin-top: 40px;
+}
+.analytics h4 {
+    color: #5932EA;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+.chart-row-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+.chart-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.analytics-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+.analytics-placeholder img {
+    max-width: 420px;
+    width: 100%;
+    opacity: 0.9;
+}
+.analytics-placeholder p {
+    color: #666;
+    margin-top: 10px;
+    font-weight: 600;
 }
 
 /* Responsive adjustments */
@@ -140,17 +166,15 @@
 <div class="main-content">
     <div class="container">
 
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h2 class="page-title">Batch Scores</h2>
-            <p class="text-muted">View intern assignment scores and completion rates</p>
-        </div>
-
-        <!-- Batch Selection Card -->
-        <div class="card shadow-sm mb-4 batch-card">
-            <div class="card-body">
-                <form method="get" class="row g-3 align-items-center justify-content-center">
-                    <div class="col-md-4">
+        <!-- Header + Batch Card in same row -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <div>
+                <h2 class="page-title">Batch Scores</h2>
+                <p class="text-muted">View intern assignment scores and completion rates</p>
+            </div>
+            <div class="batch-card" style="flex:1 1 300px; margin-left:20px;">
+                <div class="card-body p-2">
+                    <form method="get" class="d-flex gap-2 align-items-center">
                         <select name="batch_id" id="batch_id" class="form-select" required>
                             <option value="">-- Select Batch --</option>
                             {% for batch in batches %}
@@ -159,17 +183,16 @@
                                 </option>
                             {% endfor %}
                         </select>
-                    </div>
-                    <div class="col-md-2 d-grid">
-                        <button type="submit" class="btn btn-primary btn-block">Show Scores</button>
-                    </div>
-                </form>
+                        <button type="submit" class="btn btn-primary">Show</button>
+                    </form>
+                </div>
             </div>
         </div>
 
         {% if selected_batch %}
+        {% if scoreboard %}
         <!-- Scoreboard Card -->
-        <div class="card shadow-sm scoreboard-card">
+        <div class="card shadow-sm scoreboard-card mb-4">
             <div class="card-header bg-white border-0 text-center">
                 <h5 class="mb-0 text-purple" style="padding: 15px 0;">Scores for Batch: {{ selected_batch.name }}</h5>
             </div>
@@ -196,38 +219,145 @@
                             <td>{{ row.total_score }}</td>
                             <td>{{ row.average_score }}</td>
                             <td>
-    <div class="progress-wrapper">
-        <div class="progress-bar" 
-             style="width: {{ row.completion_rate }}%;
-                    background: {% if row.completion_rate < 50 %}#E74C3C
-                                {% elif row.completion_rate < 80 %}#F39C12
-                                {% else %}#27AE60
-                                {% endif %};">
-        </div>
-        <div class="progress-text">{{ row.completion_rate }}%</div>
-    </div>
-</td>
-
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-3">No interns or assignment data found for this batch.</td>
+                                <div class="progress-wrapper">
+                                    <div class="progress-bar" 
+                                         style="width: {{ row.completion_rate }}%;
+                                                background: {% if row.completion_rate < 50 %}#E74C3C
+                                                            {% elif row.completion_rate < 80 %}#F39C12
+                                                            {% else %}#27AE60
+                                                            {% endif %};">
+                                    </div>
+                                    <div class="progress-text">{{ row.completion_rate }}%</div>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics">
+            <h4>Performance Analytics</h4>
+
+            <!-- Top Performer Chart Row -->
+            <div class="chart-row-2 mb-3">
+                <div class="chart-box" style="flex:1 1 100%;">
+                    <h6>Top Performer</h6>
+                    <canvas id="topPerformerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Pie Charts Row -->
+            <div class="chart-row-2">
+               <div class="chart-box">
+    <h6>Average Score Distribution</h6>
+    <canvas id="averageScoreChart"></canvas>
+</div>
+
+                <div class="chart-box">
+                    <h6>Submission Rate</h6>
+                    <canvas id="submissionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         {% else %}
-        <!-- Default Box -->
+        <div class="default-box">No submissions found for this batch.</div>
+        {% endif %}
+        {% else %}
         <div class="card shadow-sm text-center default-box">
             <div class="card-body">
                 <h5 class="card-title">Please select a batch to view scores</h5>
                 <p class="text-muted">The scoreboard will appear here once a batch is selected.</p>
             </div>
         </div>
-        {% endif %}
+        <div class="analytics-placeholder">
+                        <p>Analytics will appear here once available.</p>
 
+            <img src="{% static 'images/analytics.png' %}" alt="Analytics Placeholder">
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<script>
+{% if scoreboard %}
+    const topLabels = [{% for row in scoreboard %}'{{ row.intern.user.get_full_name|default:row.intern.unique_id }}',{% endfor %}];
+    const topData = [{% for row in scoreboard %}{{ row.total_score }},{% endfor %}];
+    const colors = ['#5932EA','#27AE60','#F39C12','#E74C3C','#3498DB','#9B59B6','#1ABC9C','#F1C40F'];
+    const barColors = topLabels.map((_, i) => colors[i % colors.length]);
+
+    new Chart(document.getElementById('topPerformerChart'), {
+        type: 'bar',
+        data: { labels: topLabels, datasets:[{data: topData, backgroundColor: barColors}] },
+        options: { plugins:{ legend:{display:false } }, scales:{ y:{ beginAtZero:true } } }
+    });
+
+    let totalScoreSecured=0;
+    let totalPossibleScore=0;
+    let totalSubmitted=0;
+    let totalAssignments=0;
+
+    // Pass scoreboard data as JS array
+    const scoreboardData = [
+        {% for row in scoreboard %}
+        {
+            total_score: {{ row.total_score }},
+            total_assignments: {{ row.total_assignments }},
+            submitted_count: {{ row.submitted_count }},
+            max_score: {{ row.max_score|default:100 }}
+        },
+        {% endfor %}
+    ];
+
+    scoreboardData.forEach(row => {
+        totalScoreSecured += row.total_score;
+        totalPossibleScore += row.total_assignments * row.max_score;
+        totalSubmitted += row.submitted_count;
+        totalAssignments += row.total_assignments;
+    });
+
+    let remainingScore = totalPossibleScore - totalScoreSecured;
+    let totalPending = totalAssignments - totalSubmitted;
+
+  // Average Score Distribution Pie Chart
+const avgScores = scoreboardData.map(r => r.total_score / (r.total_assignments || 1)); // average per intern
+const avgLabels = topLabels;
+
+new Chart(document.getElementById('averageScoreChart'), {
+    type:'pie',
+    data:{ 
+        labels: avgLabels, 
+        datasets:[{data: avgScores, backgroundColor: barColors}] 
+    },
+    plugins:[ChartDataLabels],
+    options:{ 
+        responsive:true, 
+        plugins:{ 
+            datalabels:{ 
+                color:'#fff', 
+                formatter:(v,c)=>{
+                    let s=c.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); 
+                    return ((v/s)*100).toFixed(1)+'%'; 
+                }, 
+                font:{weight:'bold',size:12}
+            }, 
+            legend:{ position:'bottom'} 
+        } 
+    }
+});
+
+    new Chart(document.getElementById('submissionChart'), {
+        type:'pie',
+        data:{ labels:['Submitted','Pending'], datasets:[{data:[totalSubmitted,totalPending], backgroundColor:['#3498DB','#E74C3C']}] },
+        plugins:[ChartDataLabels],
+        options:{ responsive:true, plugins:{ datalabels:{ color:'#fff', formatter:(v,c)=>{ let s=c.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return ((v/s)*100).toFixed(1)+'%'; }, font:{weight:'bold',size:12}}, legend:{ position:'bottom'} } }
+    });
+{% endif %}
+</script>
+
 {% endblock %}

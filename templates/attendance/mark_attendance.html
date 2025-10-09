@@ -156,6 +156,20 @@
 }
 .back-btn:hover { text-decoration: underline; }
 
+/* ===== Image Container ===== */
+.image-container {
+  margin-top: 25px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 /* ===== Right Panel ===== */
 .right-panel {
   position: fixed;
@@ -307,6 +321,39 @@
     flex: 1 1 100%;
   }
 }
+/* ===== Image Container ===== */
+.image-container {
+  margin-top: 25px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+.image-card {
+  position: relative;
+  width: 100%;
+  max-width: 800px; /* optional max width */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.image-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Light blue overlay */
+.image-card .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(173, 216, 230, 0.2); /* very light blue with 20% opacity */
+  pointer-events: none; /* allows clicks through overlay */
+  border-radius: 12px;
+}
+
 
 </style>
 
@@ -377,6 +424,15 @@
       <div class="back-btn-container">
         <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
       </div>
+
+      <!-- Image Container - Hidden when batch is selected -->
+      <div class="image-container" id="batchImage" {% if selected_batch %}style="display: none;"{% endif %}>
+        <div class = "image-card">
+        <img src="{% static 'images/attendance.png' %}" alt="attendance" />
+        <div class="overlay"></div>
+
+      </div>
+      </div>
     </div>
   </div>
 
@@ -414,6 +470,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const rows = document.querySelectorAll("#attendanceTable tbody tr");
   const mainDateInput = document.querySelector('input[name="date"]');
   const currentDateElement = document.getElementById('current-date');
+  const batchSelect = document.getElementById('batch');
+  const batchImage = document.getElementById('batchImage');
 
   // Update date
   function updateCurrentDate() {
@@ -448,6 +506,15 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   mainDateInput.addEventListener('change', updateCurrentDate);
+
+  // Show/hide image based on batch selection
+  batchSelect.addEventListener('change', function() {
+    if (this.value) {
+      batchImage.style.display = 'none';
+    } else {
+      batchImage.style.display = 'block';
+    }
+  });
 });
 </script>
 {% endblock %}

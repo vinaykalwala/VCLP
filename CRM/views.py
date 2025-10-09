@@ -2415,10 +2415,10 @@ def delete_assessment(request, pk):
 
 
 @login_required
-def view_submissions(request, assessment_id):
+def view_assessments_submissions(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id)
     submissions = assessment.submissions.all()
-    return render(request, "assessments/view_submissions.html", {
+    return render(request, "assessments/view_assessments_submissions.html", {
         "assessment": assessment,
         "submissions": submissions,
     })
@@ -2496,3 +2496,134 @@ def batch_assessment_scores(request):
         "selected_batch": selected_batch,
         "scoreboard": scoreboard,
     })
+
+
+#extra matter not use
+#gvhmj
+#vhmj
+#nm,
+#vnm j
+#hmfrom datetime import datefrom datetime import date
+from django.db.models import Avg
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import (
+    InternProfile, Attendance, Assignment, AssignmentSubmission,
+    Assessment, AssessmentSubmission, LessonFile, RecordedSession, Doubt
+)
+
+def get_doubts_for_user(user):
+    try:
+        intern_profile = user.intern_profile
+    except InternProfile.DoesNotExist:
+        return None
+
+    user_doubts = Doubt.objects.filter(intern=intern_profile)
+    total = user_doubts.count()
+    resolved = user_doubts.filter(resolved=True).count()
+
+    class DoubtSummary:
+        pass
+
+    summary = DoubtSummary()
+    summary.total = total
+    summary.resolved = resolved
+    return summary
+
+@login_required
+def intern_overview(request):
+    if request.user.role.lower() != "intern":
+        return redirect("dashboard")
+    
+    intern_profile = request.user.intern_profile
+    today = date.today()
+    current_month = today.month
+    current_year = today.year
+
+    # --- Attendance ---
+    attendances = Attendance.objects.filter(
+        intern=intern_profile,
+        date__year=current_year,
+        date__month=current_month
+    )
+    present_count = attendances.filter(status='Present').count()
+    absent_count = attendances.filter(status='Absent').count()
+    total_days = attendances.count()
+    percentage = (present_count / total_days * 100) if total_days > 0 else 0
+    monthly_attendance = {
+        "present_count": present_count,
+        "absent_count": absent_count,
+        "total_days": total_days,
+        "percentage": round(percentage, 2)
+    }
+
+    # --- Assignments ---
+    total_assignments = Assignment.objects.count()
+    submitted_assignments_qs = AssignmentSubmission.objects.filter(intern=intern_profile)
+    submitted_assignments = submitted_assignments_qs.count()
+    # Average assignment score
+    avg_assignment_score = submitted_assignments_qs.aggregate(avg_score=Avg('score'))['avg_score'] or 0
+    assignment_summary = {
+        "total": total_assignments,
+        "submitted": submitted_assignments,
+        "pending": total_assignments - submitted_assignments,
+        "avg_score": round(avg_assignment_score, 2)
+    }
+
+    # --- Assessments ---
+    total_assessments = Assessment.objects.count()
+    completed_assessments_qs = AssessmentSubmission.objects.filter(intern=intern_profile)
+    completed_assessments = completed_assessments_qs.count()
+    # Average assessment score
+    avg_assessment_score = completed_assessments_qs.aggregate(avg_score=Avg('score'))['avg_score'] or 0
+    assessment_summary = {
+        "total": total_assessments,
+        "completed": completed_assessments,
+        "pending": total_assessments - completed_assessments,
+        "avg_score": round(avg_assessment_score, 2)
+    }
+
+    # --- Doubts ---
+    doubts = get_doubts_for_user(request.user)
+    pending_doubts = doubts.total - doubts.resolved if doubts else 0
+
+    # --- Lessons & Recorded Sessions ---
+    total_files = LessonFile.objects.count()
+    total_recorded_sessions = RecordedSession.objects.count()
+    recorded_sessions = LessonFile.objects.filter(title__icontains='recorded').count()
+
+    # --- Recent Activities ---
+    recent_activities = []
+    lessons = LessonFile.objects.order_by('-uploaded_at')[:5]
+    for lesson in lessons:
+        recent_activities.append({
+            'icon': 'fas fa-book',
+            'color': 'primary',
+            'text': f'New lesson uploaded: {lesson.title}',
+            'time': lesson.uploaded_at.strftime('%d %b %Y, %I:%M %p')
+        })
+    assessments = Assessment.objects.order_by('-created_at')[:5]
+    for assessment in assessments:
+        recent_activities.append({
+            'icon': 'fas fa-clipboard-check',
+            'color': 'success',
+            'text': f'New assessment created: {assessment.title}',
+            'time': assessment.created_at.strftime('%d %b %Y, %I:%M %p')
+        })
+
+    context = {
+        'today': today.strftime('%Y-%m-%d'),
+        'month_name': today.strftime('%B'),
+        'monthly_attendance': monthly_attendance,
+        'assignment_summary': assignment_summary,
+        'assessment_summary': assessment_summary,
+        'total_files': total_files,
+        'total_recorded_sessions': total_recorded_sessions,
+        'recorded_sessions': recorded_sessions,
+        'recent_activities': recent_activities,
+        'intern_profile': intern_profile,
+        'doubts': doubts,
+        'pending_doubts': pending_doubts,
+    }
+
+    return render(request, "interns/intern_overview.html", context)

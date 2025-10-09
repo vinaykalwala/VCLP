@@ -1,27 +1,140 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
+{% load static %}
+
+<style>
+/* ====== Main Content ====== */
+.main-content h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    border-left: 5px solid #5932EA;
+    padding-left: 10px;
+    margin-top: 15px;
+}
+
+/* ====== Table Section ====== */
+.table-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    padding: 15px;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px 14px;
+    border: 1px solid #eee;
+    border-radius: 5PX;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+}
+
+.custom-table th {
+    background: #5932EA;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    
+}
+
+/* ====== Buttons ====== */
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-warning {
+    background-color: #FBBF24;
+    color: #000;
+}
+
+.btn-warning:hover {
+    background-color: #f59e0b;
+    transform: translateY(-2px);
+}
+
+.btn-download {
+    background-color: #10B981;
+    color: #fff;
+}
+
+.btn-download:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* ====== Responsive Design ====== */
+@media (max-width: 768px) {
+    .main-content h3 {
+        text-align: center;
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .custom-table td .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}
+</style>
+
+<div class="main-content">
     <h3>Submissions for "{{ assignment.title }}"</h3>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Intern</th><th>File</th><th>Submitted</th><th>Score</th><th>Feedback</th><th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for s in submissions %}
-            <tr>
-                <td>{{ s.intern.user.get_full_name }}</td>
-                <td><a href="{{ s.file.url }}" target="_blank">Download</a></td>
-                <td>{{ s.submitted_at|date:"d M Y H:i" }}</td>
-                <td>{{ s.score|default:"-" }}</td>
-                <td>{{ s.feedback|default:"-" }}</td>
-                <td>
-                    <a href="{% url 'grade_submission' s.id %}" class="btn btn-sm btn-warning">Grade</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <div class="table-box">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Intern</th>
+                    <th>File</th>
+                    <th>Submitted</th>
+                    <th>Score</th>
+                    <th>Feedback</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in submissions %}
+                <tr>
+                    <td>{{ s.intern.user.get_full_name }}</td>
+                    <td>
+                        <a href="{{ s.file.url }}" target="_blank" class="btn btn-download">Download</a>
+                    </td>
+                    <td>{{ s.submitted_at|date:"d M Y H:i" }}</td>
+                    <td>{{ s.score|default:"-" }}</td>
+                    <td>{{ s.feedback|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'grade_submission' s.id %}" class="btn btn-warning btn-sm">Grade</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#777; font-style:italic;">No submissions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
 {% endblock %}
