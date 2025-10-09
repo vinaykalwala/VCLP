@@ -1,34 +1,211 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3>Create Assignment</h3>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label>Title</label>
+{% load static %}
+
+<div class="main-content">
+    <div class="main-container">
+  <div class="container">
+    <!-- Assignment Card -->
+    <div class="assignment-wrapper">
+
+      <!-- Header Section -->
+      <div class="assignment-header">
+        <div class="header-content">
+          <h2>Create New Assignment</h2>
+          <p>Fill in the details below to create an assignment for your batch.</p>
+        </div>
+      </div>
+
+      <!-- Body: Form + Image Side by Side -->
+      <div class="assignment-body">
+        <!-- Left: Form -->
+        <form method="POST" enctype="multipart/form-data" class="assignment-form">
+          {% csrf_token %}
+          
+          <div class="form-group">
             <input type="text" name="title" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Description</label>
+            <label class="form-label">Title</label>
+          </div>
+
+          <div class="form-group">
             <textarea name="description" class="form-control"></textarea>
-        </div>
-        <div class="mb-3">
-            <label>Batch</label>
+            <label class="form-label">Description</label>
+          </div>
+
+          <div class="form-group">
             <select name="batch" class="form-control" required>
-                {% for batch in batches %}
-                <option value="{{ batch.id }}">{{ batch.name }}</option>
-                {% endfor %}
+              <option value="" disabled selected>Select Batch</option>
+              {% for batch in batches %}
+              <option value="{{ batch.id }}">{{ batch.name }}</option>
+              {% endfor %}
             </select>
-        </div>
-        <div class="mb-3">
-            <label>File (optional)</label>
+            <label class="form-label">Batch</label>
+          </div>
+
+          <div class="form-group">
             <input type="file" name="file" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label>Deadline</label>
+            <label class="form-label">Upload File (optional)</label>
+          </div>
+
+          <div class="form-group">
             <input type="datetime-local" name="deadline" class="form-control" required>
+            <label class="form-label">Deadline</label>
+          </div>
+
+          <button type="submit" class="btn-submit">Create Assignment</button>
+        </form>
+
+        <!-- Right: Image -->
+        <div class="assignment-image-side">
+          <img src="{% static 'images/create.png' %}" alt="Assignment Illustration">
         </div>
-        <button type="submit" class="btn btn-success">Create</button>
-    </form>
+      </div>
+
+    </div>
+  </div>
 </div>
+</div>
+<style>
+.main-container {
+  font-family: 'Inter', sans-serif;
+  background: #f5f6fa;
+  min-height: 100vh;
+  padding: 20px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.assignment-wrapper {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.assignment-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+/* Header */
+.assignment-header {
+  background: linear-gradient(135deg, #5932EA, #4c28d1);
+  color: #fff;
+  padding: 25px 30px;
+}
+.header-content h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+.header-content p {
+  margin-top: 8px;
+  font-size: 15px;
+  opacity:1;
+}
+
+/* Body: Form + Image */
+.assignment-body {
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+}
+
+.assignment-form {
+  flex: 1;
+}
+
+/* Floating Labels */
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 14px 15px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  background: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #5932EA;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(89,50,234,0.2);
+}
+
+.form-label {
+  position: absolute;
+  top: 14px;
+  left: 15px;
+  color: #6b7280;
+  font-size: 18px;
+  transition: 0.2s ease all;
+}
+
+.form-control:focus + .form-label,
+.form-control:not(:placeholder-shown) + .form-label {
+  top: -8px;
+  left: 12px;
+  background: #fff;
+  padding: 0 5px;
+  font-size: 12px;
+  color: #5932EA;
+  font-weight: 600;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #5932EA, #4c28d1);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(89,50,234,0.3);
+}
+
+/* Image Side */
+.assignment-image-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.assignment-image-side img {
+  max-width: 100%;
+  height: auto;
+  transform: rotate(-5deg);
+  opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .assignment-body {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .assignment-image-side img {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+</style>
 {% endblock %}

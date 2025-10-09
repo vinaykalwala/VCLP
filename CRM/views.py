@@ -2384,10 +2384,10 @@ def delete_assessment(request, pk):
 
 
 @login_required
-def view_submissions(request, assessment_id):
+def view_assessments_submissions(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id)
     submissions = assessment.submissions.all()
-    return render(request, "assessments/view_submissions.html", {
+    return render(request, "assessments/view_assessments_submissions.html", {
         "assessment": assessment,
         "submissions": submissions,
     })

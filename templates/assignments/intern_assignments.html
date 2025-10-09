@@ -1,48 +1,162 @@
 {% extends "login_base.html" %}
 {% block content %}
+<style>
+/* --- General Styling --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f6fa;
+}
+
+/* Page Title */
+h2 {
+    font-weight: 700;
+    color: #5932EA;
+    margin-bottom: 20px;
+}
+
+/* Grid Layout for Cards */
+.assignment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+}
+
+/* Card Body */
+.card-body {
+    padding: 0px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    padding-bottom: 20px;
+    padding-top: 0;
+}
+
+/* Paragraphs inside cards with transparent background */
+.card-body p {
+    background: rgba(89, 50, 234, 0.05); /* subtle purple */
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin: 0;
+    color: #333;
+}
+
+/* Card Title */
+.card-title {
+    font-weight: 700;
+    color: #4727B2;
+    margin-bottom: 12px;
+    font-size: 1.25rem;
+}
+
+/* Links inside cards */
+.card-body a {
+    text-decoration: none;
+    color: #5932EA;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.card-body a:hover {
+    color: #4727B2;
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #5932EA;
+    border: none;
+    padding: 8px 18px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: 0.3s;
+    align-self: flex-start;
+}
+.btn-primary:hover {
+    background-color: #4727B2;
+}
+
+/* Responsive */
+@media(max-width: 576px){
+    .card-body {
+        padding: 0px 12px;
+        padding-bottom: 10px;
+    }
+    .assignment-grid {
+        grid-template-columns: 1fr;
+    }
+    .container h2{
+        text-align: center;
+    }
+}
+.card-title {
+    background: linear-gradient(90deg, #5932EA, #4727B2); /* beautiful purple gradient */
+    color: #fff;
+    padding: 12px 15px; /* add vertical and horizontal padding */
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0 -25px 10px -25px; /* stretch to card edges */
+    text-align: center;
+}
+</style>
+
 <div class="main-content">
 <div class="container">
     <h2>My Assignments</h2>
     <hr>
 
-    {% for data in assignment_data %}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">{{ data.assignment.title }}</h5>
-            <p class="card-text">{{ data.assignment.description }}</p>
-            <p><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</p>
+    {% if assignment_data %}
+    <div class="assignment-grid">
+        {% for data in assignment_data %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ data.assignment.title }}</h5>
 
-            {% if data.assignment.file %}
-                <p>
-                    <strong>Assignment File:</strong>
-                    <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
-                </p>
-            {% endif %}
+                <p class="card-text">{{ data.assignment.description }}</p>
+                <p><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</p>
 
-            {% if data.is_submitted %}
-                <p><strong>Status:</strong> ✅ Submitted</p>
-                <p>
-                    <strong>Your Submission:</strong>
-                    <a href="{{ data.submission.file.url }}" target="_blank">View File</a>
-                </p>
-                
-                {% if data.is_graded %}
-                    <p><strong>Score:</strong> {{ data.score }}</p>
-                    <p><strong>Feedback:</strong> {{ data.feedback }}</p>
-                {% else %}
-                    <p><strong>Status:</strong> ⏳ Submitted, awaiting grading.</p>
+                {% if data.assignment.file %}
+                    <p><strong>Assignment File:</strong> 
+                        <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
+                    </p>
                 {% endif %}
-            {% else %}
-    <p><strong>Status:</strong> ❌ Not Submitted</p>
-    <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-sm btn-primary mt-2">Submit</a>
-{% endif %}
 
-            
+                {% if data.is_submitted %}
+                    <p style="background-color: rgb(214, 255, 218);"><strong>Status:</strong> ✅ Submitted</p>
+                    <p><strong>Your Submission:</strong> 
+                        <a href="{{ data.submission.file.url }}" target="_blank">View File</a>
+                    </p>
+                    
+                    {% if data.is_graded %}
+                        <p style="background-color: #f7ecb9;"><strong>Score:</strong> {{ data.score }}</p>
+                        <p><strong>Feedback:</strong> {{ data.feedback }}</p>
+                    {% else %}
+                        <p style="background-color: rgb(255, 255, 171);"><strong>Status:</strong> ⏳ Submitted, awaiting grading.</p>
+                    {% endif %}
+                {% else %}
+                    <p style="background-color:rgb(255, 236, 236) ;"><strong>Status:</strong> ❌ Not Submitted</p>
+                    <a href="{% url 'submit_assignment' data.assignment.id %}" class="btn btn-primary mt-2" style="color: #f5f6fa;text-decoration: none;">Submit Assignment</a>
+                {% endif %}
+            </div>
         </div>
+        {% endfor %}
     </div>
-    {% empty %}
+    {% else %}
         <p>No assignments found.</p>
-    {% endfor %}
+    {% endif %}
 </div>
 </div>
 {% endblock %}

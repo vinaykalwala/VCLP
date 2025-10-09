@@ -1,7 +1,7 @@
 {% extends 'login_base.html' %}
 {% block content %}
 <style>
-/* ===== CSS Variables - Design System ===== */
+/* ===== CSS Variables - Professional & Aesthetic Design System ===== */
 :root {
     /* Primary Brand Colors */
     --primary: #6366f1;
@@ -67,30 +67,23 @@
 }
 
 /* ===== Import Modern Font ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-
+/* ====== Base Styles ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
 
 /* ====== Page Container ====== */
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: fadeIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    padding: var(--spacing-xl);
+    background: var(--background);
+    min-height: 100vh;
 }
 
 /* ====== Header Section ====== */
@@ -98,23 +91,37 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 1100px;
-    margin-bottom: var(--spacing-2xl);
-    background: var(--primary-gradient);
     padding: var(--spacing-lg) var(--spacing-xl);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl), var(--glow-primary);
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-2xl);
     position: relative;
     overflow: hidden;
-    animation: slideInDown 0.6s ease-out;
+    animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes slideInDown {
+.header-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.header-bar h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+}
+
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -122,146 +129,102 @@
     }
 }
 
-.header-bar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.7s;
-}
-
-.header-bar:hover::before {
-    left: 100%;
-}
-
-.header-bar h2 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-    letter-spacing: -0.5px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
 /* ====== Ask Doubt Button ====== */
 .btn-ask {
-    background-color: #fff;
-    color: var(--primary);
+    background: var(--primary-gradient);
+    color: #FFFFFF;
     font-weight: 600;
-    border-radius: var(--radius-full);
-    padding: var(--spacing-sm) var(--spacing-xl);
-    font-size: 15px;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
     text-decoration: none;
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-md);
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    border: 2px solid transparent;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-ask:hover {
-    background: var(--success-gradient);
-    color: #fff;
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: var(--shadow-xl), var(--glow-success);
-    border-color: var(--success);
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), var(--glow-primary);
 }
 
 .btn-ask:active {
-    transform: translateY(-1px) scale(1.02);
+    transform: translateY(0);
+}
+
+.btn-ask::before {
+    content: '+';
+    font-size: 1.2rem;
+    margin-right: var(--spacing-xs);
 }
 
 /* ====== Cards Wrapper ====== */
 .cards-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: var(--spacing-lg);
 }
 
 /* ====== Individual Card ====== */
 .card {
-    width: 100%;
-    max-width: 1000px;
     background: var(--card-bg);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
-    border-left: 5px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
     transition: all var(--transition-base);
+    border-left: 4px solid var(--primary);
     position: relative;
     overflow: hidden;
-    animation: fadeInUp 0.5s ease-out backwards;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--primary-hover);
 }
-
-.card:nth-child(1) { animation-delay: 0.1s; }
-.card:nth-child(2) { animation-delay: 0.15s; }
-.card:nth-child(3) { animation-delay: 0.2s; }
-.card:nth-child(4) { animation-delay: 0.25s; }
-.card:nth-child(5) { animation-delay: 0.3s; }
 
 .card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 5px;
+    width: 100%;
     height: 100%;
     background: var(--primary-gradient);
-    transition: width var(--transition-base);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-    border-left-color: var(--primary-hover);
+    opacity: 0;
+    transition: opacity var(--transition-base);
 }
 
 .card:hover::before {
-    width: 100%;
     opacity: 0.05;
 }
 
 /* ====== Card Content ====== */
 .card h5 {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: var(--spacing-md);
-    line-height: 1.5;
-    letter-spacing: -0.3px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
 }
 
 .card p {
-    margin: var(--spacing-xs) 0;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
 }
 
 .card p strong {
     color: var(--text-primary);
     font-weight: 600;
-    min-width: 70px;
+    min-width: 80px;
 }
 
 /* ====== Status Badge ====== */
@@ -269,77 +232,55 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: 6px var(--spacing-sm);
     border-radius: var(--radius-full);
-    letter-spacing: 0.3px;
     transition: all var(--transition-base);
     box-shadow: var(--shadow-sm);
 }
 
-.status::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    animation: pulse 2s infinite;
-}
-
 .status.pending {
     background: var(--warning-light);
-    color: #92400e;
-    border: 1px solid var(--warning);
+    color: var(--accent);
 }
 
 .status.pending::before {
-    background: var(--warning);
+    content: '⏳';
+    font-size: var(--font-size-sm);
 }
 
 .status.resolved {
     background: var(--success-light);
-    color: #065f46;
-    border: 1px solid var(--success);
+    color: var(--primary);
 }
 
 .status.resolved::before {
-    background: var(--success);
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.6;
-        transform: scale(0.9);
-    }
+    content: '✅';
+    font-size: var(--font-size-sm);
 }
 
 .status:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 /* ====== Answer Box ====== */
 .alert {
-    background: linear-gradient(135deg, var(--primary-light) 0%, #faf5ff 100%);
+    background: var(--success-light);
     border-left: 4px solid var(--primary);
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
     margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
     color: var(--text-primary);
-    font-size: 14px;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
     line-height: 1.6;
+    transition: all var(--transition-base);
 }
 
 .alert:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateX(3px);
+    background: var(--success-light);
+    transform: translateX(2px);
 }
 
 .alert strong {
@@ -351,134 +292,67 @@
 
 .alert small {
     color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--font-size-xs);
     display: block;
     margin-top: var(--spacing-xs);
 }
 
 /* ====== Empty State ====== */
 .empty-state {
+    grid-column: 1 / -1;
     text-align: center;
-    color: var(--text-tertiary);
-    margin-top: var(--spacing-2xl);
-    font-size: 18px;
-    font-weight: 500;
     padding: var(--spacing-2xl);
     background: var(--card-bg);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-lg);
     border: 2px dashed var(--border);
-    animation: fadeIn 0.8s ease-out;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    animation: fadeIn 0.7s ease-out;
 }
 
 .empty-state::before {
-    content: '📭';
+    content: '📝';
     display: block;
-    font-size: 64px;
-    margin-bottom: var(--spacing-lg);
-    animation: float 3s ease-in-out infinite;
+    font-size: 56px;
+    margin-bottom: var(--spacing-md);
+    animation: pulse 2s ease-in-out infinite;
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 /* ====== Responsive ====== */
-@media (max-width: 992px) {
+@media (max-width: 1280px) {
     .dashboard-container {
-        max-width: 95%;
-        padding: 0 var(--spacing-md);
+        padding: var(--spacing-lg);
     }
 
+    .cards-wrapper {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
     .header-bar {
-        max-width: 100%;
         flex-direction: column;
         gap: var(--spacing-md);
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
     }
 
     .header-bar h2 {
-        font-size: 24px;
-    }
-
-    .btn-ask {
-        align-self: center;
-        padding: var(--spacing-sm) var(--spacing-lg);
-    }
-
-    .card {
-        max-width: 100%;
-        padding: var(--spacing-lg);
-    }
-
-    .card h5 {
-        font-size: 16px;
+        font-size: var(--font-size-xl);
     }
 }
 
 @media (max-width: 768px) {
-    .main-content {
-        padding: var(--spacing-lg) var(--spacing-sm);
-    }
-
-    .header-bar h2 {
-        font-size: 22px;
-    }
-
-    .card {
-        padding: var(--spacing-md);
-    }
-
-    .card h5 {
-        font-size: 15px;
+    .cards-wrapper {
+        grid-template-columns: 1fr;
     }
 
     .card p {
-        font-size: 13px;
-    }
-
-    .status {
-        font-size: 12px;
-        padding: 6px var(--spacing-sm);
-    }
-
-    .alert {
-        font-size: 13px;
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-}
-
-@media (max-width: 576px) {
-    .header-bar {
-        padding: var(--spacing-md);
-    }
-
-    .header-bar h2 {
-        font-size: 20px;
-    }
-
-    .btn-ask {
-        padding: var(--spacing-xs) var(--spacing-md);
-        font-size: 14px;
-    }
-
-    .card {
-        padding: var(--spacing-md);
-        border-left-width: 3px;
-    }
-
-    .card h5 {
-        font-size: 14px;
-    }
-
-    .card p {
-        font-size: 12px;
         flex-direction: column;
         align-items: flex-start;
     }
@@ -486,38 +360,42 @@
     .card p strong {
         min-width: auto;
     }
+}
 
-    .status {
-        font-size: 11px;
-        padding: 5px 10px;
+@media (max-width: 576px) {
+    .dashboard-container {
+        padding: var(--spacing-md);
+    }
+
+    .header-bar h2 {
+        font-size: var(--font-size-lg);
+    }
+
+    .btn-ask {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs) var(--spacing-md);
+    }
+
+    .card h5 {
+        font-size: var(--font-size-base);
+    }
+
+    .card p {
+        font-size: var(--font-size-xs);
     }
 
     .alert {
-        font-size: 12px;
+        font-size: var(--font-size-xs);
         padding: var(--spacing-sm);
     }
 
     .empty-state {
-        font-size: 16px;
+        font-size: var(--font-size-base);
         padding: var(--spacing-lg);
     }
 
     .empty-state::before {
-        font-size: 48px;
-    }
-}
-
-@media (min-width: 1400px) {
-    .dashboard-container {
-        max-width: 1300px;
-    }
-
-    .card {
-        max-width: 1100px;
-    }
-
-    .header-bar {
-        max-width: 1200px;
+        font-size: 40px;
     }
 }
 
@@ -541,21 +419,22 @@ html {
 <div class="main-content">
   <div class="dashboard-container">
     <div class="header-bar">
-        <h2>My Doubts</h2>
-        <a href="{% url 'doubt_create' %}" class="btn-ask">+ Ask a Doubt</a>
+        <h1>My Doubts</h1>
+        <a href="{% url 'doubt_create' %}" class="btn-ask">Ask a Doubt</a>
     </div>
 
+    <div class="cards-wrapper">
     {% for doubt in doubts %}
     <div class="card">
-        <h5>{{ doubt.question }}</h5>
+        <p><strong>Question:</strong> {{ doubt.question }}</p>
         <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
         <p><strong>Created:</strong> {{ doubt.created_at|date:"d M Y, H:i" }}</p>
         <p>
             <strong>Status:</strong>
             {% if doubt.resolved %}
-                <span class="status resolved">✅ Resolved</span>
+                <span class="status resolved">Resolved</span>
             {% else %}
-                <span class="status pending">⏳ Pending</span>
+                <span class="status pending">Pending</span>
             {% endif %}
         </p>
 
@@ -569,6 +448,7 @@ html {
     {% empty %}
         <p class="empty-state">No doubts raised yet.</p>
     {% endfor %}
+    </div>
   </div>
 </div>
 {% endblock %}
