@@ -2467,12 +2467,6 @@ def batch_assessment_scores(request):
     })
 
 
-#extra matter not use
-#gvhmj
-#vhmj
-#nm,
-#vnm j
-#hmfrom datetime import datefrom datetime import date
 from django.db.models import Avg
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -2563,7 +2557,7 @@ def intern_overview(request):
 
     # --- Recent Activities ---
     recent_activities = []
-    lessons = LessonFile.objects.order_by('-uploaded_at')[:5]
+    lessons = LessonFile.objects.order_by('-uploaded_at')[:3]
     for lesson in lessons:
         recent_activities.append({
             'icon': 'fas fa-book',
@@ -2571,7 +2565,7 @@ def intern_overview(request):
             'text': f'New lesson uploaded: {lesson.title}',
             'time': lesson.uploaded_at.strftime('%d %b %Y, %I:%M %p')
         })
-    assessments = Assessment.objects.order_by('-created_at')[:5]
+    assessments = Assessment.objects.order_by('-created_at')[:3]
     for assessment in assessments:
         recent_activities.append({
             'icon': 'fas fa-clipboard-check',
