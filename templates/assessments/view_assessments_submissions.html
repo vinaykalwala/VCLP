@@ -3,148 +3,192 @@
 {% load static %}
 
 <style>
-/* ====== Main Content ====== */
-.main-content h3,
-.sub-page-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2b2b2b;
+/* ===== Global Style Reset ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fc;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Page Layout ===== */
+.main-content {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* ===== Header Section ===== */
+.sub-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 25px;
 }
 
-.sub-page-title {
-    border-left: 5px solid #5932EA;
-    padding-left: 10px;
-    margin-top: 15px;
-}
-
-/* ====== Buttons ====== */
-.btn {
-    display: inline-block;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.3s ease;
-    text-decoration: none;
-    text-align: center;
-}
-
-.btn-warning {
-    background-color: #FBBF24;
-    color: #000;
-}
-
-.btn-warning:hover {
-    background-color: #f59e0b;
-    transform: translateY(-2px);
-}
-
-.btn-download {
-    background-color: #10B981;
-    color: #fff;
-}
-
-.btn-download:hover {
-    background-color: #059669;
-    transform: translateY(-2px);
-}
-
-/* ====== Table Section ====== */
-.table-box,
-.sub-submissions-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    overflow-x: auto;
-    padding: 15px;
-}
-
-.custom-table,
-.sub-submissions-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-}
-
-.custom-table th,
-.custom-table td,
-.sub-submissions-table th,
-.sub-submissions-table td {
-    padding: 12px 14px;
-    border: 1px solid #eee;
-    text-align: left;
-    font-size: 14px;
-    color: #333;
-    border-radius: 5px;
-}
-
-.custom-table th,
-.sub-submissions-table th {
-    background: #5932EA;
-    color: white;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 13px;
-}
-
-/* ====== Stats Cards ====== */
-.sub-stats-bar {
+.sub-header-content {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
 }
 
-.sub-stat-card {
-    flex: 1;
-    padding: 10px 15px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-.sub-stat-label {
-    font-size: 0.8rem;
-    color: #64748b;
-    font-weight: 500;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
-.sub-stat-value {
-    font-size: 1.25rem;
+.sub-page-title {
+    font-size: 26px;
     font-weight: 700;
     color: #2b2b2b;
+    border-left: 6px solid #5932EA;
+    padding-left: 12px;
+    margin: 0;
+    line-height: 1.3;
+    word-break: break-word;
 }
 
-/* ====== Back Button ====== */
+.sub-assessment-meta {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* ===== Back Button ===== */
 .sub-back-btn {
-    display: inline-block;
-    margin-top: 0;
-    padding: 6px 12px;
+    padding: 8px 14px;
     background: #fff;
-    border: 2px solid #eee;
+    border: 2px solid #e2e8f0;
     border-radius: 6px;
     font-weight: 600;
-    color: #333;
+    color: #374151;
     text-decoration: none;
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .sub-back-btn:hover {
     border-color: #5932EA;
     color: #5932EA;
+    box-shadow: 0 2px 8px rgba(89, 50, 234, 0.2);
     transform: translateY(-2px);
 }
 
-/* ====== Responsive ====== */
-@media (max-width:768px){
-    .sub-stats-bar {flex-direction: column; gap:10px;}
-    .custom-table td .btn,
-    .sub-submissions-table td .btn {width:100%; margin-bottom:5px;}
+/* ===== Stats Bar (REVISED FIX) ===== */
+.sub-stats-bar {
+    display: grid;
+    /* This is the key fix: I've reduced the minimum card width to 210px.
+       This gives the grid enough flexibility to keep three cards on one line
+       at 1024px screen width without overflowing. */
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.sub-stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #5932EA;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sub-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    border-color: #7C5BFF;
+}
+
+.sub-stat-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.sub-stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ===== Table Container ===== */
+.table-box {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    padding: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.custom-table th {
+    background: linear-gradient(135deg, #5932EA, #7C5BFF);
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+    border: none;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.custom-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #374151;
+    vertical-align: middle;
+    background: #fff;
+    transition: background 0.2s ease;
+}
+
+.custom-table tr:hover td {
+    background: #f9fafb;
+}
+
+/* ===== Buttons, Empty State, etc. (No changes needed here) ===== */
+.btn { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.3s ease; text-decoration: none; text-align: center; }
+.btn-warning { background-color: #FBBF24; color: #000; }
+.btn-warning:hover { background-color: #f59e0b; transform: translateY(-2px); }
+.btn-download { background-color: #10B981; color: #fff; }
+.btn-download:hover { background-color: #059669; transform: translateY(-2px); }
+.table-box.empty-state { text-align: center; padding: 40px 20px; color: #6b7280; font-style: italic; background: #fff; }
+
+/* ===== RESPONSIVE DESIGN ===== */
+/* For tablets and smaller devices */
+@media (max-width: 768px) {
+    .main-content { margin: 30px auto; padding: 0 15px; }
+    .sub-page-header { flex-direction: column; align-items: flex-start; }
+    .sub-page-title { font-size: 22px; }
+    .sub-assessment-meta { font-size: 13px; }
+    .table-box { padding: 15px; }
+    /* This makes the cards stack into a single column on smaller tablets and mobile */
+    .sub-stats-bar {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* For mobile devices */
+@media (max-width: 480px) {
+    .main-content { padding: 0 10px; }
+    .sub-page-title { font-size: 20px; }
+    .sub-stat-value { font-size: 1.4rem; }
+    .custom-table th, .custom-table td { padding: 10px 12px; font-size: 13px; }
 }
 </style>
 
@@ -171,19 +215,19 @@
         </div>
         <div class="sub-stat-card">
             <div class="sub-stat-label">Average Score</div>
-            <div class="sub-stat-value">{{ assessment.average_score|default:"N/A" }}</div>
+            <div class="sub-stat-value">{{ assessment.average_score|floatformat:2|default:"N/A" }}</div>
         </div>
     </div>
 
-    <div class="sub-submissions-card table-box">
-        <table class="sub-submissions-table custom-table">
+    <div class="table-box">
+        <table class="custom-table">
             <thead>
                 <tr>
                     <th>ID Number</th>
                     <th>Intern</th>
                     <th>Submitted At</th>
-                    <th class="sub-marks-cell">Total Marks</th>
-                    <th class="sub-marks-cell">Score</th>
+                    <th>Total Marks</th>
+                    <th>Score</th>
                 </tr>
             </thead>
             <tbody>
@@ -192,15 +236,15 @@
                     <td>{{ sub.intern.unique_id }}</td>
                     <td>{{ sub.intern.user.get_full_name }}</td>
                     <td>{{ sub.submitted_at|date:"d M Y H:i" }}</td>
-                    <td class="sub-marks-cell">{{ sub.assessment.total_marks }}</td>
-                    <td class="sub-marks-cell">{{ sub.score|default:"-" }}</td>
+                    <td>{{ sub.assessment.total_marks }}</td>
+                    <td>{{ sub.score|floatformat:2|default:"-" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="table-box" style="text-align:center; color:#777; font-style:italic;">
+    <div class="table-box empty-state">
         No submissions found for this assessment.
     </div>
     {% endif %}
