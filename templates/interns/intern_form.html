@@ -4,177 +4,198 @@
 {% load static %}
 
 <style>
-/* Card Wrapper & Hover */
-.main-content .card {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-    border: none;
-    transition: transform 0.3s, box-shadow 0.3s;
-    max-width: 1000px;
-    margin: 10px auto;
-}
-.main-content .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 45px rgba(0,0,0,0.12);
+/* === Global Reset === */
+* { box-sizing: border-box; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f5f6fa;
+  margin: 0;
+  padding: 0;
 }
 
-/* Card Header */
-.card-header {
-    background: linear-gradient(135deg, #5932EA, #6366f1);
-    color: #fff;
-    font-size: 1.6rem;
-    font-weight: 700;
-    padding: 1.5rem 2rem;
-    border-bottom: none;
-    text-align: center;
+/* === Container === */
+.intern-form-container {
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
 }
 
-/* Form Group Wrapper */
-
-.form-group-custom label {
-    font-weight: 600;
-    color:  #6B7280;
-    margin-bottom: 0.5rem;
+/* === Card === */
+.intern-card {
+  width: 100%;
+  max-width: 1000px;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-wrap: wrap;
+}
+.intern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12);
 }
 
-/* Inputs, Textareas, Selects */
-.form-group-custom input:not([type="checkbox"]):not([type="radio"]),
-.form-group-custom textarea,
-.form-group-custom select {
-    padding: 0.65rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: border 0.3s, box-shadow 0.3s;
-    background: #eef5ff;
-    width: 100%;
-    box-sizing: border-box;
-    height: 50px;
+/* === Left Side (Form Section) === */
+.intern-card-left {
+  flex: 1 1 55%;
+  padding: 45px 35px;
 }
 
-/* Checkboxes & Radios */
-.form-group-custom input[type="checkbox"],
-.form-group-custom input[type="radio"] {
-    width: auto;
-    height: auto;
-    margin-right: 0.5rem;
-    transform: scale(1.2);
+/* === Header === */
+.intern-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 35px;
+  background-color: #5932EA;
+  padding: 15px 20px;
+  border-radius: 12px;
+  color: white;
+}
+.intern-card-header i {
+  font-size: 32px;
+}
+.intern-card-header h2 {
+  font-size: 26px;
+  font-weight: 700;
 }
 
-/* Focus styles */
-.form-group-custom input:focus,
-.form-group-custom select:focus,
-.form-group-custom textarea:focus {
-    border-color: #4f46e5;
-    outline: none;
+/* === Form Fields === */
+.intern-card-left form .form-group-custom {
+  margin-bottom: 22px;
+}
+.intern-card-left form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+.intern-card-left form input,
+.intern-card-left form select,
+.intern-card-left form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fafafa;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+.intern-card-left form input:focus,
+.intern-card-left form select:focus,
+.intern-card-left form textarea:focus {
+  border-color: #5932EA;
+  box-shadow: 0 0 12px rgba(89, 50, 234, 0.15);
+  outline: none;
 }
 
-/* Hide help text */
-.form-group-custom small.text-muted {
-    display: none;
-}
-/* Checkboxes & Radios: same line with label */
-.form-group-custom input[type="checkbox"],
-.form-group-custom input[type="radio"] {
-    width: auto;
-    height: auto;
-    margin-right: 0.5rem;
-    transform: scale(1.2);
-    vertical-align: middle;
-    display: inline-block;
+/* === Checkboxes / Radios === */
+.intern-card-left input[type="checkbox"],
+.intern-card-left input[type="radio"] {
+  width: auto;
+  height: auto;
+  margin-right: 0.5rem;
+  transform: scale(1.2);
+  vertical-align: middle;
 }
 
-.form-group-custom label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem; /* Space between checkbox and label text */
+/* === Buttons === */
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.btn-update {
+  background: #5932EA;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1 1 auto;
+  min-width: 130px;
+}
+.btn-update:hover {
+  background: #4c28d1;
+  transform: translateY(-2px);
+}
+.btn-cancel {
+  background: #f3f4f6;
+  color: #333;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  flex: 1 1 auto;
+  min-width: 130px;
+}
+.btn-cancel:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
 }
 
-/* Buttons */
-.btn-primary {
-    background: #4f46e5;
-    border-radius: 12px;
-    font-weight: 600;
-    padding: 0.65rem 1.4rem;
-    transition: background 0.3s;
-    border: none;
-}
-.btn-primary:hover {
-    background: #3730a3;
-}
 
-.btn-secondary {
-    background: #f3f4f6;
-    border-radius: 12px;
-    font-weight: 600;
-    padding: 0.65rem 1.4rem;
-    color: #374151;
-    border: none;
-}
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
 
-/* Responsive Fix */
-@media (max-width: 1200px) {
-    .main-content .card {
-        max-width: 90%;
-    }
-}
+/* === Responsive === */
 @media (max-width: 768px) {
-    .card-header {
-        font-size: 1.4rem;
-        text-align: center;
-    }
-    .row > [class*="col-"] {
-        margin-bottom: 1rem;
-    }
-    .d-grid.gap-2.d-md-flex.justify-content-md-end {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    .main-content .card {
-        max-width: 100%;
-    }
+  .intern-card {
+    flex-direction: column;
+  }
+  .intern-card-left {
+    padding: 30px 20px;
+  }
+  
 }
 </style>
 
 <div class="main-content">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title mb-0">{{ form.instance.pk|yesno:"Edit Intern,Create Intern" }}</h3>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="row g-3">
-                                {% for field in form %}
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label>{{ field.label }}</label>
-                                            {{ field }}
-                                            {% for error in field.errors %}
-                                                <div class="text-danger">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                                <a href="{% url 'intern_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+  <div class="intern-form-container">
+    <div class="intern-card">
+      
+      <!-- Left: Form -->
+      <div class="intern-card-left">
+        <div class="intern-card-header">
+          <i class="fas fa-user-graduate"></i>
+          <h2>{{ form.instance.pk|yesno:"Edit Intern,Create Intern" }}</h2>
         </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group-custom">
+              <label>{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}
+                <div class="text-danger" style="font-size:13px;margin-top:4px;">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <div class="form-buttons">
+            <a href="{% url 'intern_list' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-update">Save</button>
+          </div>
+        </form>
+      </div>
+
+      
+
     </div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
