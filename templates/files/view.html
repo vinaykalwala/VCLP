@@ -48,14 +48,14 @@
 /* Table Styles */
 .lessons-table {
     width: 100%;
-    border-collapse: collapse; /* important for vertical lines */
+    border-collapse: collapse;
     font-family: 'Roboto', sans-serif;
 }
 
 .lessons-table th, .lessons-table td {
     padding: 8px 18px;
     text-align: left;
-    border: 1px solid #E5E7EB; /* full grid lines */
+    border: 1px solid #E5E7EB;
 }
 
 .lessons-table th {
@@ -81,16 +81,18 @@
     font-size: 0.9em;
 }
 
-/* Action Buttons */
+/* Action Buttons - Unified */
 .action-btn {
-    padding: 10px 16px;
+    padding: 6px 12px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
+    font-size: 0.9em;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .action-btn--view {
@@ -103,14 +105,31 @@
     transform: translateY(-2px);
 }
 
-.action-btn--minimal {
-    background-color: #6B7280;
+.action-btn--edit {
+    background-color: #F59E0B;
     color: #fff;
 }
 
-.action-btn--minimal:hover {
-    background-color: #4B5563;
+.action-btn--edit:hover {
+    background-color: #D97706;
     transform: translateY(-2px);
+}
+
+.action-btn--delete {
+    background-color: #EF4444;
+    color: #fff;
+}
+
+.action-btn--delete:hover {
+    background-color: #B91C1C;
+    transform: translateY(-2px);
+}
+
+/* Button container for mobile alignment */
+.action-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
 /* Responsive */
@@ -120,6 +139,10 @@
     }
     .lessons-page__header-banner h1 {
         font-size: 1.8em;
+    }
+    .action-btn-group {
+        flex-direction: column;
+        gap: 4px;
     }
 }
 </style>
@@ -131,7 +154,6 @@
 <div class="lessons-page__header-banner">
     <h1>Available Lessons</h1>
 </div>
-
 
 {% if lessons %}
 <div class="lessons-table-container">
@@ -151,19 +173,19 @@
                 <td class="lesson-title">{{ lesson.title }}</td>
                 <td class="lesson-date">{{ lesson.uploaded_at|date:"M. j, Y, g:i a" }}</td>
                 <td>
-                    <a href="{% url 'pdf_viewer_page' lesson.id %}" target="_blank" class="action-btn action-btn--view">
-                        📄 Open
-                    </a>
-                    {% if user.role in 'trainer' %}
-                    
-                        <a href="{% url 'edit_lesson' lesson.id %}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="{% url 'delete_lesson' lesson.id %}" class="btn btn-sm btn-danger">Delete</a>
-                    
-                    {% endif %}
-                    <!-- Optional minimal view -->
-                    <!-- <button onclick="openMinimalViewer({{ lesson.id }})" class="action-btn action-btn--minimal">
-                        🔒 Minimal
-                    </button> -->
+                    <div class="action-btn-group">
+                        <a href="{% url 'pdf_viewer_page' lesson.id %}" target="_blank" class="action-btn action-btn--view">
+                            📄 Open
+                        </a>
+                        {% if user.role == 'trainer' %}
+                        <a href="{% url 'edit_lesson' lesson.id %}" class="action-btn action-btn--edit">
+                             Edit
+                        </a>
+                        <a href="{% url 'delete_lesson' lesson.id %}" class="action-btn action-btn--delete">
+                            Delete
+                        </a>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             {% endfor %}
@@ -180,35 +202,6 @@
 </div>
 
 <script>
-function openMinimalViewer(lessonId) {
-    const url = "{% url 'secure_pdf_view' 0 %}".replace('0', lessonId);
-    const windowFeatures = "width=1000,height=700,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes";
-    const newWindow = window.open(url, '_blank', windowFeatures);
-
-    if (newWindow) {
-        newWindow.addEventListener('load', function() {
-            const disableScript = `
-                document.addEventListener('contextmenu', e => e.preventDefault());
-                document.addEventListener('keydown', e => {
-                    if (e.ctrlKey && (e.key === 's' || e.key === 'p') || 
-                        e.key === 'PrintScreen' || e.key === 'F12') e.preventDefault();
-                });
-                document.styleSheets[0].insertRule(
-                    'body { user-select: none; }',
-                    document.styleSheets[0].cssRules.length
-                );
-            `;
-            try {
-                newWindow.document.head.appendChild(
-                    Object.assign(newWindow.document.createElement('script'), { textContent: disableScript })
-                );
-            } catch (e) {
-                console.log('Security scripts injected');
-            }
-        });
-    }
-}
-
 document.addEventListener('contextmenu', function(e) {
     if (e.target.closest('table')) e.preventDefault();
 });
