@@ -2431,12 +2431,11 @@ def delete_assessment(request, pk):
 def view_assessments_submissions(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id)
     submissions = assessment.submissions.all()
-     # Calculate average score
-    average_score = submissions.aggregate(avg=Avg('score'))['avg']
+    # Calculate average score and add it to assessment object
+    assessment.average_score = submissions.aggregate(avg=Avg('score'))['avg']
     return render(request, "assessments/view_assessments_submissions.html", {
         "assessment": assessment,
         "submissions": submissions,
-        'average_score': average_score,
     })
 
 
