@@ -7,23 +7,25 @@
     --primary: #6366f1;
     --primary-hover: #4f46e5;
     --primary-light: #eef2ff;
-    --primary-gradient: linear-gradient(135deg, #5932EA, #7C5BFF);
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 
-    --success: #10B981;
-    --success-hover: #10B981;
+    --success: #10b981;
+    --success-hover: #059669;
     --success-light: #d1fae5;
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
 
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-
-    --warning: #FBBF24;
+    --warning: #f59e0b;
+    --warning-hover: #d97706;
     --warning-light: #fef3c7;
+
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
 
     --background: #f8fafc;
     --background-secondary: #f1f5f9;
     --card-bg: #ffffff;
-    --text-primary: #0f172a;
+    --text-primary: #1e293b;
     --text-secondary: #64748b;
     --text-tertiary: #94a3b8;
     --border: #e2e8f0;
@@ -36,12 +38,9 @@
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
-    --glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
-    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
-
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
     --spacing-xs: 0.5rem;
     --spacing-sm: 0.75rem;
@@ -50,191 +49,1207 @@
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
 
-    --radius-sm: 0.5rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
     --radius-full: 9999px;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
 }
 
-/* ===== Page Title ===== */
-.page-title-wrapper {
-    display: flex;
-    justify-content: center;
+/* ===== Page Header ===== */
+.page-header {
+    text-align: center;
     margin-bottom: var(--spacing-2xl);
-    flex-wrap: wrap;
+    padding: var(--spacing-xl) 0;
 }
 
 .page-title {
+    font-size: 3rem;
+    font-weight: 800;
     background: var(--primary-gradient);
-    color: #fff;
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-radius: var(--radius-xl);
-    font-size: 28px;
-    font-weight: 700;
-    text-align: center;
-    box-shadow: var(--shadow-xl), var(--glow-primary);
-    transition: all var(--transition-base);
-    width: 100%;
-    max-width: 600px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.1;
 }
 
-/* ===== Table Styling ===== */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: var(--radius-xl);
+.page-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===== Stats Cards ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border);
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-}
-
-.table thead th {
-    background: var(--primary-gradient);
-    color: #fff;
-    padding: var(--spacing-md);
+    transition: all var(--transition-base);
     text-align: center;
-    font-weight: 600;
-    font-size: 14px;
-    white-space: nowrap;
-    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
 }
 
-.table tbody td {
-    padding: var(--spacing-sm);
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--primary-gradient);
+    opacity: 0.05;
+    transition: opacity var(--transition-base);
+}
+
+.stat-card:hover::before {
+    opacity: 0.1;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-2xl);
+}
+
+.stat-card.resolved::before {
+    background: var(--success-gradient);
+}
+
+.stat-card.pending::before {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-md);
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.resolved .stat-icon {
+    background: var(--success-gradient);
+}
+
+.stat-card.pending .stat-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
     color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.5;
+    line-height: 1;
+    margin-bottom: var(--spacing-xs);
 }
 
-.table tbody tr:hover {
-    background-color: var(--primary-light);
-}
-
-/* ===== Badges ===== */
-.badge {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: var(--radius-full);
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ===== Filters Bar ===== */
+.filters-bar {
+    background: var(--card-bg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-2xl);
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 16px 8px 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+}
+
+.clear-filters {
+    background: var(--text-tertiary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.clear-filters:hover {
+    background: var(--text-secondary);
+}
+
+/* ===== Doubts Grid ===== */
+.doubts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    align-items: stretch;
+}
+
+.doubt-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    transition: all var(--transition-base);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 420px;
+}
+
+.doubt-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2xl);
+}
+
+.doubt-card.resolved {
+    border-left: 4px solid var(--success);
+}
+
+.doubt-card.pending {
+    border-left: 4px solid var(--warning);
+}
+
+.doubt-card.hidden {
+    display: none;
+}
+
+.doubt-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+    background: var(--background-secondary);
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+.doubt-meta {
+    flex: 1;
+}
+
+.doubt-number {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.doubt-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: var(--spacing-sm);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.doubt-status {
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.doubt-status.resolved {
+    background: var(--success-light);
+    color: var(--success-hover);
+}
+
+.doubt-status.pending {
+    background: var(--warning-light);
+    color: var(--warning-hover);
+}
+
+.doubt-body {
+    padding: var(--spacing-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.doubt-question {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    white-space: pre-line;
+    flex: 1;
+}
+
+.doubt-question.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.btn-expand {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.btn-expand:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-expand.resolution-btn {
+    background: var(--success);
+}
+
+.btn-expand.resolution-btn:hover {
+    background: var(--success-hover);
+}
+
+/* Resolution area with consistent spacing */
+.doubt-resolution {
+    background: var(--success-light);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--success);
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.resolution-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.resolution-label {
+    font-weight: 700;
+    color: var(--success-hover);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.resolution-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.resolution-text {
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.resolution-text.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Placeholder for cards without resolution */
+.resolution-placeholder {
+    height: 0;
+    visibility: hidden;
+}
+
+.doubt-footer {
+    padding: var(--spacing-lg);
+    background: var(--background-secondary);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
     font-weight: 600;
 }
 
-/* ===== Alert Boxes ===== */
-.alert-success, .alert-info {
-    border-radius: var(--radius-md);
-    padding: 12px 16px;
-    font-size: 14px;
+.user-details {
+    display: flex;
+    flex-direction: column;
 }
 
-/* ===== Responsive ===== */
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.batch-info {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.doubt-date {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+    margin-left: auto;
+}
+
+/* ===== Modal Styles ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: var(--radius-2xl);
+    width: 90%;
+    max-width: 600px;
+    box-shadow: var(--shadow-2xl);
+    animation: slideIn 0.3s ease;
+    position: relative;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+}
+
+.modal-header.resolution {
+    background: var(--success-gradient);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.modal-title::before {
+    font-size: 1.1em;
+}
+
+.modal-title.question::before {
+    content: '❓';
+}
+
+.modal-title.resolution::before {
+    content: '✅';
+}
+
+.close-modal {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: var(--spacing-xl);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-text {
+    white-space: pre-line;
+    line-height: 1.7;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.modal-meta {
+    background: var(--background-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-lg);
+    border-left: 4px solid var(--primary);
+}
+
+.modal-meta.resolution {
+    border-left-color: var(--success);
+}
+
+.meta-item {
+    display: flex;
+    justify-content: between;
+    margin-bottom: var(--spacing-xs);
+}
+
+.meta-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 120px;
+}
+
+.meta-value {
+    color: var(--text-primary);
+    flex: 1;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--card-bg);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-md);
+    margin: var(--spacing-2xl) 0;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.no-results {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--text-secondary);
+    display: none;
+}
+
+.no-results.show {
+    display: block;
+}
+
+/* ===== Responsive Design ===== */
 @media (max-width: 1200px) {
-    .page-title { font-size: 24px; padding: 1rem 2rem; }
-    .table thead th, .table tbody td { font-size: 13px; padding: 0.5rem; }
-}
-
-@media (max-width: 992px) {
-    .page-title { font-size: 22px; }
-    .table { min-width: 600px; }
+    .doubts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
-    .page-title { font-size: 20px; padding: 0.75rem 1.5rem; }
-    .table { min-width: 100%; }
-    .table thead { display: none; }
-    .table tbody td {
-        display: block;
-        width: 100%;
-        padding: 0.5rem;
-        text-align: right;
-        position: relative;
-        border-bottom: 1px solid var(--border);
+    .container {
+        padding: var(--spacing-md);
     }
-    .table tbody td::before {
-        content: attr(data-label);
-        float: left;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .doubts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    .doubt-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .doubt-date {
+        margin-left: 0;
+    }
+    
+    .doubt-card {
+        min-height: 380px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
     }
 }
 
-@media (max-width: 576px) {
-    .page-title { font-size: 18px; padding: 0.5rem 1rem; }
-    .badge { font-size: 10px; padding: 3px 6px; }
-    .alert-success, .alert-info { font-size: 12px; padding: 8px 12px; }
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .stat-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .doubt-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .doubt-status {
+        align-self: flex-start;
+    }
+    
+    .modal-body {
+        padding: var(--spacing-lg);
+    }
+    
+    .modal-header {
+        padding: var(--spacing-md);
+    }
 }
 </style>
 
+<!-- Modal for Full Question -->
+<div id="questionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title question">Full Question</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-text" id="modalQuestionText"></div>
+            <div class="modal-meta" id="modalQuestionMeta"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Full Resolution -->
+<div id="resolutionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header resolution">
+            <h2 class="modal-title resolution">Resolution Details</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-text" id="modalResolutionText"></div>
+            <div class="modal-meta" id="modalResolutionMeta"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filter and Search functionality
+class DoubtFilter {
+    constructor() {
+        this.statusFilter = document.getElementById('statusFilter');
+        this.batchFilter = document.getElementById('batchFilter');
+        this.searchInput = document.getElementById('searchInput');
+        this.clearFiltersBtn = document.getElementById('clearFilters');
+        this.doubtCards = document.querySelectorAll('.doubt-card');
+        this.noResults = document.getElementById('noResults');
+        
+        this.init();
+    }
+    
+    init() {
+        // Add event listeners
+        this.statusFilter.addEventListener('change', () => this.applyFilters());
+        this.batchFilter.addEventListener('change', () => this.applyFilters());
+        this.searchInput.addEventListener('input', () => this.applyFilters());
+        this.clearFiltersBtn.addEventListener('click', () => this.clearFilters());
+        
+        // Initialize stats
+        this.updateStats();
+    }
+    
+    applyFilters() {
+        const statusValue = this.statusFilter.value;
+        const batchValue = this.batchFilter.value;
+        const searchValue = this.searchInput.value.toLowerCase().trim();
+        
+        let visibleCount = 0;
+        
+        this.doubtCards.forEach(card => {
+            const isResolved = card.classList.contains('resolved');
+            const batchName = card.querySelector('.batch-info').textContent.toLowerCase();
+            const questionText = card.querySelector('.doubt-question').textContent.toLowerCase();
+            const internName = card.querySelector('.user-details .user-name').textContent.toLowerCase();
+            const trainerName = card.querySelectorAll('.user-details .user-name')[1].textContent.toLowerCase();
+            
+            // Status filter
+            let statusMatch = true;
+            if (statusValue === 'resolved' && !isResolved) statusMatch = false;
+            if (statusValue === 'pending' && isResolved) statusMatch = false;
+            
+            // Batch filter
+            let batchMatch = true;
+            if (batchValue !== 'all' && !batchName.includes(batchValue.toLowerCase())) {
+                batchMatch = false;
+            }
+            
+            // Search filter
+            let searchMatch = true;
+            if (searchValue) {
+                searchMatch = questionText.includes(searchValue) || 
+                            internName.includes(searchValue) || 
+                            trainerName.includes(searchValue) ||
+                            batchName.includes(searchValue);
+            }
+            
+            // Show/hide card based on filters
+            if (statusMatch && batchMatch && searchMatch) {
+                card.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+        
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            this.noResults.classList.add('show');
+        } else {
+            this.noResults.classList.remove('show');
+        }
+        
+        // Update stats
+        this.updateStats();
+    }
+    
+    clearFilters() {
+        this.statusFilter.value = 'all';
+        this.batchFilter.value = 'all';
+        this.searchInput.value = '';
+        this.applyFilters();
+    }
+    
+    updateStats() {
+        const totalVisible = document.querySelectorAll('.doubt-card:not(.hidden)').length;
+        const resolvedVisible = document.querySelectorAll('.doubt-card.resolved:not(.hidden)').length;
+        const pendingVisible = document.querySelectorAll('.doubt-card.pending:not(.hidden)').length;
+        
+        // Update stats cards
+        const totalElement = document.querySelector('.stat-card.total .stat-value');
+        const resolvedElement = document.querySelector('.stat-card.resolved .stat-value');
+        const pendingElement = document.querySelector('.stat-card.pending .stat-value');
+        
+        if (totalElement) totalElement.textContent = totalVisible;
+        if (resolvedElement) resolvedElement.textContent = resolvedVisible;
+        if (pendingElement) pendingElement.textContent = pendingVisible;
+    }
+}
+
+// Modal functionality
+class ModalManager {
+    constructor() {
+        this.questionModal = document.getElementById('questionModal');
+        this.resolutionModal = document.getElementById('resolutionModal');
+        this.modalQuestionText = document.getElementById('modalQuestionText');
+        this.modalQuestionMeta = document.getElementById('modalQuestionMeta');
+        this.modalResolutionText = document.getElementById('modalResolutionText');
+        this.modalResolutionMeta = document.getElementById('modalResolutionMeta');
+        
+        this.init();
+    }
+    
+    init() {
+        // Close modals when clicking X
+        document.querySelectorAll('.close-modal').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => this.closeModals());
+        });
+        
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeModals();
+                }
+            });
+        });
+        
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModals();
+            }
+        });
+    }
+    
+    showQuestionModal(doubtData) {
+        this.modalQuestionText.textContent = doubtData.question;
+        
+        // Create meta information
+        this.modalQuestionMeta.innerHTML = `
+            <div class="meta-item">
+                <span class="meta-label">Intern:</span>
+                <span class="meta-value">${doubtData.internName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Trainer:</span>
+                <span class="meta-value">${doubtData.trainerName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Batch:</span>
+                <span class="meta-value">${doubtData.batchName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Asked On:</span>
+                <span class="meta-value">${doubtData.createdAt}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Status:</span>
+                <span class="meta-value">${doubtData.status}</span>
+            </div>
+        `;
+        
+        this.questionModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    showResolutionModal(resolutionData) {
+        this.modalResolutionText.textContent = resolutionData.answer;
+        
+        // Create meta information
+        this.modalResolutionMeta.innerHTML = `
+            <div class="meta-item">
+                <span class="meta-label">Intern:</span>
+                <span class="meta-value">${resolutionData.internName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Trainer:</span>
+                <span class="meta-value">${resolutionData.trainerName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Batch:</span>
+                <span class="meta-value">${resolutionData.batchName}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Question Asked:</span>
+                <span class="meta-value">${resolutionData.questionCreated}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Resolved On:</span>
+                <span class="meta-value">${resolutionData.resolvedAt}</span>
+            </div>
+        `;
+        
+        this.resolutionModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    closeModals() {
+        this.questionModal.style.display = 'none';
+        this.resolutionModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filter system
+    const doubtFilter = new DoubtFilter();
+    
+    // Initialize modal system
+    const modalManager = new ModalManager();
+    
+    // Add show more buttons where needed
+    document.querySelectorAll('.doubt-card').forEach(card => {
+        const question = card.querySelector('.doubt-question');
+        const questionText = question.textContent;
+        const internName = card.querySelector('.user-details .user-name').textContent;
+        const trainerName = card.querySelectorAll('.user-details .user-name')[1].textContent;
+        const batchName = card.querySelector('.batch-info').textContent;
+        const createdAt = card.querySelector('.doubt-date').textContent;
+        const status = card.querySelector('.doubt-status').textContent;
+        
+        // Add show more for questions
+        if (questionText.length > 150) {
+            question.classList.add('collapsed');
+            const btn = document.createElement('button');
+            btn.className = 'btn-expand';
+            btn.innerHTML = '📖 Show Full Question';
+            btn.onclick = () => {
+                modalManager.showQuestionModal({
+                    question: questionText,
+                    internName: internName,
+                    trainerName: trainerName,
+                    batchName: batchName,
+                    createdAt: createdAt,
+                    status: status
+                });
+            };
+            question.parentNode.insertBefore(btn, question.nextSibling);
+        }
+        
+        // Add show more for resolutions
+        const resolution = card.querySelector('.resolution-text');
+        if (resolution) {
+            const resolutionText = resolution.textContent;
+            const resolutionTime = card.querySelector('.resolution-time')?.textContent || 'Not specified';
+            
+            if (resolutionText.length > 100) {
+                resolution.classList.add('collapsed');
+                const btn = document.createElement('button');
+                btn.className = 'btn-expand resolution-btn';
+                btn.innerHTML = '📖 Show Full Resolution';
+                btn.onclick = () => {
+                    modalManager.showResolutionModal({
+                        answer: resolutionText,
+                        internName: internName,
+                        trainerName: trainerName,
+                        batchName: batchName,
+                        questionCreated: createdAt,
+                        resolvedAt: resolutionTime
+                    });
+                };
+                resolution.parentNode.insertBefore(btn, resolution.nextSibling);
+            }
+        }
+    });
+    
+    // Make modal manager globally available
+    window.modalManager = modalManager;
+});
+</script>
+
 <div class="main-content">
     <div class="container">
-        <div class="page-title-wrapper">
-            <h2 class="page-title">All Doubts Overview</h2>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Doubt Management</h1>
+            <p class="page-subtitle">Monitor and resolve intern doubts efficiently with this comprehensive overview</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value">{{ doubts|length }}</div>
+                <div class="stat-label">Total Doubts</div>
+            </div>
+            <div class="stat-card resolved">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value">{{ doubts|length }}</div>
+                <div class="stat-label">Resolved</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-value">{{ doubts|length }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">All Doubts</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Batch:</span>
+                <select class="filter-select" id="batchFilter">
+                    <option value="all">All Batches</option>
+                    {% for batch in batches %}
+                    <option value="{{ batch.name }}">{{ batch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search doubts, interns, trainers...">
+            </div>
+            <button class="clear-filters" id="clearFilters">Clear Filters</button>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults">
+            <div class="empty-state-icon">🔍</div>
+            <h3>No Doubts Found</h3>
+            <p>Try adjusting your filters or search terms to see more results.</p>
         </div>
 
         {% if doubts %}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Intern</th>
-                        <th>Batch</th>
-                        <th>Trainer</th>
-                        <th>Question</th>
-                        <th>Created On</th>
-                        <th>Status</th>
-                        <th>Resolution</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for doubt in doubts %}
-                    <tr>
-                        <td data-label="#">{{ forloop.counter }}</td>
-                        <td data-label="Intern">{{ doubt.intern.user.username }}</td>
-                        <td data-label="Batch">{{ doubt.batch.name }}</td>
-                        <td data-label="Trainer">{{ doubt.trainer.user.username }}</td>
-                        <td data-label="Question">{{ doubt.question|truncatechars:100 }}</td>
-                        <td data-label="Created On">{{ doubt.created_at|date:"d M Y, H:i" }}</td>
-                        <td data-label="Status">
-                            {% if doubt.resolved %}
-                                <span class="badge bg-success">Resolved</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td data-label="Resolution">
-                            {% if doubt.resolved %}
-                                <div class="alert alert-success">
-                                    <strong>{{ doubt.resolution.answer }}</strong><br>
-                                    <small>Resolved at: {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
-                                </div>
-                            {% else %}
-                                <em>No resolution yet</em>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Doubts Grid -->
+        <div class="doubts-grid">
+            {% for doubt in doubts %}
+            <div class="doubt-card {% if doubt.resolved %}resolved{% else %}pending{% endif %}" id="doubt-{{ doubt.id }}">
+                <div class="doubt-header">
+                    <div class="doubt-meta">
+                        <div class="doubt-number">Doubt #{{ forloop.counter }}</div>
+                        <div class="doubt-title">{{ doubt.question|striptags|truncatechars:80 }}</div>
+                    </div>
+                    <div class="doubt-status {% if doubt.resolved %}resolved{% else %}pending{% endif %}">
+                        {% if doubt.resolved %}Resolved{% else %}Pending{% endif %}
+                    </div>
+                </div>
+                
+                <div class="doubt-body">
+                    <div class="doubt-question {% if doubt.question|length > 150 %}collapsed{% endif %}">
+                        {{ doubt.question|striptags }}
+                    </div>
+                    
+                    {% if doubt.resolved %}
+                    <div class="doubt-resolution">
+                        <div class="resolution-header">
+                            <span class="resolution-label">Resolution</span>
+                            <span class="resolution-time">{{ doubt.resolution.resolved_at|date:"M d, Y \\a\\t H:i" }}</span>
+                        </div>
+                        <div class="resolution-text {% if doubt.resolution.answer|length > 100 %}collapsed{% endif %}">
+                            {{ doubt.resolution.answer|striptags }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Invisible placeholder to maintain consistent height -->
+                    <div class="resolution-placeholder"></div>
+                    {% endif %}
+                </div>
+                
+                <div class="doubt-footer">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ doubt.intern.user.username|first|upper }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ doubt.intern.user.username }}</div>
+                            <div class="user-role">Intern</div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-info">
+                        <div class="user-avatar" style="background: var(--success-gradient);">
+                            {{ doubt.trainer.user.username|first|upper }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ doubt.trainer.user.username }}</div>
+                            <div class="user-role">Trainer</div>
+                        </div>
+                    </div>
+                    
+                    <div class="batch-info">
+                        {{ doubt.batch.name }}
+                    </div>
+                    
+                    <div class="doubt-date">
+                        {{ doubt.created_at|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% else %}
-        <div class="alert alert-info text-center">
-            No doubts found in the system.
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <h3>No Doubts Found</h3>
+            <p>There are currently no doubts in the system. When interns ask questions, they'll appear here for review and resolution.</p>
         </div>
         {% endif %}
     </div>
