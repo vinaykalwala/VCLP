@@ -231,9 +231,12 @@
 </td>
                         <td>
                             <a href="{% url 'intern_detail' intern.pk %}" class="action-btn view">View</a>
-                            <a href="{% url 'intern_update' intern.pk %}" class="action-btn edit">Edit</a>
-                            <a href="{% url 'intern_delete' intern.pk %}" class="action-btn delete">Delete</a>
-                        </td>
+
+                            {% if user.is_superuser %}
+    <a href="{% url 'intern_update' intern.pk %}" class="action-btn edit">Edit</a>
+    <a href="{% url 'intern_delete' intern.pk %}" class="action-btn delete">Delete</a>
+{% endif %}
+                       </td>
                     </tr>
                 {% empty %}
                     <tr>

@@ -215,8 +215,10 @@
                     <td>{{ trainer.availability }}</td>
                     <td>
                         <a href="{% url 'trainer_detail' trainer.pk %}" class="btn1 btn-info">View</a>
+                        {% if user.is_superuser %}
                         <a href="{% url 'trainer_update' trainer.pk %}" class="btn1 btn-warning">Edit</a>
                         <a href="{% url 'trainer_delete' trainer.pk %}" class="btn1 btn-danger">Delete</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

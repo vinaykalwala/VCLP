@@ -15,11 +15,11 @@ h2 {
     text-align: center;
 }
 
-/* Assignment Grid: 2 wide cards per row */
+/* Assignment Grid */
 .assignment-grid {
     display: grid;
     gap: 25px;
-    grid-template-columns: repeat(2, 1fr); /* 2 cards per row on desktop */
+    grid-template-columns: repeat(2, 1fr);
     justify-items: stretch;
 }
 
@@ -141,75 +141,49 @@ h2 {
     transition: background 0.3s, transform 0.2s;
 }
 
-/* Submit Button */
-.btn-submit {
-    background: #5932EA;
+.btn-submit { background: #5932EA; }
+.btn-submit:hover { background: #4727B2; transform: translateY(-2px); }
+.btn-view { background: #27AE60; }
+.btn-view:hover { background: #1e8449; transform: translateY(-2px); }
+
+/* Feedback Modal */
+.feedback-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+}
+.feedback-modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 25px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: left;
+    position: relative;
+}
+.feedback-modal-content .close {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.btn-submit:hover {
-    background: #4727B2;
-    transform: translateY(-2px);
-}
-
-/* View Submission Button */
-.btn-view {
-    background: #27AE60;
-}
-
-.btn-view:hover {
-    background: #1e8449;
-    transform: translateY(-2px);
-}
-
-/* Responsive: below 770px, single column */
-@media (max-width: 770px) {
-    .assignment-grid {
-        grid-template-columns: 1fr; /* single column */
-    }
-}
-
-/* Responsive: below 440px, stack footer bar above buttons */
+/* Responsive */
+@media (max-width: 770px) { .assignment-grid { grid-template-columns: 1fr; } }
 @media (max-width: 440px) {
-    .assignment-footer {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .footer-progress-wrapper {
-        width: 100%;
-        margin-bottom: 10px;
-        height: 30px;
-    }
-
-    .assignment-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .assignment-actions a.btn {
-        width: 100%;
-        text-align: center;
-    }
-
-    .footer-progress-text {
-        font-size: 0.75rem;
-    }
+    .assignment-footer { flex-direction: column; align-items: stretch; }
+    .footer-progress-wrapper { width: 100%; margin-bottom: 10px; height: 30px; }
+    .assignment-actions { flex-direction: column; gap: 10px; }
+    .assignment-actions a.btn { width: 100%; text-align: center; }
+    .footer-progress-text { font-size: 0.75rem; }
 }
-
-/* Extremely small screens <= 350px */
-@media (max-width: 350px) {
-    .footer-progress-wrapper {
-        display: none; /* hide bar */
-    }
-    .assignment-footer::after {
-        content: attr(data-status);
-        display: block;
-        text-align: center;
-        font-weight: 600;
-        color: #555;
-        margin-top: 6px;
-    }
-}
+@media (max-width: 350px) { .footer-progress-wrapper { display: none; } }
 </style>
 
 <div class="main-content">
@@ -228,22 +202,50 @@ h2 {
 
             <!-- Middle Body -->
             <div class="assignment-body">
-                <div class="assignment-desc">{{ data.assignment.description }}</div>
-                <div class="assignment-meta"><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</div>
-                {% if data.assignment.file %}
-                <div class="assignment-file">
-                    <strong>File:</strong> <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
-                </div>
-                {% endif %}
-                {% if data.is_submitted and data.is_graded %}
-                <div class="assignment-meta"><strong>Score:</strong> {{ data.score }} | <strong>Feedback:</strong> {{ data.feedback }}</div>
-                {% endif %}
-            </div>
+    <div class="assignment-desc">{{ data.assignment.description }}</div>
+    <div class="assignment-meta"><strong>Deadline:</strong> {{ data.assignment.deadline|date:"d M Y, h:i A" }}</div>
+    
+    {% if data.assignment.file %}
+    <div class="assignment-file">
+        <strong>File:</strong> <a href="{{ data.assignment.file.url }}" target="_blank">Download</a>
+    </div>
+    {% endif %}
 
-            <!-- Footer: Progress Bar + Buttons -->
+    <!-- Score & Feedback -->
+    <div class="assignment-meta">
+        <strong>Score:</strong>
+        {% if data.is_submitted %}
+            {% if data.is_graded %}
+                {% if data.score %}{{ data.score }}{% else %}Not available{% endif %}
+            {% else %}
+                Not graded
+            {% endif %}
+        {% else %}
+            Not graded
+        {% endif %}
+        |
+        <strong>Feedback:</strong>
+        {% if data.is_submitted and data.is_graded %}
+            {% if data.feedback %}
+                {% if data.feedback|length > 80 %}
+                    {{ data.feedback|truncatechars:20 }}
+                    <a href="#" class="read-more-link" data-feedback="{{ data.feedback|escapejs }}">Read more</a>
+                {% else %}
+                    {{ data.feedback }}
+                {% endif %}
+            {% else %}
+                Not available
+            {% endif %}
+        {% else %}
+            Not available
+        {% endif %}
+    </div>
+</div>
+
+
+            <!-- Footer -->
             <div class="assignment-footer"
                  data-status="{% if data.is_submitted %}{% if data.is_graded %}Graded ✅{% else %}Submitted, Awaiting Grading ⏳{% endif %}{% else %}Not Submitted ❌{% endif %}">
-
                 <div class="footer-progress-wrapper">
                     {% if data.is_submitted %}
                         {% if data.is_graded %}
@@ -270,6 +272,34 @@ h2 {
         </div>
         {% endfor %}
     </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-modal-content">
+            <span class="close">&times;</span>
+            <p id="modalFeedback"></p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('feedbackModal');
+        const modalText = document.getElementById('modalFeedback');
+        const closeBtn = modal.querySelector('.close');
+
+        document.querySelectorAll('.read-more-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                modalText.textContent = this.dataset.feedback;
+                modal.style.display = 'block';
+            });
+        });
+
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', e => { if (e.target == modal) modal.style.display = 'none'; });
+    });
+    </script>
+
     {% else %}
         <p style="text-align:center; color:#666; font-weight:500; margin-top:40px;">No assignments found.</p>
     {% endif %}

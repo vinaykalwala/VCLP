@@ -34,7 +34,7 @@
             align-items: center;
         }
         .control-btn {
-  background-color: #FBBF24; /* Amber */
+            background-color: #FBBF24; /* Amber */
             color: white;
             border: none;
             padding: 8px 15px;
@@ -145,18 +145,17 @@
             <button class="control-btn">
                 <a href="{% url 'view_lessons' %}" style="text-decoration: none;color:#333;">← Back to All Lessons</a>
             </button>
-            
-           
             <button class="control-btn close-btn" onclick="closeViewer()" title="Close">Close</button>
         </div>
     </div>
 
     <iframe 
-    src="{% url 'secure_pdf_view' lesson.id %}" 
-    style="width:100%;height:100vh;border:none;">
-</iframe>
+        id="pdfFrame"
+        src="{% url 'secure_pdf_view' lesson.id %}" 
+        style="width:100%;height:100vh;border:none;">
+    </iframe>
 
-    <!-- Security overlay to prevent right-click on iframe -->
+    <!-- Security overlay -->
     <div class="security-overlay" id="securityOverlay"></div>
     
     <!-- Warning message -->
@@ -165,77 +164,78 @@
     </div>
 
     <script>
-        let zoomLevel = 1;
         const pdfFrame = document.getElementById('pdfFrame');
-        const securityOverlay = document.getElementById('securityOverlay');
         const warningMessage = document.getElementById('warningMessage');
 
-        function onPDFLoad() {
-            // Show warning message briefly
+        function showWarning() {
             warningMessage.classList.add('show');
-            setTimeout(() => {
-                warningMessage.classList.remove('show');
-            }, 3000);
-        }
-
-        
-
-       
-        function applyZoom() {
-            pdfFrame.style.transform = `scale(${zoomLevel})`;
-            pdfFrame.style.width = `${100 / zoomLevel}%`;
-            pdfFrame.style.height = `${100 / zoomLevel}%`;
+            setTimeout(() => warningMessage.classList.remove('show'), 2000);
         }
 
         function closeViewer() {
             window.close();
         }
 
-        document.addEventListener('contextmenu', function(e) {
+        // Disable right-click
+        document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             showWarning();
-            return false;
         });
 
-        document.addEventListener('keydown', function(e) {
+        // Disable print, save, source view, dev tools, and screenshots
+        document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key.toLowerCase()) {
-                    case 's': // Ctrl+S
-                    case 'p': // Ctrl+P
-                    case 'u': // Ctrl+U
-                        e.preventDefault();
-                        showWarning();
-                        return false;
+                const key = e.key.toLowerCase();
+                if (['p', 's', 'u', 'c'].includes(key)) {
+                    e.preventDefault();
+                    showWarning();
+                    return false;
                 }
             }
-            if (e.key === 'F12' || e.key === 'PrintScreen') {
+            if (['F12', 'PrintScreen', 'p'].includes(e.key)) {
                 e.preventDefault();
                 showWarning();
                 return false;
             }
         });
 
-        function showWarning() {
-            warningMessage.classList.add('show');
-            setTimeout(() => {
-                warningMessage.classList.remove('show');
-            }, 2000);
-        }
+        // Disable drag & drop
+        document.addEventListener('dragstart', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => e.preventDefault());
 
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        document.addEventListener('drop', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
+        // Disable user text selection
         document.styleSheets[0].insertRule(
-            'body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }', 
+            'body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }',
             document.styleSheets[0].cssRules.length
         );
+
+        // Disable print event
+        window.matchMedia('print').addListener(function(mql) {
+            if (mql.matches) {
+                showWarning();
+                setTimeout(() => window.stop(), 10);
+            }
+        });
+
+        // Prevent access to iframe contents (hide print/download UI)
+        pdfFrame.addEventListener('load', () => {
+            try {
+                const innerDoc = pdfFrame.contentDocument || pdfFrame.contentWindow.document;
+                const downloadBtns = innerDoc.querySelectorAll('[data-element="download"], [data-element="print"], button[title="Download"], button[title="Print"]');
+                downloadBtns.forEach(btn => btn.style.display = 'none');
+            } catch (err) {
+                // cross-origin restriction ignored safely
+            }
+        });
+
+        // Disable copying content
+        document.addEventListener('copy', (e) => {
+            e.preventDefault();
+            showWarning();
+        });
+        
     </script>
-    
+    <script>
+        
+    </script>
 </body>

@@ -164,7 +164,7 @@ body {
   {% if intern.profile_photo %}
     <img src="{{ intern.profile_photo.url }}" alt="Profile Photo">
   {% else %}
-    <img src="{% static 'images/default-avatar.png' %}" alt="Default">
+    <img src="{% static 'images/user.webp' %}" alt="Default">
   {% endif %}
   <h2>{{ intern.user.get_full_name|default:intern.user.username }}</h2>
   <p class="role">{{ intern.qualification|default:"Intern" }}</p>

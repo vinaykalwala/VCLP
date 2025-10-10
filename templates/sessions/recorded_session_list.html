@@ -15,25 +15,29 @@
                 <div class="session-card">
                     <!-- Updated Session Header -->
                     <div class="session-header-card">
-    <div class="session-icon">
-        <i class="fas fa-video"></i>
-    </div>
-    <div class="session-title">
-        <h3>{{ session.title }}</h3>
-        <span class="session-batch">{{ session.batch.name }}</span>
-    </div>
-</div>
+                        <div class="session-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="session-title">
+                            <h3>{{ session.title }}</h3>
+                            <span class="session-batch">{{ session.batch.name }}</span>
+                        </div>
+                    </div>
 
-                    <p class="session-description">
+                    <p class="session-description" data-full="{{ session.description|escapejs }}">
                         {% if session.description %}
                             {{ session.description }}
                         {% else %}
                             No description provided.
                         {% endif %}
                     </p>
+                    {% if session.description and session.description|length > 80 %}
+                        <a href="#" class="read-more">Read More Discription</a>
+                    {% endif %}
 
                     {% if session.video %}
-                        <video width="100%" controls class="session-video">
+                        <!-- 🔒 Download disabled -->
+                        <video width="100%" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" class="session-video">
                             <source src="{{ session.video.url }}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
@@ -60,6 +64,15 @@
                 No recorded sessions found.
             </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- Modal for Full Description -->
+<div id="descModal" class="desc-modal">
+    <div class="desc-modal-content">
+        <span class="desc-modal-close">&times;</span>
+        <h3 class="desc-modal-title">Full Description</h3>
+        <p id="descModalText"></p>
     </div>
 </div>
 
@@ -117,7 +130,6 @@
     box-shadow: 0 12px 28px rgba(0,0,0,0.12);
 }
 
-
 /* Underline after header */
 .session-header-card {
     display: flex;
@@ -160,7 +172,20 @@
     color: #555;
     margin: 12px 0;
     min-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* only two lines */
+    -webkit-box-orient: vertical;
 }
+.read-more {
+    font-size: 13px;
+    color: #5932EA;
+    text-decoration: none;
+    font-weight: 600;
+}
+.read-more:hover { text-decoration: underline; }
+
 .session-video { border-radius: 10px; margin-bottom: 12px; }
 .session-footer {
     justify-content: space-between;
@@ -197,10 +222,80 @@
 }
 .btn-delete:hover { background: #b91c1c; transform: translateY(-2px); }
 
+/* Modal */
+.desc-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    padding-top: 80px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    margin: 0 auto;
+}
+.desc-modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    animation: modalFade 0.3s ease-in-out;
+}
+.desc-modal-title {
+    color: #5932EA;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+#descModalText {
+    color: #444;
+    font-size: 15px;
+    line-height: 1.6;
+}
+.desc-modal-close {
+    float: right;
+    font-size: 22px;
+    color: #666;
+    cursor: pointer;
+}
+.desc-modal-close:hover { color: #000; }
+@keyframes modalFade {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .header-bar { flex-direction: column; align-items: stretch; gap: 10px; }
     .header-bar h2 { text-align: center; }
 }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("descModal");
+    const modalText = document.getElementById("descModalText");
+    const closeBtn = document.querySelector(".desc-modal-close");
+
+    document.querySelectorAll(".read-more").forEach(link => {
+        link.addEventListener("click", e => {
+            e.preventDefault();
+            const fullText = e.target.previousElementSibling.getAttribute("data-full");
+            modalText.innerText = fullText;
+            modal.style.display = "block";
+        });
+    });
+
+    closeBtn.onclick = () => (modal.style.display = "none");
+    window.onclick = e => { if (e.target == modal) modal.style.display = "none"; };
+});
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+    if (e.ctrlKey && (e.key === 's' || e.key === 'p' || e.key === 'u')) e.preventDefault();
+});
+</script>
 {% endblock %}
