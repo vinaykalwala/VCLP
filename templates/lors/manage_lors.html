@@ -236,7 +236,7 @@ input[type="checkbox"] {
         </div>
 
         <!-- Table Section -->
-        <form method="post">
+        <form method="post" id="lor-form">
             {% csrf_token %}
             {% if selected_batch %}
                 <input type="hidden" name="batch_id" value="{{ selected_batch.id }}">
@@ -266,7 +266,7 @@ input[type="checkbox"] {
                     </thead>
                     <tbody>
                         {% for intern in interns %}
-                        <tr>
+                        <tr data-project="{{ intern.project_name|default:'' }}">
                             <td style="text-align:center;">
                                 {% if intern.lor_generated %}
                                     <input type="checkbox" disabled>
@@ -292,7 +292,7 @@ input[type="checkbox"] {
                                     {% if intern.lor_generated %}
                                         <span class="disabled-btn">Generated</span>
                                     {% else %}
-                                        <a href="{% url 'download_lor' intern.id %}" class="download-btn">Generate LOR</a>
+                                        <a href="{% url 'download_lor' intern.id %}" class="download-btn lor-link">Generate LOR</a>
                                     {% endif %}
                                 {% else %}
                                     <span class="disabled-btn">Not Completed</span>
@@ -314,8 +314,20 @@ input[type="checkbox"] {
 </div>
 
 <script>
+// Select all checkboxes
 document.getElementById('select-all')?.addEventListener('click', function(e) {
     document.querySelectorAll('.intern-checkbox').forEach(cb => cb.checked = e.target.checked);
+});
+
+// Alert if project is missing before download
+document.querySelectorAll('.lor-link, button[name="action"]').forEach(el => {
+    el.addEventListener('click', function(e) {
+        let row = e.target.closest('tr');
+        if (row && row.dataset.project === '') {
+            e.preventDefault();
+            alert('Project is incomplete / Project name is missing. Cannot generate LOR.');
+        }
+    });
 });
 </script>
 {% endblock %}
