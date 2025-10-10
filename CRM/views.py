@@ -442,6 +442,7 @@ def generate_intern_pdf(request, mode, identifier=None):
 
         response = HttpResponse(pdf_buffer, content_type="application/pdf")
         filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
+        filename = filename.upper()
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
 
@@ -472,6 +473,7 @@ def generate_intern_pdf(request, mode, identifier=None):
                 continue
 
             filename = f"{intern.unique_id}_{intern.user.get_full_name()}_undertaking.pdf"
+            filename = filename.upper()
             zip_file.writestr(filename, pdf_buffer.read())
 
             intern.undertaking_generated = True
@@ -480,9 +482,9 @@ def generate_intern_pdf(request, mode, identifier=None):
     zip_buffer.seek(0)
     response = HttpResponse(zip_buffer, content_type="application/zip")
     if mode == "batch":
-        response["Content-Disposition"] = f'attachment; filename="{batch.name}_undertakings.zip"'
+        response["Content-Disposition"] = f'attachment; filename="{batch.name.upper()}_UNDERTAKINGS.ZIP"'
     else:
-        response["Content-Disposition"] = 'attachment; filename="undertakings.zip"'
+        response["Content-Disposition"] = 'attachment; filename="UNDERTAKINGS.ZIP"'
     return response
 
 
