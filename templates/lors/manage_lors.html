@@ -242,11 +242,11 @@ input[type="checkbox"] {
                 <input type="hidden" name="batch_id" value="{{ selected_batch.id }}">
             {% endif %}
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button type="submit" name="action" value="download_selected" class="download-btn">
+                <button type="submit" name="action" value="download_selected" class="download-btn" id="download-selected-btn">
                     <i class="fas fa-download"></i> Download for Selected
                 </button>
                 {% if selected_batch %}
-                <button type="submit" name="action" value="download_batch" class="download-btn" style="background: #28a745;">
+                <button type="submit" name="action" value="download_batch" class="download-btn" style="background: #28a745;" id="download-batch-btn">
                     <i class="fas fa-file-archive"></i> Download for Batch
                 </button>
                 {% endif %}
@@ -266,7 +266,7 @@ input[type="checkbox"] {
                     </thead>
                     <tbody>
                         {% for intern in interns %}
-                        <tr data-project="{{ intern.project_name|default:'' }}">
+                        <tr data-project="{{ intern.project_title|default_if_none:'' }}">
                             <td style="text-align:center;">
                                 {% if intern.lor_generated %}
                                     <input type="checkbox" disabled>
@@ -319,15 +319,43 @@ document.getElementById('select-all')?.addEventListener('click', function(e) {
     document.querySelectorAll('.intern-checkbox').forEach(cb => cb.checked = e.target.checked);
 });
 
-// Alert if project is missing before download
-document.querySelectorAll('.lor-link, button[name="action"]').forEach(el => {
+// Individual "Generate LOR" links
+document.querySelectorAll('.lor-link').forEach(el => {
     el.addEventListener('click', function(e) {
-        let row = e.target.closest('tr');
-        if (row && row.dataset.project === '') {
+        const project = e.target.closest('tr').dataset.project?.trim();
+        if (!project) {
             e.preventDefault();
             alert('Project is incomplete / Project name is missing. Cannot generate LOR.');
         }
     });
+});
+
+// "Download Selected" button
+document.getElementById('download-selected-btn')?.addEventListener('click', function(e) {
+    const selectedRows = Array.from(document.querySelectorAll('.intern-checkbox:checked')).map(cb => cb.closest('tr'));
+    for (let row of selectedRows) {
+        const project = row.dataset.project?.trim();
+        if (!project) {
+            e.preventDefault();
+            alert('One or more selected interns have incomplete projects. Cannot generate LOR.');
+            return;
+        }
+    }
+});
+
+// "Download Batch" button
+document.getElementById('download-batch-btn')?.addEventListener('click', function(e) {
+    const rows = Array.from(document.querySelectorAll('.lor-table tbody tr'));
+    for (let row of rows) {
+        const status = row.querySelector('.status-completed') ? true : false;
+        const lorGenerated = row.querySelector('input.intern-checkbox') ? false : true;
+        const project = row.dataset.project?.trim();
+        if (status && !lorGenerated && !project) {
+            e.preventDefault();
+            alert('Some interns in this batch have incomplete projects. Cannot generate LOR.');
+            return;
+        }
+    }
 });
 </script>
 {% endblock %}

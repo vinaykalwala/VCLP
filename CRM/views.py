@@ -2431,12 +2431,11 @@ def delete_assessment(request, pk):
 def view_assessments_submissions(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id)
     submissions = assessment.submissions.all()
-     # Calculate average score
-    average_score = submissions.aggregate(avg=Avg('score'))['avg']
+    # Calculate average score and add it to assessment object
+    assessment.average_score = submissions.aggregate(avg=Avg('score'))['avg']
     return render(request, "assessments/view_assessments_submissions.html", {
         "assessment": assessment,
         "submissions": submissions,
-        'average_score': average_score,
     })
 
 
@@ -2595,7 +2594,11 @@ def intern_overview(request):
 
     # --- Doubts ---
     doubts = get_doubts_for_user(request.user)
-    pending_doubts = doubts.total - doubts.resolved if doubts else 0
+    total_doubts = doubts.total if doubts else 0
+    resolved_doubts = doubts.resolved if doubts else 0
+    pending_doubts = total_doubts - resolved_doubts
+    
+
 
     # --- Lessons & Recorded Sessions ---
     total_files = LessonFile.objects.count()
@@ -2634,6 +2637,10 @@ def intern_overview(request):
         'intern_profile': intern_profile,
         'doubts': doubts,
         'pending_doubts': pending_doubts,
+        'total_doubts': total_doubts,
+        
+
     }
 
     return render(request, "interns/intern_overview.html", context)
+

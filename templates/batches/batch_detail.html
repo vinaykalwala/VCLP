@@ -1,3 +1,5 @@
+[file name]: batch_detail.html
+[file content begin]
 {% extends 'login_base.html' %}
 {% block title %}Batch Details{% endblock %}
 {% block content %}
@@ -309,6 +311,23 @@
                                 <p class="info-value-modern">{{ batch.end_date|default:"Not set" }}</p>
                             </div>
                         </div>
+
+                        <!-- Timings Field Added Here -->
+                        <div class="info-item-modern">
+                            <div class="info-icon-modern">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="info-content-modern">
+                                <div class="info-label-modern">Timings</div>
+                                <p class="info-value-modern">
+                                    {% if batch.timings %}
+                                        {{ batch.timings }}
+                                    {% else %}
+                                        Not Scheduled
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -366,3 +385,4 @@
 </body>
 </html>
 {% endblock %}
+[file content end]

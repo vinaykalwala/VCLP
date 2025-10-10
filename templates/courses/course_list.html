@@ -181,7 +181,7 @@
 /* Toolbar */
 .course-toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 35px;
   flex-wrap: wrap;
@@ -196,7 +196,7 @@
 .search-box {
   position: relative;
   flex: 1;
-  max-width: 500px;
+  max-width: 900px;
 }
 
 .search-input {
@@ -364,7 +364,7 @@
   gap: 8px;
   font-size: 14px;
   padding: 14px 20px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background:  #5932EA; 
   color: var(--bg);
   border-radius: 10px;
   text-decoration: none;
@@ -372,7 +372,7 @@
   transition: var(--transition);
   flex: 1;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow:  #5932EA; 
   position: relative;
   overflow: hidden;
 }
@@ -708,6 +708,18 @@
     gap: 20px;
   }
 }
+.actions a.edit-btn {
+  background: #FBBF24;  /* force override */
+  color:black 
+}
+
+.actions a.edit-btn:hover {
+  background: #10B981;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
+}
+
+
 </style>
 
 <div class="course-page">
@@ -751,9 +763,10 @@
           </a>
 
           <div class="actions">
-            <a href="{% url 'course_update' course.pk %}">
+            
+            <a href="{% url 'course_update' course.pk %}" class="edit-btn">
               <span>✏️</span>
-              <span>Edit Course</span>
+              <span >Edit Course</span>
             </a>
             <a href="javascript:void(0)" class="delete-btn" data-id="{{ course.pk }}" data-name="{{ course.name }}">
               <span>🗑️</span>
