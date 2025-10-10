@@ -24,7 +24,7 @@
           <img src="{{ logo_path }}" alt="Company Logo" style="height:60px; vertical-align:middle; margin-right:10px;">
           <h1 style="font-size:20px; display:inline-block; vertical-align:middle; color:#660B05;">
             {{ company.name }}
-            </h1>
+          </h1>
         </td>
       </tr>
       <tr>
@@ -33,7 +33,7 @@
         </td>
       </tr>
       <tr>
-        <td class="center" style="font-size:11px;  padding-top:2px; color:#333;">
+        <td class="center" style="font-size:11px; padding-top:2px; color:#333;">
           Phone: {{ company.phone }} | Website: {{ company.website }}
         </td>
       </tr>
@@ -49,13 +49,15 @@
     </div>
 
     <!-- Subject & Greeting -->
-    <p style="font-size:13px;"><strong>Subject:</strong> Offer for {{ course.name }} – Paid Internship</p>
-    <p style="font-size:13px;">Dear {{ intern_name }},</p>
+    <p style="font-size:13px;"><strong>Subject:</strong> Offer for {{ course.name|upper }} – Paid Internship</p>
+    <p style="font-size:13px;">Dear {{ intern_name|upper }},</p>
 
     <!-- Introduction -->
     <p class="paragraph">
-      We are delighted to offer you a position in our <strong>{{ course.name }}</strong> Internship Program.
-      This program provides hands-on experience and exposure to real-world projects in {{ course.description }}.
+      We are delighted to offer you a position in our <strong>{{ course.name|upper }}</strong> Internship Program.
+      This program is designed to provide students and young professionals with comprehensive training,
+      hands-on experience, practical learning, and exposure to real-world projects in the field of
+      {{ course.name|upper }}.
     </p>
 
     <!-- Program Details -->
@@ -65,10 +67,8 @@
       <tr><td><strong>Duration:</strong></td><td>3 months</td></tr>
       <tr><td><strong>Start Date:</strong></td><td>{{ batch.start_date }}</td></tr>
       <tr><td><strong>End Date:</strong></td><td>{{ batch.end_date }}</td></tr>
-      <tr><td><strong>Role:</strong></td><td>Trainee</td></tr>
+      <tr><td><strong>Role:</strong></td><td>Intern</td></tr>
       <tr><td><strong>Course:</strong></td><td>{{ course.name }}</td></tr>
-      <tr><td><strong>Batch:</strong></td><td>{{ batch.name }}</td></tr>
-      <tr><td><strong>Trainer:</strong></td><td>{{ batch.trainer_name }}</td></tr>
       <tr><td><strong>Working Days:</strong></td><td>Monday to Friday</td></tr>
       <tr><td><strong>Timings:</strong></td><td>{{ batch.timings }}</td></tr>
     </table>
@@ -78,7 +78,7 @@
     <ul class="simple">
       <li>Interactive online sessions with industry experts.</li>
       <li>Real-time project work and practical assignments.</li>
-      <li>Mentorship from experienced professionals.</li>
+      <li>Mentorship and guidance from experienced professionals.</li>
       <li>Certificate of Completion and Letter of Recommendation upon successful completion.</li>
     </ul>
 
@@ -88,44 +88,58 @@
       <li><strong>Program Duration & Schedule</strong>
         <ul class="simple">
           <li>The internship will run from {{ batch.start_date }} to {{ batch.end_date }}.</li>
-          <li>Attendance is mandatory.</li>
+          <li>Attendance in training sessions, workshops, and project assignments is mandatory.</li>
         </ul>
       </li>
       <li><strong>Eligibility & Conduct</strong>
-        <ul class="simple"><li>Maintain professional behavior.</li></ul>
+        <ul class="simple">
+          <li>This program is intended for students and young professionals seeking practical training.</li>
+          <li>Interns must maintain professional behavior, respect intellectual property, and follow organizational decorum.</li>
+        </ul>
       </li>
       <li><strong>Payment & Fees</strong>
-        <ul class="simple"><li>Paid internship covering training and guidance.</li></ul>
+        <ul class="simple">
+          <li>This is a paid internship program. The fee covers training, mentorship, and project guidance.</li>
+          <li>Payment must be completed before the start of the program to confirm enrollment.</li>
+        </ul>
       </li>
       <li><strong>Attendance & Performance</strong>
-        <ul class="simple"><li>Completion of assignments required for certification.</li></ul>
+        <ul class="simple">
+          <li>Regular attendance is compulsory.</li>
+          <li>Completion of all tasks, assignments, and projects is required to be eligible for certification.</li>
+        </ul>
       </li>
       <li><strong>Confidentiality</strong>
-        <ul class="simple"><li>Maintain confidentiality of all internal processes and documents.</li></ul>
+        <ul class="simple">
+          <li>Interns must maintain confidentiality regarding all internal processes, documents, and project details.</li>
+        </ul>
       </li>
       <li><strong>Certificate & Recommendation</strong>
-        <ul class="simple"><li>Successful interns will receive a Certificate of Completion and Letter of Recommendation.</li></ul>
+        <ul class="simple">
+          <li>On successful completion, you will receive an official Certificate of Completion and, based on performance, a Letter of Recommendation.</li>
+        </ul>
       </li>
       <li><strong>Termination</strong>
-        <ul class="simple"><li>The organization reserves the right to terminate the internship for misconduct or non-compliance.</li></ul>
+        <ul class="simple">
+          <li>The organization reserves the right to terminate your internship for misconduct, breach of terms, or non-compliance with program requirements.</li>
+        </ul>
       </li>
     </ol>
 
-    <!-- Signatures -->
-    <table width="100%" style="margin-top:20px;">
-      <tr>
-        <td style="width:50%; text-align:left;">
-          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
-          <div><strong>HR Department</strong></div>
-          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
-        </td>
-        <td style="width:50%; text-align:right;">
-          <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
-          <div><strong>Authorized Signatory</strong></div>
-          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
-        </td>
-      </tr>
-    </table>
+    <!-- Acceptance & Best Regards -->
+    <h4 style="font-size:14px; margin-top:12px;">Acceptance</h4>
+    <p class="paragraph">Kindly confirm your acceptance of this offer and complete the payment at the earliest.
+    Upon confirmation, you will receive onboarding details and access credentials.</p>
+    <p class="paragraph">We are excited to welcome you to the Vindus Career Launch Internship Program and look forward
+    to supporting your professional journey.</p>
+
+    <div style="margin-top:15px; font-size:13px; line-height:1.5;">
+      <p style="margin:0;">Best Regards,</p>
+      <p style="margin:4px 0 0 0; font-weight:bold;">Vinay Kalwala</p>
+      <p style="margin:0;">Managing Director</p>
+      <p style="margin:0;">{{ company.name }}</p>
+      <p style="margin:0;">Phone: {{ company.phone }} | Website: {{ company.website }}</p>
+    </div>
 
   </div>
 </body>
