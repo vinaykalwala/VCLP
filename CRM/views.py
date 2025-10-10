@@ -648,16 +648,14 @@ def manage_certificates_view(request):
         action = request.POST.get('action')
         interns_to_process = None
 
-        # ✅ MODIFIED: Added 'completion_certificate_generated=False' to filters
         if action == 'download_selected':
             intern_ids = request.POST.getlist('intern_ids')
             if not intern_ids:
                 messages.error(request, "Please select at least one intern.")
                 return redirect(request.get_full_path())
             interns_to_process = InternProfile.objects.filter(
-                id__in=intern_ids, 
-                internship_status='Completed', 
-                completion_certificate_generated=False
+                id__in=intern_ids,
+                internship_status='Completed',
             )
 
         elif action == 'download_batch':
@@ -666,29 +664,39 @@ def manage_certificates_view(request):
                 messages.error(request, "Please filter by a batch first.")
                 return redirect(request.get_full_path())
             interns_to_process = InternProfile.objects.filter(
-                batch_id=batch_id, 
-                internship_status='Completed', 
-                completion_certificate_generated=False
+                batch_id=batch_id,
+                internship_status='Completed',
             )
 
         if interns_to_process and interns_to_process.exists():
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+                count_generated = 0
                 for intern in interns_to_process:
+                    # Skip if certificate already generated
+                    if intern.completion_certificate_generated:
+                        continue
+
                     pdf_bytes = generate_pdf_for_intern(intern)
                     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
                     zf.writestr(filename, pdf_bytes)
-            
-            interns_to_process.update(completion_certificate_generated=True)
-            
-            zip_buffer.seek(0)
-            response = HttpResponse(zip_buffer, content_type='application/zip')
-            response['Content-Disposition'] = 'attachment; filename="certificates.zip"'
-            messages.success(request, f"Successfully generated {interns_to_process.count()} new certificates.")
-            return response
+
+                    # Mark as generated
+                    intern.completion_certificate_generated = True
+                    intern.save(update_fields=['completion_certificate_generated'])
+                    count_generated += 1
+
+            if count_generated > 0:
+                zip_buffer.seek(0)
+                response = HttpResponse(zip_buffer, content_type='application/zip')
+                response['Content-Disposition'] = 'attachment; filename="certificates.zip"'
+                messages.success(request, f"Successfully generated {count_generated} new certificates.")
+                return response
+            else:
+                messages.warning(request, "No new certificates to generate. All selected interns already have a certificate.")
+                return redirect(request.get_full_path())
         else:
-            # ✅ MODIFIED: Improved warning message
-            messages.warning(request, "No new certificates to generate. All selected interns are either not 'Completed' or already have a certificate.")
+            messages.warning(request, "No interns found to generate certificates for the selected filters.")
             return redirect(request.get_full_path())
 
     context = {
@@ -697,6 +705,7 @@ def manage_certificates_view(request):
         'selected_batch': selected_batch,
     }
     return render(request, 'certificates/manage_certificates.html', context)
+
 
 @login_required
 def download_certificate_view(request, intern_id):
@@ -709,7 +718,7 @@ def download_certificate_view(request, intern_id):
 
     intern = get_object_or_404(InternProfile, id=intern_id)
 
-    # ✅ ADDED: Check if certificate was already generated
+    # Prevent re-download
     if intern.completion_certificate_generated:
         messages.warning(request, f"Certificate for {intern.user.get_full_name()} has already been generated.")
         return redirect('manage_certificates')
@@ -719,9 +728,11 @@ def download_certificate_view(request, intern_id):
         return redirect('manage_certificates')
 
     pdf_bytes = generate_pdf_for_intern(intern)
+
+    # Mark certificate as generated
     intern.completion_certificate_generated = True
-    intern.save()
-    
+    intern.save(update_fields=['completion_certificate_generated'])
+
     response = HttpResponse(pdf_bytes, content_type='application/pdf')
     filename = f"Certificate_{intern.unique_id}_{intern.user.get_full_name()}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
@@ -2420,9 +2431,12 @@ def delete_assessment(request, pk):
 def view_assessments_submissions(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id)
     submissions = assessment.submissions.all()
+     # Calculate average score
+    average_score = submissions.aggregate(avg=Avg('score'))['avg']
     return render(request, "assessments/view_assessments_submissions.html", {
         "assessment": assessment,
         "submissions": submissions,
+        'average_score': average_score,
     })
 
 
