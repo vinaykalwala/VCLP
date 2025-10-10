@@ -228,6 +228,47 @@ body {
   }
   #closeSidebarBtn:hover { background: #c62828; }
 }
+
+/* Make the parent link position relative */
+.sidebar ul li a {
+  position: relative; /* needed for badge positioning */
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #9197B3;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+/* Badge in corner */
+.badge {
+  position: absolute;
+  top: 16px;      /* adjust vertical position */
+  right: 10px;   /* adjust horizontal position */
+  background-color: #e53935;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+/* Optional hover effect */
+.sidebar ul li a:hover .badge,
+.sidebar ul li a.active .badge {
+  transform: scale(1.2);
+}
+
 </style>
 
 </head>
@@ -264,8 +305,12 @@ body {
       <li><a href="{% url 'batch_list' %}" class="{% if request.path == '/batches/' or 'batch' in request.path %}active{% endif %}"><i class="fas fa-layer-group"></i>Batch Management</a></li>
       <li><a href="{% url 'course_list' %}"><i class="fas fa-book"></i>Courses</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
-      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
-      <li><a href="{% url 'user_list' %}"><i class="fas fa-user-cog"></i> User Management</a></li>
+<li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i>Doubts
+    {% if pending_doubts_count > 0 %}
+      <span class="badge">{{ pending_doubts_count }}</span>
+    {% endif %}
+  </a>
+</li>      <li><a href="{% url 'user_list' %}"><i class="fas fa-user-cog"></i> User Management</a></li>
       <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
 
 
@@ -288,8 +333,14 @@ body {
       <li><a href="{% url 'batch_list' %}" class="{% if request.path == '/batches/' or 'batch' in request.path %}active{% endif %}"><i class="fas fa-layer-group"></i>Batch Management</a></li>
       <li><a href="{% url 'course_list' %}"><i class="fas fa-book"></i>Courses</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
-      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
-      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
+<li>
+  <a href="{% url 'doubt_list' %}">
+    <i class="fas fa-question-circle"></i>Doubts
+    {% if pending_doubts_count > 0 %}
+      <span class="badge">{{ pending_doubts_count }}</span>
+    {% endif %}
+  </a>
+</li>      <li><a href="{% url 'signup' %}"><i class="fas fa-users"></i>Create Users</a></li>
       
 
 
@@ -309,7 +360,14 @@ body {
       <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
       <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
-      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
+<li>
+  <a href="{% url 'doubt_list' %}">
+    <i class="fas fa-question-circle"></i>Doubts
+    {% if pending_doubts_count > 0 %}
+      <span class="badge">{{ pending_doubts_count }}</span>
+    {% endif %}
+  </a>
+</li>
 
 
 
@@ -319,15 +377,33 @@ body {
       <li><a href="{% url 'intern_overview' %}"><i class="fas fa-chart-area"></i></i> Intern Overview </a></li>
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
-      <li><a href="{% url 'intern_assessments' %}"><i class="fas fa-user-check"></i> My Assessments</a></li>
-      <li><a href="{% url 'batch_assessment_scores' %}"><i class="fas fa-chart-bar"></i> Assessment Scores</a></li>
-      <li><a href="{% url 'intern_assignments' %}"><i class="fas fa-clipboard-list"></i> My Assignments</a></li>
-      <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
+<li>
+  <a href="{% url 'intern_assessments' %}">
+    <i class="fas fa-user-check"></i> My Assessments
+    {% if pending_assessments_count > 0 %}
+      <span class="badge">{{ pending_assessments_count }}</span>
+    {% endif %}
+  </a>
+</li>      <li><a href="{% url 'batch_assessment_scores' %}"><i class="fas fa-chart-bar"></i> Assessment Scores</a></li>
+<li>
+  <a href="{% url 'intern_assignments' %}">
+    <i class="fas fa-clipboard-list"></i> My Assignments
+    {% if pending_assignments_count > 0 %}
+      <span class="badge">{{ pending_assignments_count }}</span>
+    {% endif %}
+  </a>
+</li>      <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
       <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
       <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
-      <li><a href="{% url 'doubt_list' %}"><i class="fas fa-question-circle"></i></i>Doubts</a></li>
-
+<li>
+  <a href="{% url 'doubt_list' %}">
+    <i class="fas fa-question-circle"></i>Doubts
+    {% if pending_doubts_count > 0 %}
+      <span class="badge">{{ pending_doubts_count }}</span>
+    {% endif %}
+  </a>
+</li>
 
     {% endif %}
   </ul>
