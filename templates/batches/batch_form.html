@@ -415,44 +415,46 @@
                         </div>
                         
                         <!-- Schedule Section -->
-                        <div class="form-section-modern stagger-item" style="animation-delay: 0.2s">
-                            <div class="section-header">
-                                <div class="section-icon">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                                <h3 class="section-title">Schedule</h3>
-                            </div>
-                            
-                            <div class="form-grid">
-                                {% for field in form %}
-                                    {% if field.name in 'start_date,end_date' %}
-                                    <div class="form-group-modern">
-                                        <label for="{{ field.id_for_label }}" class="form-label-modern">
-                                            {{ field.label }}
-                                            {% if field.field.required %}<span class="required-dot"></span>{% endif %}
-                                        </label>
-                                        {{ field }}
-                                        {% if field.name == 'start_date' %}
-                                            <i class="fas fa-play-circle field-icon"></i>
-                                        {% elif field.name == 'end_date' %}
-                                            <i class="fas fa-flag-checkered field-icon"></i>
-                                        {% endif %}
-                                        {% if field.help_text %}
-                                        <div class="help-text">{{ field.help_text }}</div>
-                                        {% endif %}
-                                        {% if field.errors %}
-                                        <div class="error-message-modern">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            {% for error in field.errors %}
-                                            <small>{{ error }}</small>
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
+<div class="form-section-modern stagger-item" style="animation-delay: 0.2s">
+    <div class="section-header">
+        <div class="section-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <h3 class="section-title">Schedule</h3>
+    </div>
+
+    <div class="form-grid">
+        {% for field in form %}
+            {% if field.name in 'start_date,end_date,timings' %}
+            <div class="form-group-modern">
+                <label for="{{ field.id_for_label }}" class="form-label-modern">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="required-dot"></span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.name == 'start_date' %}
+                    <i class="fas fa-play-circle field-icon"></i>
+                {% elif field.name == 'end_date' %}
+                    <i class="fas fa-flag-checkered field-icon"></i>
+                {% elif field.name == 'timings' %}
+                    <i class="fas fa-clock field-icon"></i>
+                {% endif %}
+                {% if field.help_text %}
+                <div class="help-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                <div class="error-message-modern">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {% for error in field.errors %}
+                    <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
                         
                         <!-- Description Section -->
                         <div class="form-section-modern stagger-item" style="animation-delay: 0.3s">
@@ -574,6 +576,20 @@
                     icon.style.pointerEvents = 'none';
                 }
             });
+            // Ensure time inputs are properly handled
+const timeInputs = document.querySelectorAll('input[type="time"]');
+timeInputs.forEach(input => {
+    // Make sure the time input has proper styling
+    input.classList.add('form-control-modern');
+    input.style.paddingRight = '45px';
+    
+    // Add a custom time format display if needed
+    input.addEventListener('change', function() {
+        if (this.value) {
+            console.log('Selected time:', this.value);
+        }
+    });
+});
         });
     </script>
 </body>
