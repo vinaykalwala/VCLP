@@ -133,7 +133,7 @@ h2 {
     background-size: 1.5rem;
 }
 
-.btn {
+.btn1 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -175,7 +175,7 @@ h2 {
         font-size: 1.5rem;
     }
 
-    .btn {
+    .btn1 {
         padding: var(--spacing-xs) var(--spacing-md);
         font-size: 0.875rem;
     }
@@ -186,13 +186,13 @@ h2 {
         font-size: 0.875rem;
     }
 
-    .btn {
+    .btn1 {
         width: 100%;
         padding: var(--spacing-sm) var(--spacing-md);
     }
 }
 </style>
-
+<div class="main-content">
 <div class="container">
     <div class="card">
         <h2>Create Assessment</h2>
@@ -216,9 +216,10 @@ h2 {
                 <input type="file" name="file" class="form-control" required>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Create Assessment</button>
+                <button type="submit" class="btn1 btn-primary">Create Assessment</button>
             </div>
         </form>
     </div>
+</div>
 </div>
 {% endblock %}

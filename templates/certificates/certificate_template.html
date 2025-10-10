@@ -165,15 +165,12 @@
 
         <div class="content">
             <p>
-                This is to certify that <span class="highlight">{{ intern.user.get_full_name|upper }}</span>, has successfully completed the <span class="highlight">Vindus Career Launch Paid Internship Program</span> conducted by <span class="highlight">Vindus Environment Private Limited</span>.
+                This is to certify that <span class="highlight">{{ intern.user.get_full_name|upper }}</span>, has successfully completed the <span class="highlight">{{ intern.batch.course.name }}</span> under <span class="highlight">Vindus Career Launch Paid Internship Program</span> conducted by <span class="highlight">Vindus Environment Private Limited</span>.
             </p>
 
             <p>
-                The internship was held <span class="highlight">online</span> from <span class="highlight">{{ intern.batch.start_date|date:"M. d, Y" }}</span> to <span class="highlight">{{ intern.batch.end_date|date:"M. d, Y" }}</span>, under the guidance of <span class="highlight">{% if intern.batch.trainer %}{{ intern.batch.trainer.user.get_full_name|upper }}{% else %}Course Instructor{% endif %}</span>.
-            </p>
+                The internship was held <span class="highlight">online</span> from <span class="highlight">{{ intern.batch.start_date|date:"M. d, Y" }}</span> to <span class="highlight">{{ intern.batch.end_date|date:"M. d, Y" }}</span>. During this period, <span class="highlight">{{ intern.user.get_full_name|upper }}</span> has demonstrated dedication, discipline, and a keen interest in learning <span class="highlight">{{ intern.batch.course.name }}</span>. He/She has actively participated in live sessions, completed assignments, and contributed to real-time projects assigned as part of the internship.
 
-            <p>
-                During this period, <span class="highlight">{{ intern.user.get_full_name|upper }}</span> has demonstrated dedication, discipline, and a keen interest in learning <span class="highlight">{{ intern.batch.course.name }}</span>. He/She has actively participated in live sessions, completed assignments, and contributed to real-time projects assigned as part of the internship.
             </p>
 
             <p>
@@ -183,6 +180,9 @@
             <p>
                 We wish him/her all the best in future professional endeavors.
             </p>
+            <p>
+                With regards,
+            </p>
         </div>
 
         <!-- Signatures -->
@@ -191,8 +191,8 @@
         <td style="width:50%; text-align:left;">
           <div style="border-top:1px solid #000; width:60%; margin-top:40px;"></div>
           <div><strong>Vinay Kalvala</strong></div>
-          <div><strong>Authorized Signatory</strong></div>
-          <div style="font-size:11px; color:#444;">{{ company.name }}</div>
+          <div><strong>(Managing Director)</strong></div>
+          <div><strong><a href="http://www.vindusenvironment.com">Vindus Environment Private Limited</a></strong></div>
         </td>
       </tr>
     </table>

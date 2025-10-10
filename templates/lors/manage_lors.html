@@ -5,10 +5,10 @@
 
 {% block content %}
 <style>
-/* ======= LOR Management Page Styling (Attendance Theme) ======= */
+/* ======= LOR Management Page Styling ======= */
 .lor-wrapper {
     max-width: 1150px;
-    margin: 50px auto;
+    margin: 20px auto;
     padding: 35px;
     background: #f9fafb;
     border-radius: 12px;
@@ -206,37 +206,37 @@ input[type="checkbox"] {
         </div>
 
         <!-- Filter Section -->
-<div class="lor-filters">
-    <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
-        <div>
-            <label for="{{ filter_form.course.id_for_label }}">Course:</label><br>
-            {{ filter_form.course }}
+        <div class="lor-filters">
+            <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+                <div>
+                    <label for="{{ filter_form.course.id_for_label }}">Course:</label><br>
+                    {{ filter_form.course }}
+                </div>
+                <div>
+                    <label for="{{ filter_form.batch.id_for_label }}">Batch:</label><br>
+                    {{ filter_form.batch }}
+                </div>
+                <div>
+                    <button type="submit" name="apply_filter" value="true" class="filter-btn">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+                <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; width: 100%;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label for="{{ filter_form.q.id_for_label }}">Search:</label><br>
+                    {{ filter_form.q }}
+                </div>
+                <div style="flex: 0 0 auto;">
+                    <button type="submit" name="apply_search" value="true" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+            </form>
         </div>
-        <div>
-            <label for="{{ filter_form.batch.id_for_label }}">Batch:</label><br>
-            {{ filter_form.batch }}
-        </div>
-        <div>
-            <button type="submit" name="apply_filter" value="true" class="filter-btn">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-        </div>
-        <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 12px; width: 100%;">
-        <div style="flex: 1; min-width: 200px;">
-            <label for="{{ filter_form.q.id_for_label }}">Search:</label><br>
-            {{ filter_form.q }}
-        </div>
-        <div style="flex: 0 0 auto;">
-            <button type="submit" name="apply_search" value="true" class="search-btn">
-                <i class="fas fa-search"></i> Search
-            </button>
-        </div>
-    </form>
-    </form>
-</div>
 
         <!-- Table Section -->
-        <form method="post">
+        <form method="post" id="lor-form">
             {% csrf_token %}
             {% if selected_batch %}
                 <input type="hidden" name="batch_id" value="{{ selected_batch.id }}">
@@ -266,9 +266,13 @@ input[type="checkbox"] {
                     </thead>
                     <tbody>
                         {% for intern in interns %}
-                        <tr>
+                        <tr data-project="{{ intern.project_name|default:'' }}">
                             <td style="text-align:center;">
-                                <input type="checkbox" class="intern-checkbox" name="intern_ids" value="{{ intern.id }}">
+                                {% if intern.lor_generated %}
+                                    <input type="checkbox" disabled>
+                                {% else %}
+                                    <input type="checkbox" class="intern-checkbox" name="intern_ids" value="{{ intern.id }}">
+                                {% endif %}
                             </td>
                             <td>
                                 <strong>{{ intern.user.get_full_name }}</strong><br>
@@ -285,7 +289,11 @@ input[type="checkbox"] {
                             </td>
                             <td style="text-align:center;">
                                 {% if intern.internship_status == 'Completed' %}
-                                    <a href="{% url 'download_lor' intern.id %}" class="download-btn">Generate LOR</a>
+                                    {% if intern.lor_generated %}
+                                        <span class="disabled-btn">Generated</span>
+                                    {% else %}
+                                        <a href="{% url 'download_lor' intern.id %}" class="download-btn lor-link">Generate LOR</a>
+                                    {% endif %}
                                 {% else %}
                                     <span class="disabled-btn">Not Completed</span>
                                 {% endif %}
@@ -306,8 +314,20 @@ input[type="checkbox"] {
 </div>
 
 <script>
+// Select all checkboxes
 document.getElementById('select-all')?.addEventListener('click', function(e) {
     document.querySelectorAll('.intern-checkbox').forEach(cb => cb.checked = e.target.checked);
+});
+
+// Alert if project is missing before download
+document.querySelectorAll('.lor-link, button[name="action"]').forEach(el => {
+    el.addEventListener('click', function(e) {
+        let row = e.target.closest('tr');
+        if (row && row.dataset.project === '') {
+            e.preventDefault();
+            alert('Project is incomplete / Project name is missing. Cannot generate LOR.');
+        }
+    });
 });
 </script>
 {% endblock %}

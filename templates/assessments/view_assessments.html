@@ -1,255 +1,197 @@
-{% extends "login_base.html" %}
+{% extends 'login_base.html' %}
 {% block content %}
 {% load static %}
 
 <style>
-/* ======= Page Layout ======= */
-body {
-  font-family: 'Poppins', sans-serif;
-  background: radial-gradient(circle at top left, #F8F7FF, #E9E8FF, #F5F6FA);
-  color: #1E1E2F;
-  margin: 0;
-  padding: 0;
+/* ====== Main Content ====== */
+.main-content h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2b2b2b;
+    margin-bottom: 25px;
+    border-left: 5px solid #5932EA;
+    padding-left: 10px;
+    margin-top: 15px;
 }
 
+/* ====== Container ====== */
 .container {
-  max-width: 1250px;
-  margin: 0 auto;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* ======= Header Section ======= */
-.header-section {
-  background: linear-gradient(135deg, #4727B2, #5932EA);
-  color: white;
-  border-radius: 20px;
-  padding: 35px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  box-shadow: 0 15px 35px rgba(89, 50, 234, 0.25);
-  margin-bottom: 35px;
-  position: relative;
-  overflow: hidden;
-}
-
-.header-section::after {
-  content: "";
-  position: absolute;
-  top: -40px;
-  right: -60px;
-  width: 180px;
-  height: 180px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-}
-
-.header-left {
-  flex: 1;
-  min-width: 250px;
-}
-
-.header-left h3 {
-  font-size: 2.1rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.header-left p {
-  font-size: 1rem;
-  opacity: 0.9;
-  margin: 0;
-}
-
-/* ======= Create Button ======= */
-.btn-create {
-  background: white;
-  color: #4727B2;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 25px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.btn-create:hover {
-  transform: translateY(-3px);
-  background: #F1EEFF;
-}
-
-/* ======= Table Card ======= */
+/* ====== Table Card ====== */
 .table-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  border-radius: 25px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  animation: fadeIn 0.6s ease forwards;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    overflow-x: auto;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ======= Table Styling ======= */
+/* ====== Table Styling ====== */
 .table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.table thead {
-  background: linear-gradient(90deg, #5932EA, #4727B2);
-  color: white;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
 }
 
 .table th, .table td {
-  padding: 16px 14px;
-  text-align: left;
-  font-size: 0.95rem;
+    padding: 12px 14px;
+    font-size: 14px;
+    text-align: left;
+    color: #333;
 }
 
 .table th {
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
-}
-.table th:last-child {
-  border-right: none;
+    background: #5932EA;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
 }
 
 .table tbody tr {
-  background: rgba(255, 255, 255, 0.6);
-  transition: all 0.3s ease;
-  border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
 .table tbody tr:hover {
-  background: rgba(89, 50, 234, 0.08);
-  box-shadow: 0 6px 14px rgba(89, 50, 234, 0.1);
-  transform: scale(1.01);
+    background: rgba(89, 50, 234, 0.08);
+    transform: scale(1.01);
 }
 
-/* ======= Action Buttons ======= */
+/* ====== Action Buttons ====== */
 .action-btn {
-  border: none;
-  border-radius: 10px;
-  padding: 7px 14px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: #fff;
-  cursor: pointer;
-  transition: 0.3s ease;
-  margin-right: 5px;
-  text-decoration: none;
-  display: inline-block;
+    display: inline-block;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    margin-right: 5px;
 }
 
 .btn-view {
-  background: linear-gradient(90deg, #6AD0FF, #379BFF);
+    background-color: #10B981;
+    color: #fff;
 }
-.btn-view:hover { transform: translateY(-2px); }
+.btn-view:hover { background-color: #059669; transform: translateY(-2px); }
 
 .btn-edit {
-  background: linear-gradient(90deg, #F8E17D, #F7C948);
-  color: #4727B2;
+    background-color: #FBBF24;
+    color: #000;
 }
-.btn-edit:hover { transform: translateY(-2px); }
+.btn-edit:hover { background-color: #f59e0b; transform: translateY(-2px); }
 
 .btn-delete {
-  background: linear-gradient(90deg, #FF7D7D, #FF4D4D);
+    background-color: #EF4444;
+    color: #fff;
 }
-.btn-delete:hover { transform: translateY(-2px); }
+.btn-delete:hover { background-color: #DC2626; transform: translateY(-2px); }
 
 .btn-submissions {
-  background: linear-gradient(90deg, #5932EA, #4727B2);
+    background-color: #5932EA;
+    color: #fff;
 }
-.btn-submissions:hover { transform: translateY(-2px); }
+.btn-submissions:hover { background-color: #4521C4; transform: translateY(-2px); }
 
-/* ======= Empty State ======= */
+/* ====== Create Button ====== */
+.btn-create {
+    background-color: #5932EA;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+.btn-create:hover {
+    background-color: #4521C4;
+    transform: translateY(-2px);
+}
+
+/* ====== Empty State ====== */
 .empty-state {
-  text-align: center;
-  padding: 50px;
-  color: #4727B2;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    padding: 50px;
+    color: #777;
+    font-style: italic;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-/* ======= Responsive ======= */
+/* ====== Responsive ====== */
 @media (max-width: 768px) {
-  .header-section {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .btn-create {
-    width: 100%;
-  }
-  .table {
-    display: block;
-    overflow-x: auto;
-  }
-  .table th, .table td {
-    white-space: nowrap;
-  }
+    .table {
+        display: block;
+        overflow-x: auto;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+    }
+    .btn-create {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .action-btn {
+        display: block;
+        margin-bottom: 5px;
+    }
 }
 </style>
 
 <div class="main-content">
-  <div class="container">
-    
-    <!-- ===== Header Section ===== -->
-    <div class="header-section">
-      <div class="header-left">
-        <h3>📝 All Assessments</h3>
-        <p>View, edit, and manage all assessments for different batches.</p>
-      </div>
-      <a href="{% url 'create_assessment' %}" class="btn-create">+ Create New Assessment</a>
+    <h3>All Assessments</h3>
+
+    <div style="margin-bottom: 20px; text-align: right; display: flex;">
+        <a href="{% url 'create_assessment' %}" class="btn-create">+ Create New Assessment</a>
     </div>
 
-    <!-- ===== Table Section ===== -->
     {% if assessments %}
     <div class="table-card">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Batch</th>
-            <th>Total Marks</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in assessments %}
-          <tr>
-            <td>{{ a.title }}</td>
-            <td>{{ a.batch.name }}</td>
-            <td>{{ a.total_marks }}</td>
-            <td>{{ a.created_at|date:"d M Y, h:i A" }}</td>
-            <td>
-              <a href="{{ a.question_file.url }}" class="action-btn btn-view" target="_blank">📄 View File</a>
-              <a href="{% url 'edit_assessment' a.id %}" class="action-btn btn-edit">✏️ Edit</a>
-              <a href="{% url 'delete_assessment' a.id %}" class="action-btn btn-delete" onclick="return confirm('Are you sure you want to delete this assessment?')">🗑️ Delete</a>
-              <a href="{% url 'view_assessments_submissions' a.id %}" class="action-btn btn-submissions">📁 Submissions</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Batch</th>
+                    <th>Total Marks</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assessments %}
+                <tr>
+                    <td>{{ a.title }}</td>
+                    <td>{{ a.batch.name }}</td>
+                    <td>{{ a.total_marks }}</td>
+                    <td>{{ a.created_at|date:"d M Y, h:i A" }}</td>
+                    <td>
+                        <a href="{{ a.question_file.url }}" class="action-btn btn-view" target="_blank">📄 View File</a>
+                        <a href="{% url 'edit_assessment' a.id %}" class="action-btn btn-edit">✏️ Edit</a>
+                        <a href="{% url 'delete_assessment' a.id %}" class="action-btn btn-delete" onclick="return confirm('Are you sure you want to delete this assessment?')">🗑️ Delete</a>
+                        <a href="{% url 'view_assessments_submissions' a.id %}" class="action-btn btn-submissions">📁 Submissions</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     {% else %}
     <div class="empty-state">
-      <h4>No Assessments Found</h4>
-      <p>Start by creating your first assessment for your students.</p>
-      <a href="{% url 'create_assessment' %}" class="btn-create" style="margin-top: 15px;">+ Create Assessment</a>
+        <h4>No Assessments Found</h4>
+        <p>Start by creating your first assessment for your students.</p>
+        <a href="{% url 'create_assessment' %}" class="btn-create" style="margin-top: 15px;">+ Create Assessment</a>
     </div>
     {% endif %}
-  </div>
 </div>
 
 {% endblock %}

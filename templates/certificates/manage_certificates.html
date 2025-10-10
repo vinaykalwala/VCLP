@@ -8,7 +8,7 @@
 /* ======= Certificates Page Styling ======= */
 .certificate-wrapper {
     max-width: 1150px;
-    margin: 50px auto;
+    margin: 20px auto;
     padding: 35px;
     background: #f9fafb;
     border-radius: 12px;
@@ -254,7 +254,11 @@ input[type="checkbox"] {
                         {% for intern in interns %}
                         <tr>
                             <td style="text-align:center;">
-                                <input type="checkbox" class="intern-checkbox" name="intern_ids" value="{{ intern.id }}">
+                                {% if intern.completion_certificate_generated %}
+                                    <input type="checkbox" disabled>
+                                {% else %}
+                                    <input type="checkbox" class="intern-checkbox" name="intern_ids" value="{{ intern.id }}">
+                                {% endif %}
                             </td>
                             <td>
                                 <strong>{{ intern.user.get_full_name }}</strong><br>
@@ -271,7 +275,11 @@ input[type="checkbox"] {
                             </td>
                             <td style="text-align:center;">
                                 {% if intern.internship_status == 'Completed' %}
-                                    <a href="{% url 'download_certificate' intern.id %}" class="download-btn">Download</a>
+                                    {% if intern.completion_certificate_generated %}
+                                        <span class="disabled-btn">Generated</span>
+                                    {% else %}
+                                        <a href="{% url 'download_certificate' intern.id %}" class="download-btn">Download</a>
+                                    {% endif %}
                                 {% else %}
                                     <span class="disabled-btn">Not Completed</span>
                                 {% endif %}
