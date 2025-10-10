@@ -476,6 +476,19 @@
                     <span class="info-value">{{ batch.end_date|date:"M d, Y" }}</span>
                 </div>
                 {% endif %}
+               {% if batch.timings %}
+<div class="info-item">
+    <i class="fas fa-clock"></i>
+    <span class="info-label">Timing:</span>
+    <span class="info-value">{{ batch.timings }}</span>
+</div>
+{% else %}
+<div class="info-item">
+    <i class="fas fa-clock"></i>
+    <span class="info-label">Timing:</span>
+    <span class="info-value">Not Scheduled</span>
+</div>
+{% endif %}
 
                 <div class="info-item divider">
                     <i class="fas fa-users"></i>

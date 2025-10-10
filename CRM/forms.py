@@ -59,7 +59,7 @@ from .models import Batch, Course, TrainerProfile
 class BatchForm(forms.ModelForm):
     class Meta:
         model = Batch
-        fields = ['name', 'course', 'description', 'trainer', 'start_date', 'end_date']
+        fields = ['name', 'course', 'description', 'trainer', 'start_date', 'end_date', 'timings']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'course': forms.Select(attrs={'class': 'form-control'}),
@@ -67,12 +67,16 @@ class BatchForm(forms.ModelForm):
             'trainer': forms.Select(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'timings': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., 09:00 AM - 11:00 AM'
+            }),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only show trainers in the trainer dropdown
         self.fields['trainer'].queryset = TrainerProfile.objects.all()
+
 
 
 from django.contrib.auth.forms import UserChangeForm
