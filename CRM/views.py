@@ -417,6 +417,8 @@ def generate_intern_pdf(request, mode, identifier=None):
     if len(interns) == 1:
         intern = interns[0]
         logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+        signature_path = os.path.join(settings.BASE_DIR, 'static/images/signature.png')  # New image
+
         context = {
             "intern_name": intern.user.get_full_name(),
             "course": intern.batch.course,
@@ -429,7 +431,9 @@ def generate_intern_pdf(request, mode, identifier=None):
                 "website": "www.vindusenvironment.com"
             },
             "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
-            "logo_path": logo_path
+            "logo_path": logo_path,
+            "signature_path": signature_path,  # Add here
+
         }
 
         html_content = render_to_string("undertaking_letter.html", context)
@@ -453,6 +457,8 @@ def generate_intern_pdf(request, mode, identifier=None):
     with zipfile.ZipFile(zip_buffer, "w") as zip_file:
         for intern in interns:
             logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.jpg')
+            signature_path = os.path.join(settings.BASE_DIR, 'static/images/signature.png')  # New image
+
             context = {
                 "intern_name": intern.user.get_full_name(),
                 "course": intern.batch.course,
@@ -465,7 +471,9 @@ def generate_intern_pdf(request, mode, identifier=None):
                     "website": "www.vindusenvironment.com"
                 },
                 "today_date": date.today().strftime("%d-%m-%Y"),  # ✅ Fixed
-                "logo_path": logo_path
+                "logo_path": logo_path,
+                "signature_path": signature_path,  # Add here
+
             }
             html_content = render_to_string("undertaking_letter.html", context)
             pdf_buffer = generate_pdf_from_html(html_content)
@@ -579,11 +587,15 @@ def generate_pdf_for_intern(intern):
     """
     # Get absolute path to logo
     logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'vinduslogo.jpg')
+    signature_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'signature.png')
+
     
     context = {
         'intern': intern,
         'today_date': date.today().strftime("%d-%m-%Y"),
-        'logo_path': logo_path
+        'logo_path': logo_path,
+        'signature_path': signature_path
+
     }
     
     html_string = render_to_string('certificates/certificate_template.html', context)
@@ -1008,6 +1020,8 @@ def manage_lor_view(request):
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
                 logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
+                signature_path = os.path.join(settings.BASE_DIR, 'static/images/signature.png')  # New image
+
                 for intern in interns_to_process:
                     context = {
                         'intern': intern,
@@ -1019,7 +1033,9 @@ def manage_lor_view(request):
                             "website": "www.vindusenvironment.com"
                         },
                         "today_date": date.today().strftime("%d-%m-%Y"),
-                        "logo_path": logo_path
+                        "logo_path": logo_path,
+                        "signature_path": signature_path  # Add here
+
                     }
                     pdf_bytes = render_to_pdf('lors/lor_template.html', context)
                     if pdf_bytes:
@@ -1066,6 +1082,8 @@ def download_lor_view(request, intern_id):
         return redirect('manage_lor')
 
     logo_path = os.path.join(settings.BASE_DIR, 'static/images/vinduslogo.png')
+    signature_path = os.path.join(settings.BASE_DIR, 'static/images/signature.png')  # New image
+
     context = {
         'intern': intern,
         'company': {
@@ -1076,7 +1094,9 @@ def download_lor_view(request, intern_id):
             "website": "www.vindusenvironment.com"
         },
         "today_date": date.today().strftime("%d-%m-%Y"),
-        "logo_path": logo_path
+        "logo_path": logo_path,
+        "signature_path": signature_path,  # Add here
+
     }
 
     pdf_bytes = render_to_pdf('lors/lor_template.html', context)

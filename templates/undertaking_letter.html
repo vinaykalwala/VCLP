@@ -133,13 +133,17 @@
     <p class="paragraph">We are excited to welcome you to the Vindus Career Launch Internship Program and look forward
     to supporting your professional journey.</p>
 
-    <div style="margin-top:15px; font-size:13px; line-height:1.5;">
-      <p style="margin:0;">Best Regards,</p>
-      <p style="margin:4px 0 0 0; font-weight:bold;">Vinay Kalwala</p>
-      <p style="margin:0;">Managing Director</p>
-      <p style="margin:0;">{{ company.name }}</p>
-      <p style="margin:0;">Phone: {{ company.phone }} | Website: {{ company.website }}</p>
-    </div>
+  <div style="margin-top:15px; font-size:13px; line-height:1.5;">
+  <!-- Signature Image -->
+
+  <p style="margin:0;">Best Regards,</p>
+    <img src="{{ signature_path }}" alt="Signature" style="height:80px; width:auto; display:block; margin-bottom:8px;">
+
+  <p style="margin:4px 0 0 0; font-weight:bold;">Vinay Kalwala</p>
+  <p style="margin:0;">Managing Director</p>
+  <p style="margin:0;">{{ company.name }}</p>
+  <p style="margin:0;">Phone: {{ company.phone }} | Website: {{ company.website }}</p>
+</div>
 
   </div>
 </body>
