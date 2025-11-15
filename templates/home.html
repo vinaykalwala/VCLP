@@ -301,33 +301,115 @@
 }
 
 /* === SECTION BASE === */
+/* === SECTION BASE === */
 .section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Stay side by side by default */
   padding: 5rem 10%;
   background: var(--light);
+  gap: 3rem; /* space between text and image */
 }
 
 .section:nth-child(even) {
   background: var(--accent-light);
 }
 
+/* Image styling */
 .section img {
-  width: 500px;
-  max-width: 100%;
+  flex: 1 1 45%;
+  width: 100%;
+  max-width: 550px;
   border-radius: 16px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.15);
   object-fit: cover;
   margin: 1rem;
 }
 
+/* Text content */
 .section-content {
-  flex: 1;
-  min-width: 300px;
+  flex: 1 1 50%;
+  min-width: 400px;
   margin: 1rem;
 }
+
+.section-content h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--dark);
+}
+
+.section-content p {
+  color: #475569;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.section-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+.section-content ul li {
+  padding: 0.6rem 0;
+  position: relative;
+  padding-left: 2rem;
+  color: #475569;
+  font-size: 1.05rem;
+}
+.section-content ul li::before {
+  content: "★";
+  color: var(--primary);
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+
+/* === RESPONSIVENESS === */
+
+/* Between 900px and 1220px → Keep side by side but adjust widths */
+@media (max-width: 1220px) and (min-width: 901px) {
+  .section {
+    padding: 4rem 5%;
+    gap: 2rem;
+  }
+
+  .section-content {
+    flex: 1 1 55%;
+    min-width: 300px;
+  }
+
+  .section img {
+    flex: 1 1 40%;
+    max-width: 480px;
+  }
+
+  .section-content h2 {
+    font-size: 30px;
+  }
+}
+
+/* Below 900px → Stack vertically */
+@media (max-width: 900px) {
+  .section {
+    flex-wrap: wrap;
+    text-align: center;
+    padding: 3rem 5%;
+  }
+
+  .section-content, .section img {
+    flex: 1 1 100%;
+    min-width: auto;
+  }
+
+  .section img {
+    margin-top: 2rem;
+    max-width: 100%;
+  }
+}
+
 
 .section-content h2 {
   font-size: 36px;
@@ -672,7 +754,7 @@
   gap: 2rem;
   justify-content: center;
   align-items: stretch;
-  
+  margin-top:75px;
 }
 
 
@@ -714,7 +796,8 @@
   align-items: stretch;
   max-width: 1400px;
   margin: 0 auto;
-  margin-top:10px;
+  margin-top:75px;
+
 }
 
 /* ✅ Show exactly 5 cards for 1200px–1240px range */
@@ -1390,7 +1473,7 @@
     </div>
   </div>
 
-  <a href="mailto:info.vindus@gmail.com" class="btn-primary">Start Your Internship Journey</a>
+  <a href="mailto:hr@vindusenvironment.com" class="btn-primary">Start Your Internship Journey</a>
 </section>
 
 
@@ -1507,11 +1590,11 @@
     <h2>Get Started Today</h2>
     <p>Join the Vindus Career Launch Program and take the next step toward a successful career. Our team is here to support you through every stage of your learning journey.</p>
     <div class="cta-contact">
-      <p>📍 Vindus Career Launch Program, Hyderabad, India &nbsp;|&nbsp; 📧 <a href="mailto:info.vindus@gmail.com" style="color:#fff;">info.vindus@gmail.com</a> &nbsp;|&nbsp; 📱 +91 9876543210</p>
+      <p>📍 Vindus Career Launch Program, Hyderabad, India &nbsp;|&nbsp; 📧 <a href="mailto:hr@vindusenvironment.com" style="color:#fff;">hr@vindusenvironment.com</a> &nbsp;|&nbsp; 📱 +91 9876543210</p>
     </div>
     <div>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSe0Q9aBoHLdwAkpaCH1RNdo3DQKOQzfxGVGKChm4PjLMHtzUw/viewform?usp=preview" class="btn-primary" target="_blank" style="margin-right: 1rem;">Apply Now</a>
-      <a href="mailto:info.vindus@gmail.com" class="btn-secondary">Contact for More Info</a>
+      <a href="mailto:hr@vindusenvironment.com" class="btn-secondary">Contact for More Info</a>
     </div>
   </div>
 </section>

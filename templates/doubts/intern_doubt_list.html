@@ -188,7 +188,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Ensure all cards have equal height */
+    min-height: 280px; /* Ensure all cards have equal minimum height */
 }
 
 .card:hover {
@@ -246,12 +246,21 @@
 
 .question-content {
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit to 3 lines */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.5;
-    max-height: 4.5em; /* 3 lines * 1.5 line-height */
-    transition: max-height var(--transition-base);
+    line-height: 1.6;
+    transition: all var(--transition-base);
+    margin-bottom: var(--spacing-sm);
+}
+
+.question-content.limited {
+    -webkit-line-clamp: 2;
+    max-height: 3.2em; /* 2 lines */
+}
+
+.question-content.extended {
+    -webkit-line-clamp: 5;
+    max-height: 8em; /* 5 lines */
 }
 
 .question-content.expanded {
@@ -326,6 +335,9 @@
     color: var(--text-primary);
     line-height: 1.6;
     transition: all var(--transition-base);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .alert:hover {
@@ -345,6 +357,40 @@
     font-size: var(--font-size-xs);
     display: block;
     margin-top: var(--spacing-xs);
+}
+
+/* ====== View More for Long Answers ====== */
+.answer-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* Limit to 1 line */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.6;
+    transition: all var(--transition-base);
+    margin-bottom: var(--spacing-xs);
+}
+
+.answer-content.expanded {
+    -webkit-line-clamp: unset;
+    max-height: none;
+}
+
+.view-more-answer-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color var(--transition-base);
+    align-self: flex-start;
+}
+
+.view-more-answer-btn:hover {
+    color: var(--primary-hover);
 }
 
 /* ====== Modal Styles ====== */
@@ -613,6 +659,9 @@ html {
     background: var(--primary-light);
     color: var(--primary);
 }
+.card.resolved {
+    padding-bottom: var(--spacing-md);
+}
 </style>
 
 <div class="main-content">
@@ -624,14 +673,14 @@ html {
 
     <div class="cards-wrapper">
     {% for doubt in doubts %}
-    <div class="card">
+    <div class="card {% if doubt.resolved %}resolved{% endif %}">
         <div class="question-text">
             <strong>Question:</strong>
-            <div class="question-content" id="question-{{ doubt.id }}">
+            <div class="question-content {% if doubt.resolved %}limited{% else %}extended{% endif %}" id="question-{{ doubt.id }}">
                 {{ doubt.question }}
             </div>
-            <button class="read-more-btn" onclick="openModal({{ doubt.id }})">
-                View Full Question
+            <button class="read-more-btn" onclick="openQuestionModal({{ doubt.id }})">
+                View Full Details
             </button>
         </div>
         <p><strong>Trainer:</strong> {{ doubt.trainer.user.username }}</p>
@@ -647,7 +696,11 @@ html {
 
         {% if doubt.resolved %}
         <div class="alert">
-            <strong>Answer:</strong> {{ doubt.resolution.answer }}<br>
+            <strong>Answer:</strong>
+            <div class="answer-content" id="answer-{{ doubt.id }}">
+                {{ doubt.resolution.answer }}
+            </div>
+            <button class="view-more-answer-btn" onclick="openAnswerModal({{ doubt.id }})">View Full Answer</button>
             <small>Resolved at {{ doubt.resolution.resolved_at|date:"d M Y, H:i" }}</small>
         </div>
         {% endif %}
@@ -693,6 +746,42 @@ html {
     </div>
 </div>
 
+<!-- Modal for viewing full answer -->
+<div class="modal" id="answerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Answer Details</h3>
+            <button class="close-btn" onclick="closeAnswerModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-question">
+                <strong>Question:</strong>
+                <p id="answerModalQuestion"></p>
+            </div>
+            
+            <div class="modal-details">
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Trainer</span>
+                    <span class="modal-detail-value" id="answerModalTrainer"></span>
+                </div>
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Created</span>
+                    <span class="modal-detail-value" id="answerModalCreated"></span>
+                </div>
+                <div class="modal-detail-item">
+                    <span class="modal-detail-label">Resolved At</span>
+                    <span class="modal-detail-value" id="answerModalResolvedAt"></span>
+                </div>
+            </div>
+            
+            <div class="modal-answer">
+                <h4>Answer</h4>
+                <p id="answerModalAnswerText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Store doubt data for modal access
 const doubtData = {
@@ -713,8 +802,8 @@ const doubtData = {
     {% endfor %}
 };
 
-// Open modal with doubt details
-function openModal(doubtId) {
+// Open modal with question details
+function openQuestionModal(doubtId) {
     const data = doubtData[doubtId];
     if (!data) return;
     
@@ -739,9 +828,32 @@ function openModal(doubtId) {
     document.body.style.overflow = 'hidden'; // Prevent scrolling
 }
 
-// Close modal
+// Open modal with answer details
+function openAnswerModal(doubtId) {
+    const data = doubtData[doubtId];
+    if (!data || !data.resolved) return;
+    
+    // Set modal content
+    document.getElementById('answerModalQuestion').textContent = data.question;
+    document.getElementById('answerModalTrainer').textContent = data.trainer;
+    document.getElementById('answerModalCreated').textContent = data.created;
+    document.getElementById('answerModalResolvedAt').textContent = data.resolvedAt;
+    document.getElementById('answerModalAnswerText').textContent = data.answer;
+    
+    // Show modal
+    document.getElementById('answerModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+}
+
+// Close question modal
 function closeModal() {
     document.getElementById('questionModal').classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+}
+
+// Close answer modal
+function closeAnswerModal() {
+    document.getElementById('answerModal').classList.remove('active');
     document.body.style.overflow = ''; // Restore scrolling
 }
 
@@ -752,10 +864,17 @@ document.getElementById('questionModal').addEventListener('click', function(e) {
     }
 });
 
+document.getElementById('answerModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAnswerModal();
+    }
+});
+
 // Close modal with Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeModal();
+        closeAnswerModal();
     }
 });
 </script>

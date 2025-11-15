@@ -152,9 +152,56 @@
     </div>
 
     <iframe 
-    src="{% url 'secure_pdf_view' lesson.id %}" 
-    style="width:100%;height:100vh;border:none;">
-</iframe>
+    id="pdfFrame"
+    src="{% url 'secure_pdf_view' lesson.id %}#toolbar=0&navpanes=0&scrollbar=0" 
+    class="pdf-frame"
+></iframe>
+
+<script>
+    const warningMessage = document.getElementById('warningMessage');
+
+    // Show warning
+    function showWarning() {
+        warningMessage.classList.add('show');
+        setTimeout(() => warningMessage.classList.remove('show'), 2000);
+    }
+
+    // Disable right-click
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showWarning();
+    });
+
+    // Disable keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Block Ctrl / Cmd combinations
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key.toLowerCase()) {
+                case 's': // Save
+                case 'p': // Print
+                case 'u': // View source
+                    e.preventDefault();
+                    showWarning();
+                    return false;
+            }
+        }
+        // Block F12 and PrintScreen
+        if (e.key === 'F12' || e.key === 'PrintScreen') {
+            e.preventDefault();
+            showWarning();
+            return false;
+        }
+    });
+
+    // Disable text selection
+    document.body.style.userSelect = 'none';
+    document.addEventListener('selectstart', e => e.preventDefault());
+
+    // Disable drag and drop
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('drop', e => e.preventDefault());
+</script>
+
 
     <!-- Security overlay to prevent right-click on iframe -->
     <div class="security-overlay" id="securityOverlay"></div>

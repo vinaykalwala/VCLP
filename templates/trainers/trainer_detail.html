@@ -7,7 +7,7 @@
 /* === Core Container === */
 .trainer-profile-container {
     max-width: 1200px;
-    margin: 2rem auto;
+    margin: 0.5rem auto;
     padding: 20px;
     font-family: 'Poppins', sans-serif;
 }
@@ -247,7 +247,7 @@
         {% if trainer.profile_photo %}
             <img src="{{ trainer.profile_photo.url }}" alt="Profile Photo">
         {% else %}
-            <img src="{% static 'images/default-avatar.png' %}" alt="Default">
+            <img src="{% static 'images/user.webp' %}" alt="Default">
         {% endif %}
         <div class="trainer-right">
             <h1>{{ trainer.user.first_name }} {{ trainer.user.last_name }}</h1>
