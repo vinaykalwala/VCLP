@@ -2645,3 +2645,256 @@ def intern_overview(request):
 
     return render(request, "interns/intern_overview.html", context)
 
+
+
+# views.py (add these functions to CRM/views.py)
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from django.db import IntegrityError
+
+from .models import Project, ProjectSubmission, TrainerProfile, InternProfile, Batch
+from .forms import ProjectForm, ProjectSubmissionForm
+
+
+# ============================
+# CREATE PROJECT (Trainer/Admin) - FIXED
+# ============================
+
+@login_required
+def create_project(request):
+    if request.user.role not in ["trainer", "admin", "superuser"]:
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        form = ProjectForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            project = form.save(commit=False)
+            # For trainers, ensure they are set as the trainer
+            if request.user.role == "trainer":
+                project.trainer = request.user.trainer_profile
+            project.status = "assigned" if form.cleaned_data["batches"] else "draft"   
+            project.save()
+            form.save_m2m()  # Save many-to-many data
+            messages.success(request, "Project created successfully.")
+            return redirect("view_projects")
+    else:
+        form = ProjectForm(user=request.user)
+
+    return render(request, "projects/project_form.html", {"form": form, "title": "Create Project"})
+
+@login_required
+def view_projects(request):
+    user = request.user
+
+    # INTERN
+    if user.role == "intern":
+        intern = user.intern_profile
+        projects = Project.objects.filter(batches=intern.batch)
+        submissions = ProjectSubmission.objects.filter(intern=intern)
+        submission_map = {s.project_id: s for s in submissions}
+        return render(request, "projects/project_list_intern.html", {
+            "projects": projects,
+            "submission_map": submission_map
+        })
+
+    # TRAINER
+    elif user.role == "trainer":
+        trainer = user.trainer_profile
+        projects = Project.objects.filter(trainer=trainer)
+        return render(request, "projects/project_list_trainer.html", {
+            "projects": projects,
+        })
+
+    # ADMIN / SUPERUSER
+    elif user.role in ["admin", "superuser"]:
+        projects = Project.objects.all().prefetch_related("batches")
+
+        project_data = []
+
+        for project in projects:
+
+            # Fetch interns of THIS project only
+            interns = InternProfile.objects.filter(batch__in=project.batches.all()).distinct()
+
+            # Fetch submissions for THIS project only
+            submissions = ProjectSubmission.objects.filter(project=project)
+
+            intern_list = []
+            for intern in interns:
+                sub = submissions.filter(intern=intern).first()
+                intern.submission = sub
+                intern_list.append(intern)
+
+            project_data.append({
+                "project": project,
+                "interns": intern_list
+            })
+
+        return render(request, "projects/project_list_admin.html", {
+            "project_data": project_data
+        })
+
+    return HttpResponseForbidden("Not allowed.")
+
+# ============================
+# PROJECT DETAIL PAGE
+# ============================
+@login_required
+def project_detail(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+
+    # INTERN DETAIL VIEW
+    if request.user.role == "intern":
+        intern = request.user.intern_profile
+        submission = ProjectSubmission.objects.filter(project=project, intern=intern).first()
+        return render(request, "projects/project_detail_intern.html", {
+            "project": project,
+            "submission": submission
+        })
+
+    # TRAINER / ADMIN VIEW
+    interns = InternProfile.objects.filter(batch__in=project.batches.all())
+    submissions = ProjectSubmission.objects.filter(project=project)
+    sub_map = {s.intern_id: s for s in submissions}
+
+    return render(request, "projects/project_detail_admin.html", {
+        "project": project,
+        "interns": interns,
+        "sub_map": sub_map
+    })
+
+# ============================
+# INTERN SUBMIT PROJECT
+# ============================
+
+@login_required
+def submit_project(request, pk):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+
+    project = get_object_or_404(Project, pk=pk)
+    intern = request.user.intern_profile
+
+    # Check if intern is in one of the project batches
+    if intern.batch not in project.batches.all():
+        messages.error(request, "You are not assigned to this project.")
+        return redirect("view_projects")
+
+    submission = ProjectSubmission.objects.filter(project=project, intern=intern).first()
+
+    if request.method == "POST":
+        form = ProjectSubmissionForm(request.POST, request.FILES, instance=submission)
+        if form.is_valid():
+            sub = form.save(commit=False)
+
+            if not submission:  # New submission
+                sub.project = project
+                sub.intern = intern
+
+            sub.status = "submitted"
+            sub.submitted_at = timezone.now()
+            sub.save()
+
+            messages.success(request, "Project submitted successfully!")
+            return redirect("view_projects")
+    else:
+        form = ProjectSubmissionForm(instance=submission)
+
+    return render(request, "projects/submit_project.html", {
+        "form": form,
+        "project": project,
+    })
+
+
+
+
+# ============================
+# TRAINER / ADMIN VIEW SUBMISSIONS
+# ============================
+@login_required
+def view_project_submissions(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    
+    # Check permissions
+    if request.user.role == "trainer" and project.trainer != request.user.trainer_profile:
+        messages.error(request, "You can only view submissions for your own projects.")
+        return redirect("view_projects")
+
+    submissions = ProjectSubmission.objects.filter(project=project).select_related('intern', 'intern__user')
+    
+    return render(request, "projects/view_submissions.html", {
+        "project": project,
+        "submissions": submissions,
+    })
+@login_required
+def view_single_submission(request, submission_id):
+    submission = get_object_or_404(ProjectSubmission, id=submission_id)
+
+    return render(request, "projects/single_submission.html", {
+        "submission": submission
+    })
+
+# ============================
+# EDIT PROJECT (Trainer/Admin) - FIXED
+# ============================
+@login_required
+def edit_project(request, pk):
+    if request.user.role not in ["trainer", "admin", "superuser"]:
+        return redirect("dashboard")
+
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.user.role == "trainer" and project.trainer != request.user.trainer_profile:
+        messages.error(request, "You can only edit your own projects.")
+        return redirect("view_projects")
+
+    if request.method == "POST":
+        form = ProjectForm(request.POST, request.FILES, instance=project, user=request.user)
+        if form.is_valid():
+            project = form.save(commit=False)
+
+            # 🔥 IMPORTANT: update status when batch is selected
+            if form.cleaned_data["batches"]:
+                project.status = "assigned"
+            else:
+                project.status = "draft"
+
+            project.save()
+            form.save_m2m()
+
+            messages.success(request, "Project updated successfully.")
+            return redirect("view_projects")
+    else:
+        form = ProjectForm(instance=project, user=request.user)
+
+    return render(request, "projects/project_form.html", {"form": form, "title": "Edit Project"})
+
+# ============================
+# DELETE PROJECT (Trainer/Admin) - FIXED
+# ============================
+
+@login_required
+def delete_project(request, pk):
+    if request.user.role not in ["trainer", "admin", "superuser"]:
+        return redirect("dashboard")
+
+    project = get_object_or_404(Project, pk=pk)
+    
+    # Check if trainer owns the project
+    if request.user.role == "trainer" and project.trainer != request.user.trainer_profile:
+        messages.error(request, "You can only delete your own projects.")
+        return redirect("view_projects")
+
+    if request.method == "POST":
+        project_title = project.title
+        project.delete()
+        messages.success(request, f"Project '{project_title}' deleted successfully.")
+        return redirect("view_projects")
+
+    return render(request, "projects/project_confirm_delete.html", {"project": project})
+
+
+

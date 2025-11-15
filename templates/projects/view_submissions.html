@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Submissions - {{ project.title }}</h2>
+
+<table class="table">
+    <tr>
+        <th>Intern</th>
+        <th>ID</th>
+        <th>Status</th>
+        <th>GitHub</th>
+        <th>File</th>
+    </tr>
+
+{% for s in submissions %}
+    <tr>
+        <td>{{ s.intern.user.get_full_name }}</td>
+        <td>{{ s.intern.unique_id }}</td>
+        <td>{{ s.status }}</td>
+        <td>
+            {% if s.github_url %}
+                <a href="{{ s.github_url }}" target="_blank">Open</a>
+            {% else %}
+                N/A
+            {% endif %}
+        </td>
+        <td>
+            {% if s.file %}
+                <a href="{{ s.file.url }}" download>Download</a>
+            {% else %}
+                N/A
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

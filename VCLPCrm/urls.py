@@ -103,10 +103,23 @@ urlpatterns = [
     path("assessments/take/<int:assessment_id>/", views.take_assessment, name="take_assessment"),
     path("assessments/result/<int:submission_id>/", views.assessment_result, name="assessment_result"),
     path("assessments/scores/", views.batch_assessment_scores, name="batch_assessment_scores"),
+    path('intern-overview/', views.intern_overview, name='intern_overview'),
 
 
 
-path('intern-overview/', views.intern_overview, name='intern_overview'),
+
+    # in urls.py (project-level already imports views from CRM)
+# Add these path entries (place near other 'assignments' or project-like urls)
+
+    path("projects/", views.view_projects, name="view_projects"),
+    path("projects/create/", views.create_project, name="create_project"),
+    path("projects/<int:pk>/", views.project_detail, name="project_detail"),
+    path("projects/<int:pk>/edit/", views.edit_project, name="edit_project"),
+    path("projects/<int:pk>/delete/", views.delete_project, name="delete_project"),
+    path("projects/<int:pk>/submit/", views.submit_project, name="submit_project"),
+    path("projects/<int:pk>/submissions/", views.view_project_submissions, name="view_project_submissions"),
+# Add these to your existing urlpatterns in urls.py
+    path('submission/<int:submission_id>/', views.view_single_submission, name='view_single_submission'),
 
 ]
 if settings.DEBUG:

@@ -217,3 +217,51 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email', 'phone','is_active']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django import forms
+from .models import Project, ProjectSubmission
+
+class ProjectForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        # Trainers should see ALL batches
+        self.fields["batches"].queryset = Batch.objects.all()
+
+    class Meta:
+        model = Project
+        fields = ["title", "introduction", "description_file", "batches"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "introduction": forms.Textarea(attrs={"class": "form-control"}),
+            "batches": forms.SelectMultiple(attrs={"class": "form-control"}),
+        }
+
+
+class ProjectSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = ProjectSubmission
+        fields = ["description", "file", "github_url"]
+        widgets = {
+            "description": forms.Textarea(attrs={"class": "form-control"}),
+            "github_url": forms.URLInput(attrs={"class": "form-control"}),
+        }
+
+
+
+
+

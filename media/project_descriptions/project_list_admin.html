@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>All Projects (Admin)</h2>
+
+<ul>
+{% for p in projects %}
+    <li>
+        <strong>{{ p.title }}</strong> |
+        Trainer: {{ p.trainer.user.get_full_name }} |
+        <a href="{% url 'project_detail' p.id %}">View Details</a>
+    </li>
+{% endfor %}
+</ul>
+
+{% endblock %}

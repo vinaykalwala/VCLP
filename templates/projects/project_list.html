@@ -1,0 +1,28 @@
+<!-- templates/projects/project_list.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Projects</h2>
+
+{% if user.role in "trainer admin superuser" %}
+  <a href="{% url 'create_project' %}" class="btn btn-primary">Create Project</a>
+{% endif %}
+
+<ul>
+  {% for p in projects %}
+    <li>
+      <a href="{% url 'project_detail' p.id %}">{{ p.title }}</a>
+      - {{ p.get_status_display }}
+      {% if user.role == 'intern' %}
+        {% if submission_map.p.id %}
+          - Status: {{ submission_map.p.id.status }}
+        {% else %}
+          - Not submitted
+          <a href="{% url 'submit_project' p.id %}">Submit</a>
+        {% endif %}
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No projects found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Submission Details</h2>
+
+<div class="card p-4">
+
+    <p><strong>Intern:</strong> {{ submission.intern.user.get_full_name }}</p>
+    <p><strong>Intern ID:</strong> {{ submission.intern.unique_id }}</p>
+    <p><strong>Project:</strong> {{ submission.project.title }}</p>
+
+    <p><strong>Description:</strong><br>
+        {{ submission.description|default:"No description provided" }}
+    </p>
+
+    <p><strong>GitHub URL:</strong>
+        {% if submission.github_url %}
+            <a href="{{ submission.github_url }}" target="_blank">Open GitHub</a>
+        {% else %}
+            ---
+        {% endif %}
+    </p>
+
+    <p><strong>Submitted File:</strong><br>
+        {% if submission.file %}
+            <a href="{{ submission.file.url }}" download class="btn btn-primary">Download File</a>
+        {% else %}
+            No file uploaded
+        {% endif %}
+    </p>
+
+    <p><strong>Submitted At:</strong>
+        {{ submission.submitted_at|date:"M d, Y H:i" }}
+    </p>
+
+    <a href="{% url 'view_projects' %}" class="btn btn-secondary mt-3">Back</a>
+</div>
+
+{% endblock %}

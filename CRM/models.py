@@ -331,3 +331,70 @@ class Curriculum(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.course.name}"
+    
+
+
+
+
+
+
+
+
+
+from django.db import models
+from django.utils import timezone
+from CRM.models import TrainerProfile, InternProfile, Batch  # adjust if needed
+
+
+class Project(models.Model):
+    STATUS_CHOICES = (
+        ("draft", "Draft"),
+        ("assigned", "Assigned"),
+    )
+
+    title = models.CharField(max_length=255)
+    introduction = models.TextField(blank=True, null=True)
+    description_file = models.FileField(upload_to="project_descriptions/", blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
+
+    trainer = models.ForeignKey(
+        TrainerProfile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_projects"
+    )
+
+    batches = models.ManyToManyField(Batch, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class ProjectSubmission(models.Model):
+
+    STATUS_CHOICES = (
+        ("not_submitted", "Not Submitted"),
+        ("submitted", "Submitted"),
+        ("resubmitted", "Resubmitted"),
+        ("reviewed", "Reviewed"),
+    )
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    intern = models.ForeignKey(InternProfile, on_delete=models.CASCADE)
+
+    description = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to="project_submissions/", blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_submitted")
+    submitted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("project", "intern")
+
+    def __str__(self):
+        return f"{self.intern.unique_id} -> {self.project.title}"
+

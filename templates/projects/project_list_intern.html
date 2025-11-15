@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Assigned Projects</h2>
+
+<ul>
+{% for p in projects %}
+
+    {% if p.id in submission_map %}
+        {% with submission=submission_map.p.id %}
+        <li>
+            <strong>{{ p.title }}</strong> - Submitted
+            - <a href="{% url 'submit_project' p.id %}">Update</a>
+            - <a href="{% url 'project_detail' p.id %}">View</a>
+        </li>
+        {% endwith %}
+    {% else %}
+        <li>
+            <strong>{{ p.title }}</strong> - Not Submitted
+            - <a href="{% url 'submit_project' p.id %}">Submit</a>
+            - <a href="{% url 'project_detail' p.id %}">View</a>
+        </li>
+    {% endif %}
+
+{% endfor %}
+</ul>
+
+{% endblock %}

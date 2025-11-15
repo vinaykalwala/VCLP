@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>All Projects </h2>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Project</th>
+        <th>Trainer</th>
+        <th>Intern</th>
+        <th>Intern ID</th>
+        <th>Batch</th>
+        <th>Status</th>
+        <th>View Submission</th>
+    </tr>
+    {% for item in project_data %}
+    {% for intern in item.interns %}
+    <tr>
+        <td>{{ item.project.title }}</td>
+        <td>{{ item.project.trainer.user.get_full_name }}</td>
+
+        <td>{{ intern.user.get_full_name }}</td>
+        <td>{{ intern.unique_id }}</td>
+        <td>{{ intern.batch.batch_name }}</td>
+
+        <td>
+            {% if intern.submission %}
+            <span style="color: green;">Submitted</span>
+            {% else %}
+            <span style="color: red;">Not Submitted</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if intern.submission %}
+           <a href="{% url 'view_single_submission' intern.submission.id %}">
+        View</a>
+            {% else %}
+            ---
+            {% endif %}
+        </td>
+    </tr>
+
+    {% endfor %}
+    {% endfor %}
+
+</table>
+{% endblock %}
