@@ -398,3 +398,47 @@ class ProjectSubmission(models.Model):
     def __str__(self):
         return f"{self.intern.unique_id} -> {self.project.title}"
 
+
+
+
+
+# Add to CRM/models.py (or your app's models file)
+
+from django.db import models
+from django.utils import timezone
+
+
+class InternProject(models.Model):
+    intern = models.ForeignKey("InternProfile", on_delete=models.CASCADE, related_name="intern_projects")
+    trainer = models.ForeignKey("TrainerProfile", on_delete=models.SET_NULL, null=True, blank=True, related_name="intern_projects")
+
+    project_title = models.CharField(max_length=255)
+    description = models.TextField()
+    github_url = models.URLField(blank=True, null=True)
+    file = models.FileField(upload_to="intern_projects/", blank=True, null=True)
+
+    STATUS_CHOICES = (
+        ("Pending", "Pending"),
+        ("Viewed", "Viewed by Trainer"),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
+
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True,
+                                help_text="Trainer's score (percentage or points)")
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("intern", "project_title") 
+        ordering = ("-submitted_at",)
+
+    def mark_viewed(self, score=None):
+        self.status = "Viewed"
+        if score is not None:
+            self.score = score
+        self.reviewed_at = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"{self.intern.unique_id} - {self.project_title}"

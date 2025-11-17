@@ -121,6 +121,27 @@ urlpatterns = [
 # Add these to your existing urlpatterns in urls.py
     path('submission/<int:submission_id>/', views.view_single_submission, name='view_single_submission'),
 
+
+
+
+
+# in urls.py (CRM/urls.py or project-level urls.py where other routes are)
+path("intern-projects/", views.intern_project_list, name="intern_project_list"),
+path("intern-projects/create/", views.create_intern_project, name="create_intern_project"),
+path("intern-projects/<int:pk>/", views.intern_project_detail, name="intern_project_detail"),
+
+# Trainer
+path("trainer/intern-projects/", views.trainer_project_list, name="trainer_project_list"),
+path("trainer/intern-projects/<int:pk>/review/", views.trainer_project_review, name="trainer_project_review"),
+
+path("crm/intern-projects/", views.admin_intern_projects_overview, name="admin_intern_projects_overview"),
+
+
+
+
+
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

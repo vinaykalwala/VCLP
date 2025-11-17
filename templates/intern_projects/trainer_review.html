@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-3">Review Project: {{ project.project_title }}</h2>
+
+<div class="card p-4">
+
+    <h4>Intern Details</h4>
+    <p><strong>ID:</strong> {{ project.intern.unique_id }}</p>
+    <p><strong>Name:</strong> {{ project.intern.user.get_full_name }}</p>
+    <p><strong>Batch:</strong> {{ project.intern.batch.name }}</p>
+
+    <hr>
+
+    <h4>Project Details</h4>
+    <p><strong>Description:</strong><br>{{ project.description|linebreaks }}</p>
+    <p><strong>Github URL:</strong>
+        {% if project.github_url %}
+        <a href="{{ project.github_url }}" target="_blank">{{ project.github_url }}</a>
+        {% else %}
+        -
+        {% endif %}
+    </p>
+
+    <p><strong>File:</strong>
+        {% if project.file %}
+        <a href="{{ project.file.url }}" target="_blank">Download</a>
+        {% else %}
+        -
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-success">Save Review</button>
+    </form>
+
+</div>
+
+{% endblock %}

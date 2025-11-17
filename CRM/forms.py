@@ -265,3 +265,36 @@ class ProjectSubmissionForm(forms.ModelForm):
 
 
 
+
+
+
+# Add to CRM/forms.py
+
+from django import forms
+from .models import InternProject
+
+class InternProjectForm(forms.ModelForm):
+    class Meta:
+        model = InternProject
+        fields = ["project_title", "description", "github_url", "file"]
+        widgets = {
+            "project_title": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "github_url": forms.URLInput(attrs={"class": "form-control"}),
+        }
+
+class TrainerReviewForm(forms.ModelForm):
+    class Meta:
+        model = InternProject
+        fields = ["status", "score"]
+        widgets = {
+            "status": forms.Select(attrs={"class": "form-control"}),
+            "score": forms.NumberInput(attrs={"class": "form-control", "step": "0.01", "min": "0"}),
+        }
+        labels = {
+            "status": "Mark as",
+            "score": "Score (e.g., percentage)"
+        }
+
+
+

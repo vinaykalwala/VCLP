@@ -2917,3 +2917,133 @@ def delete_project(request, pk):
 
 
 
+# Add to CRM/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import InternProject, InternProfile, TrainerProfile, Batch
+from .forms import InternProjectForm, TrainerReviewForm
+from django.db.models import Q
+
+# -- Intern: create / edit their project(s) --
+@login_required
+def create_intern_project(request):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+    intern = request.user.intern_profile
+
+    if request.method == "POST":
+        form = InternProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            ip = form.save(commit=False)
+            ip.intern = intern
+            # Set trainer automatically (if intern.batch and batch.trainer)
+            if intern.batch:
+                ip.trainer = intern.batch.trainer
+            ip.save()
+            messages.success(request, "Project submitted successfully.")
+            return redirect("intern_project_list")
+    else:
+        form = InternProjectForm()
+
+    return render(request, "intern_projects/create_project.html", {"form": form})
+
+@login_required
+def intern_project_list(request):
+    if request.user.role != "intern":
+        return redirect("dashboard")
+    intern = request.user.intern_profile
+    projects = InternProject.objects.filter(intern=intern)
+    return render(request, "intern_projects/intern_list.html", {"projects": projects})
+
+@login_required
+def intern_project_detail(request, pk):
+    project = get_object_or_404(InternProject, pk=pk)
+    # Allow intern owning it to view
+    if request.user.role == "intern" and project.intern.user != request.user:
+        messages.error(request, "Not allowed.")
+        return redirect("dashboard")
+    return render(request, "intern_projects/intern_detail.html", {"project": project})
+
+# -- Trainer: list intern submissions for their batches and review a project --
+@login_required
+def trainer_project_list(request):
+    if request.user.role != "trainer":
+        return redirect("dashboard")
+
+    trainer = request.user.trainer_profile
+
+    # get all batches assigned to this trainer
+    trainer_batches = Batch.objects.filter(trainer=trainer)
+
+    selected_batch = request.GET.get("batch")
+
+    # default empty results
+    projects = InternProject.objects.none()
+
+    # show results only when a batch is selected
+    if selected_batch:
+        projects = InternProject.objects.filter(
+            intern__batch__trainer=trainer,
+            intern__batch__id=selected_batch
+        )
+
+    return render(request, "intern_projects/trainer_list.html", {
+        "projects": projects,
+        "trainer_batches": trainer_batches,
+        "selected_batch": selected_batch,
+    })
+
+@login_required
+def trainer_project_review(request, pk):
+    if request.user.role != "trainer":
+        return redirect("dashboard")
+    trainer = request.user.trainer_profile
+    project = get_object_or_404(InternProject, pk=pk)
+
+    # permission: trainer must be assigned trainer for that intern/batch or the explicit trainer
+    allowed = (project.trainer == trainer) or (project.intern.batch and project.intern.batch.trainer == trainer)
+    if not allowed:
+        messages.error(request, "You are not allowed to review this project.")
+        return redirect("trainer_project_list")
+
+    if request.method == "POST":
+        form = TrainerReviewForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Review saved.")
+            return redirect("trainer_project_list")
+    else:
+        form = TrainerReviewForm(instance=project)
+
+    return render(request, "intern_projects/trainer_review.html", {"project": project, "form": form})
+
+# -- Admin / Superuser: overview of all intern projects --
+@login_required
+def admin_intern_projects_overview(request):
+
+    if not (request.user.is_superuser or request.user.role == "admin"):
+        return redirect("dashboard")
+
+    selected_batch = request.GET.get("batch")
+
+    # Admin can see all batches
+    batches = Batch.objects.all()
+
+    # DEFAULT → EMPTY (no projects)
+    projects = InternProject.objects.none()
+
+    # WHEN batch is selected → load projects
+    if selected_batch:
+        projects = InternProject.objects.select_related(
+            "intern__user", "trainer", "intern__batch"
+        ).filter(
+            intern__batch__id=selected_batch
+        )
+
+    return render(request, "intern_projects/admin_overview.html", {
+        "projects": projects,
+        "batches": batches,
+        "selected_batch": selected_batch,
+    })
