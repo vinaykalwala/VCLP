@@ -1,60 +1,779 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ project.title }}</h2>
-    <a href="{% url 'view_projects' %}" class="btn btn-secondary">Back to Projects</a>
+<!-- Header Section -->
+<div class="project-header">
+    <div class="header-container">
+        <div class="header-content">
+            <h1 class="project-title">{{ project.title }}</h1>
+            <div class="header-actions">
+                <a href="{% url 'view_projects' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Projects
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h5>Project Information</h5>
-    </div>
-    <div class="card-body">
-        <p><strong>Trainer:</strong> {{ project.trainer.user.get_full_name }}</p>
-        <p><strong>Introduction:</strong> {{ project.introduction }}</p>
-        
-        {% if project.description_file %}
-        <p><strong>Project Description File:</strong></p>
-        <a href="{{ project.description_file.url }}" download class="btn btn-outline-primary mb-3">
-            <i class="fas fa-download"></i> Download Project Description
-        </a>
-        {% endif %}
+<!-- Main Project Card -->
+<div class="project-dashboard">
+    <div class="dashboard-container">
+        <div class="project-card">
+            <div class="card-header-section">
+                <div class="header-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="header-text">
+                    <h2>Project Information</h2>
+                    <p>Complete project details and requirements</p>
+                </div>
+            </div>
 
-        <hr>
+            <div class="card-content">
+                <!-- Project Details -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-user-tie"></i>
+                            Trainer
+                        </div>
+                        <div class="info-value">{{ project.trainer.user.get_full_name }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            Created
+                        </div>
+                        <div class="info-value">{{ project.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="info-item full-width">
+                        <div class="info-label">
+                            <i class="fas fa-file-alt"></i>
+                            Introduction
+                        </div>
+                        <div class="info-value">{{ project.introduction }}</div>
+                    </div>
+                </div>
 
-        <h5>Your Submission</h5>
-        {% if submission %}
-            <div class="alert alert-info">
-                <p><strong>Status:</strong> 
-                    <span class="badge {% if submission.status == 'submitted' %}bg-success{% else %}bg-warning{% endif %}">
-                        {{ submission.get_status_display }}
-                    </span>
-                </p>
-                <p><strong>Submitted On:</strong> {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
-                {% if submission.github_url %}
-                <p><strong>GitHub Repository:</strong> 
-                    <a href="{{ submission.github_url }}" target="_blank" class="btn btn-outline-dark btn-sm">
-                        <i class="fab fa-github"></i> View on GitHub
+                <!-- Project File Download -->
+                {% if project.description_file %}
+                <div class="file-section">
+                    <div class="file-header">
+                        <i class="fas fa-file-pdf"></i>
+                        <h3>Project Description File</h3>
+                    </div>
+                    <a href="{{ project.description_file.url }}" download class="download-button">
+                        <div class="download-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="download-text">
+                            <span class="file-title">Download Project Description</span>
+                            <span class="file-subtitle">Complete project brief and requirements</span>
+                        </div>
                     </a>
-                </p>
+                </div>
                 {% endif %}
-                {% if submission.description %}
-                <p><strong>Description:</strong> {{ submission.description }}</p>
+
+                <!-- Divider -->
+                <div class="section-divider">
+                    <span>Your Submission</span>
+                </div>
+
+                <!-- Submission Status -->
+                {% if submission %}
+                <div class="submission-status submitted">
+                    <div class="status-header">
+                        <div class="status-badge">
+                            <i class="fas fa-check-circle"></i>
+                            {{ submission.get_status_display }}
+                        </div>
+                        <div class="submission-date">
+                            Submitted on {{ submission.submitted_at|date:"M d, Y H:i" }}
+                        </div>
+                    </div>
+                    
+                    <div class="submission-details">
+                        {% if submission.github_url %}
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fab fa-github"></i>
+                                GitHub Repository
+                            </div>
+                            <a href="{{ submission.github_url }}" target="_blank" class="github-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                View on GitHub
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if submission.description %}
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </div>
+                            <div class="description-text">{{ submission.description }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'submit_project' project.id %}" class="update-button">
+                            <i class="fas fa-edit"></i>
+                            Update Submission
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="submission-status not-submitted">
+                    <div class="status-header">
+                        <div class="status-badge warning">
+                            <i class="fas fa-clock"></i>
+                            Not Submitted
+                        </div>
+                    </div>
+                    
+                    <div class="empty-submission">
+                        <div class="empty-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="empty-text">
+                            <h3>No Submission Yet</h3>
+                            <p>You haven't submitted this project yet. Click below to get started.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'submit_project' project.id %}" class="submit-button">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Project
+                        </a>
+                    </div>
+                </div>
                 {% endif %}
             </div>
-            <a href="{% url 'submit_project' project.id %}" class="btn btn-warning">
-                Update Submission
-            </a>
-        {% else %}
-            <div class="alert alert-warning">
-                You haven't submitted this project yet.
-            </div>
-            <a href="{% url 'submit_project' project.id %}" class="btn btn-primary">
-                Submit Project
-            </a>
-        {% endif %}
+        </div>
     </div>
 </div>
 
+</div>
+
+<style>
+:root {
+    --primary: #5932EA;
+    --primary-light: #6d4aff;
+    --primary-lighter: #f0edff;
+    --primary-dark: #4725c3;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: var(--gray-800);
+   
+}
+
+/* Header Section */
+.project-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 40px 0;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-md);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* Main Dashboard */
+.project-dashboard {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0px;
+}
+
+.project-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 30px;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.header-text h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.header-text p {
+    color: var(--gray-600);
+    font-size: 1rem;
+}
+
+.card-content {
+    padding: 30px;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-label i {
+    color: var(--primary);
+    font-size: 0.8rem;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: var(--gray-800);
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/* File Section */
+.file-section {
+    margin-bottom: 30px;
+    padding: 24px;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
+
+.file-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.file-header i {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.file-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.download-button {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.download-button:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.download-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius);
+    background: var(--primary-lighter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.download-text {
+    flex: 1;
+}
+
+.file-title {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 2px;
+}
+
+.file-subtitle {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+}
+
+/* Section Divider */
+.section-divider {
+    position: relative;
+    text-align: center;
+    margin: 40px 0;
+    color: var(--gray-400);
+}
+
+.section-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gray-200);
+}
+
+.section-divider span {
+    background: white;
+    padding: 0 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+/* Submission Status */
+.submission-status {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
+
+.submission-status:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.submission-status.submitted {
+    border-color: var(--success);
+}
+
+.submission-status.not-submitted {
+    border-color: var(--warning);
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--success);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+}
+
+.status-badge.warning {
+    background: var(--warning);
+}
+
+.submission-date {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.submission-details {
+    padding: 20px;
+    background: white;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.detail-label i {
+    color: var(--primary);
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+}
+
+.description-text {
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--primary);
+}
+
+/* Empty Submission */
+.empty-submission {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    background: white;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--warning-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--warning);
+    font-size: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.empty-text h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 8px;
+}
+
+.empty-text p {
+    color: var(--gray-600);
+}
+
+/* Action Buttons */
+.action-buttons {
+    padding: 20px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: center;
+}
+
+.update-button, .submit-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.update-button {
+    background: var(--warning);
+    color: white;
+}
+
+.update-button:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.submit-button {
+    background: var(--primary);
+    color: white;
+}
+
+.submit-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .project-header {
+        padding: 30px 0;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .project-title {
+        font-size: 2rem;
+    }
+    
+    .card-header-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+        padding: 24px;
+    }
+    
+    .card-content {
+        padding: 24px;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .status-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .empty-submission {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .action-buttons {
+        justify-content: stretch;
+    }
+    
+    .update-button, .submit-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-header {
+        padding: 20px 0;
+    }
+    
+    .project-title {
+        font-size: 1.75rem;
+    }
+    
+    .dashboard-container {
+        padding: 0 16px;
+    }
+    
+    .card-header-section,
+    .card-content {
+        padding: 20px;
+    }
+    
+    .download-button {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.project-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.info-item, .file-section, .submission-status {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.info-item:nth-child(1) { animation-delay: 0.1s; }
+.info-item:nth-child(2) { animation-delay: 0.2s; }
+.file-section { animation-delay: 0.3s; }
+.submission-status { animation-delay: 0.4s; }
+</style>
 {% endblock %}

@@ -1,28 +1,440 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
+    <!-- Top Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1>Project Dashboard</h1>
+            <p>Manage and track all your assigned projects</p>
+        </div>
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-info">
+<h3 id="totalProjectsCount">0</h3>                    <span>Total Projects</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon submitted">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+<h3 id="submittedCount">0</h3>                    <span>Submitted</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+<h3 id="pendingCount">0</h3>                    <span>Not Submitted</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<h2>Assigned Projects</h2>
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="projectSearch" placeholder="Search projects...">
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All Projects</button>
+            <button class="filter-btn" data-filter="submitted">Submitted</button>
+            <button class="filter-btn" data-filter="pending">Not Submitted</button>
+        </div>
+    </div>
 
-<ul>
-{% for p in projects %}
+    <!-- Projects Grid -->
+    <div class="projects-grid">
+        {% for p in projects %}
+            {% if p.id in submission_map %}
+                {% with submission=submission_map.p.id %}
+                <div class="project-card submitted" data-status="submitted">
+                    <div class="card-header">
+                        <div class="status-indicator submitted">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Submitted</span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'submit_project' p.id %}" class="action-btn update" title="Update Submission">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'project_detail' p.id %}" class="action-btn view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <h3 class="project-title">{{ p.title }}</h3>
+                    <p class="project-description">Your project has been successfully submitted and is under review.</p>
+                   <div class="card-footer">
+                        <a href="{% url 'submit_project' p.id %}" class="submit-btn" style="background-color: #5932EA;">
+                            <i class="fas fa-paper-plane"></i>
+                          Update
+                        </a>
+                    </div>
+                </div>
+                {% endwith %}
+            {% else %}
+                <div class="project-card pending" data-status="pending">
+                    <div class="card-header">
+                        <div class="status-indicator pending">
+                            <i class="fas fa-clock"></i>
+                            <span>Not Submitted</span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{% url 'submit_project' p.id %}" class="action-btn submit" title="Submit Project">
+                                <i class="fas fa-paper-plane"></i>
+                            </a>
+                            <a href="{% url 'project_detail' p.id %}" class="action-btn view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <h3 class="project-title">{{ p.title }}</h3>
+                    <p class="project-description">This project is awaiting your submission. Click the submit button to get started.</p>
+                    <div class="card-footer">
+                        <a href="{% url 'submit_project' p.id %}" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Now
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 
-    {% if p.id in submission_map %}
-        {% with submission=submission_map.p.id %}
-        <li>
-            <strong>{{ p.title }}</strong> - Submitted
-            - <a href="{% url 'submit_project' p.id %}">Update</a>
-            - <a href="{% url 'project_detail' p.id %}">View</a>
-        </li>
-        {% endwith %}
-    {% else %}
-        <li>
-            <strong>{{ p.title }}</strong> - Not Submitted
-            - <a href="{% url 'submit_project' p.id %}">Submit</a>
-            - <a href="{% url 'project_detail' p.id %}">View</a>
-        </li>
-    {% endif %}
+<style>
+.dashboard-header {
+    background: linear-gradient(135deg, #5932EA);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
 
-{% endfor %}
-</ul>
+.header-content h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
 
+.header-content p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.stat-icon.submitted {
+    color: #10b981;
+}
+
+.stat-icon.pending {
+    color: #f59e0b;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stat-info span {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.filter-section {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    position: relative;
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-bar i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-indicator.submitted {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-indicator.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-btn.update {
+    background: #3b82f6;
+    color: white;
+}
+
+.action-btn.submit {
+    background: #10b981;
+    color: white;
+}
+
+.action-btn.view {
+    background: #6b7280;
+    color: white;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.project-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.project-description {
+    margin: 0 0 1.5rem 0;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.submission-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #10b981;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .stats-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-bar {
+        min-width: auto;
+    }
+    
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('projectSearch');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        projectCards.forEach(card => {
+            const title = card.querySelector('.project-title').textContent.toLowerCase();
+            if (title.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter cards
+            projectCards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                
+                if (filter === 'all' || filter === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const totalProjects = document.querySelectorAll(".project-card").length;
+    const submittedProjects = document.querySelectorAll('.project-card[data-status="submitted"]').length;
+    const pendingProjects = document.querySelectorAll('.project-card[data-status="pending"]').length;
+
+    document.getElementById("totalProjectsCount").textContent = totalProjects;
+    document.getElementById("submittedCount").textContent = submittedProjects;
+    document.getElementById("pendingCount").textContent = pendingProjects;
+});
+
+</script>
 {% endblock %}

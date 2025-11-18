@@ -1,48 +1,668 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<!-- ================= STYLING ================= -->
+<style>
+:root {
+  --primary: #5932EA;
+  --primary-light: #6d4aff;
+  --primary-lighter: #f0edff;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --warning: #f59e0b;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius: 12px;
+  --radius-lg: 16px;
+}
 
-<h2>All Projects </h2>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Project</th>
-        <th>Trainer</th>
-        <th>Intern</th>
-        <th>Intern ID</th>
-        <th>Batch</th>
-        <th>Status</th>
-        <th>View Submission</th>
-    </tr>
-    {% for item in project_data %}
-    {% for intern in item.interns %}
-    <tr>
-        <td>{{ item.project.title }}</td>
-        <td>{{ item.project.trainer.user.get_full_name }}</td>
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+}
 
-        <td>{{ intern.user.get_full_name }}</td>
-        <td>{{ intern.unique_id }}</td>
-        <td>{{ intern.batch.batch_name }}</td>
+/* ================= HEADER ================= */
+.proj-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  padding:20px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  box-shadow: var(--shadow-lg);
+  padding-top: 30px;
+}
 
-        <td>
-            {% if intern.submission %}
-            <span style="color: green;">Submitted</span>
-            {% else %}
-            <span style="color: red;">Not Submitted</span>
-            {% endif %}
-        </td>
+.header-content h2 {
+  font-size: 28px;
+  font-weight: 700;
+}
 
-        <td>
-            {% if intern.submission %}
-           <a href="{% url 'view_single_submission' intern.submission.id %}">
-        View</a>
-            {% else %}
-            ---
-            {% endif %}
-        </td>
-    </tr>
+.header-content p {
+  opacity: 0.9;
+  font-size: 15px;
+}
 
-    {% endfor %}
-    {% endfor %}
+.proj-search-box {
+  position: relative;
+}
 
-</table>
+.proj-search-box input {
+  padding: 12px 45px 12px 16px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  width: 330px;
+  font-size: 14px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.proj-search-box input:focus {
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+
+.proj-search-box i {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary);
+}
+
+/* ================= FILTER BUTTONS ================= */
+.filter-section {
+  margin-bottom: 25px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 12px;
+  background: white;
+  padding: 8px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  width: fit-content;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--gray-600);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.filter-btn:hover {
+  background: var(--gray-50);
+  color: var(--gray-700);
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.btn-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filter-btn:not(.active) .btn-badge {
+  background: var(--gray-200);
+  color: var(--gray-600);
+}
+
+/* ================= TABLE ================= */
+.proj-table-wrapper {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-100);
+    overflow-x: auto;       /* FIXED */
+    overflow-y: hidden;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0;
+  margin-bottom: 16px;
+}
+
+.table-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color:#5932EA;
+}
+
+.table-stats {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.proj-table {
+    width: 100%;
+    min-width: 1000px;   /* FIXED */
+    border-collapse: collapse;
+}
+
+
+.proj-table th {
+  background:#f3f3f3;
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--gray-200);
+  border-right: 1px solid #d1d5db;
+
+}
+
+.proj-table th .sort-icon {
+  margin-left: 4px;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.proj-table td {
+  padding: 20px;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 14px;
+  border-right: 1px solid #e5e7eb;
+
+}
+
+.proj-table tr:last-child td {
+  border-bottom: none;
+}
+
+.proj-table tr:hover {
+  background: var(--gray-50);
+}
+
+/* Table Cell Styles */
+.project-cell .project-title {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.project-cell .project-date {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.intern-avatar { 
+  background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%); 
+}
+
+.unique-id {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.batch-tag {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.submitted {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.status-badge.pending {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Action Buttons */
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.no-data {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--gray-500);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--gray-600);
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1024px) {
+  .proj-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .proj-search-box input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .proj-table-wrapper {
+    margin: 0 -12px;
+    border-radius: 0;
+  }
+  
+  .proj-table th,
+  .proj-table td {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .proj-header {
+    padding: 20px;
+  }
+}
+</style>
+
+<div class="main-content">
+
+<!-- ================= HEADER WITH SEARCH ================= -->
+<div class="proj-header">
+  <div class="header-content">
+    <h2>Project Dashboard</h2>
+    <p>Monitor and manage all project submissions</p>
+  </div>
+  <div class="proj-search-box">
+      <input type="text" id="projectSearch" placeholder="Search projects, trainers, interns...">
+      <i class="fas fa-search"></i>
+  </div>
+</div>
+
+<!-- ================= FILTER BUTTONS ================= -->
+<div class="filter-section">
+  <div class="filter-buttons">
+    <button class="filter-btn all active" data-filter="all">
+      <span class="btn-icon">📁</span>
+      All Projects
+      <span class="btn-badge" id="allCount">0</span>
+    </button>
+    
+    <button class="filter-btn submitted" data-filter="submitted">
+      <span class="btn-icon">✅</span>
+      Submitted
+      <span class="btn-badge" id="submittedTabCount">0</span>
+    </button>
+    
+    <button class="filter-btn pending" data-filter="not-submitted">
+      <span class="btn-icon">⏱️</span>
+      Not Submitted
+      <span class="btn-badge" id="pendingTabCount">0</span>
+    </button>
+  </div>
+</div>
+
+<!-- ================= BEAUTIFUL TABLE ================= -->
+<div class="proj-table-wrapper">
+  <div class="table-header">
+    <h3>Project Details</h3>
+    <div class="table-stats">
+      Showing <span id="showingCount">0</span> of <span id="totalShowing">0</span> projects
+    </div>
+  </div>
+  
+  <table class="proj-table">
+    <thead>
+        <tr>
+            <th class="project-col">
+              <span>Project</span>
+            </th>
+            <th class="trainer-col">
+              <span>Trainer</span>
+            </th>
+            <th class="intern-col">
+              <span>Intern</span>
+            </th>
+            <th class="id-col">Intern ID</th>
+            <th class="batch-col">Batch</th>
+            <th class="status-col">Status</th>
+            <th class="action-col">Action</th>
+        </tr>
+    </thead>
+
+    <tbody id="projectTableBody">
+        {% for item in project_data %}
+        {% for intern in item.interns %}
+        <tr class="project-row {% if intern.submission %}submitted{% else %}not-submitted{% endif %}">
+            <td class="project-cell">
+              <div class="project-info">
+                <div class="project-title">{{ item.project.title|default:'NA' }}</div>
+                <div class="project-date">Assigned: N/A</div>
+              </div>
+            </td>
+            
+            <td class="trainer-cell">
+              <div class="user-info">
+                <span>{{ item.project.trainer.user.get_full_name|default:'NA' }}</span>
+              </div>
+            </td>
+            
+            <td class="intern-cell">
+              <div class="user-info">
+                <div class="avatar intern-avatar">{{ intern.user.get_full_name|default:'I'|first }}</div>
+                <span>{{ intern.user.get_full_name|default:'NA' }}</span>
+              </div>
+            </td>
+            
+            <td class="id-cell">
+              <span class="unique-id">{{ intern.unique_id|default:'NA' }}</span>
+            </td>
+            
+            <td class="batch-cell">
+              <span class="batch-tag">{{ intern.batch.batch_name|default:'NA' }}</span>
+            </td>
+
+            <td class="status-cell">
+                {% if intern.submission %}
+                <span class="status-badge submitted">
+                  <span class="status-dot"></span>
+                  Submitted
+                </span>
+                {% else %}
+                <span class="status-badge pending">
+                  <span class="status-dot"></span>
+                  Not Submitted
+                </span>
+                {% endif %}
+            </td>
+
+            <td class="action-cell">
+                {% if intern.submission %}
+                <a class="view-btn" href="{% url 'view_single_submission' intern.submission.id %}">
+                  <i class="fas fa-eye"></i>
+                  View
+                </a>
+                {% else %}
+                <span class="no-data">
+                  <i class="fas fa-minus"></i>
+                  NA
+                </span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+  </table>
+  
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState" style="display: none;">
+    <div class="empty-icon">📊</div>
+    <h3>No projects found</h3>
+    <p>Try adjusting your search or filter criteria</p>
+  </div>
+</div>
+
+</div>
+
+
+<!-- ================= JS (Search + Filters + Counts) ================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const rows = document.querySelectorAll('.project-row');
+  const allCount = document.getElementById('allCount');
+  const submittedTabCount = document.getElementById('submittedTabCount');
+  const pendingTabCount = document.getElementById('pendingTabCount');
+  const showingCount = document.getElementById('showingCount');
+  const totalShowing = document.getElementById('totalShowing');
+  const emptyState = document.getElementById('emptyState');
+  const tableBody = document.getElementById('projectTableBody');
+
+  function updateCounts() {
+    let submitted = 0;
+    let pending = 0;
+    let visible = 0;
+
+    rows.forEach(row => {
+      if (row.style.display !== 'none') {
+        visible++;
+        if (row.classList.contains('submitted')) submitted++;
+        else pending++;
+      }
+    });
+
+    const total = rows.length;
+    const totalSubmitted = document.querySelectorAll('.project-row.submitted').length;
+    const totalPending = document.querySelectorAll('.project-row.not-submitted').length;
+
+    // Update tab counts
+    allCount.textContent = total;
+    submittedTabCount.textContent = totalSubmitted;
+    pendingTabCount.textContent = totalPending;
+
+    // Update showing count
+    showingCount.textContent = visible;
+    totalShowing.textContent = total;
+
+    // Show/hide empty state
+    if (visible === 0) {
+      emptyState.style.display = 'block';
+      tableBody.style.display = 'none';
+    } else {
+      emptyState.style.display = 'none';
+      tableBody.style.display = 'table-row-group';
+    }
+  }
+
+  // Initialize counts
+  updateCounts();
+
+  // SEARCH
+  const searchBox = document.getElementById('projectSearch');
+  searchBox.addEventListener('keyup', () => {
+    const val = searchBox.value.toLowerCase();
+    rows.forEach(row => {
+      row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+    });
+    updateCounts();
+  });
+
+  // FILTER BUTTONS
+  const filterButtons = document.querySelectorAll('.filter-btn');
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active class from all buttons
+      filterButtons.forEach(b => b.classList.remove('active'));
+      
+      // Add active class to clicked button
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter;
+
+      rows.forEach(row => {
+        if (filter === "all") {
+          row.style.display = "";
+        } 
+        else if (row.classList.contains(filter)) {
+          row.style.display = "";
+        } 
+        else {
+          row.style.display = "none";
+        }
+      });
+      
+      updateCounts();
+    });
+  });
+
+  // Add smooth animations
+  rows.forEach((row, index) => {
+    row.style.animationDelay = `${index * 0.05}s`;
+    row.classList.add('fade-in');
+  });
+});
+
+// Add fade-in animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

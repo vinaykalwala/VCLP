@@ -1,40 +1,504 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
+    <!-- Header Section -->
+    <div class="project-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1 class="project-title">{{ project.project_title }}</h1>
+                <div class="project-meta">
+                    <span class="status-badge status-{{ project.status|lower }}">{{ project.status }}</span>
+                    <span class="submission-date">Submitted {{ project.submitted_at|date:"d M Y, H:i" }}</span>
+                </div>
+            </div>
+            <div class="score-display">
+                {% if project.score %}
+                <div class="score-circle">
+                    <div class="score-value">{{ project.score }}</div>
+                    <div class="score-label">Score</div>
+                </div>
+                {% else %}
+                <div class="score-pending">
+                    <div class="pending-icon">⏳</div>
+                    <div class="pending-text">Pending Evaluation</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
-<h2>{{ project.project_title }}</h2>
+    <!-- Project Details Card -->
+    <div class="project-details-container">
+        <div class="details-grid">
+            <!-- Description Section -->
+            <div class="detail-card full-width">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Project Description</h3>
+                </div>
+                <div class="card-content">
+                    <div class="description-text">
+                        {{ project.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
 
-<div class="card p-4">
+            <!-- Links Section -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Repository</h3>
+                </div>
+                <div class="card-content">
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" class="link-button github-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                        </svg>
+                        View on GitHub
+                    </a>
+                    {% else %}
+                    <div class="no-link">No GitHub URL provided</div>
+                    {% endif %}
+                </div>
+            </div>
 
-    <p><strong>Description:</strong><br>{{ project.description|linebreaks }}</p>
-
-    <p><strong>Github URL:</strong>
-        {% if project.github_url %}
-        <a href="{{ project.github_url }}" target="_blank">{{ project.github_url }}</a>
-        {% else %}
-        -
-        {% endif %}
-    </p>
-
-    <p><strong>Uploaded File:</strong>
-        {% if project.file %}
-            <a href="{{ project.file.url }}" target="_blank">Download</a>
-        {% else %}
-            -
-        {% endif %}
-    </p>
-
-    <p><strong>Status:</strong> {{ project.status }}</p>
-
-    <p><strong>Score:</strong>
-        {% if project.score %}
-            {{ project.score }}
-        {% else %}
-            Not evaluated yet
-        {% endif %}
-    </p>
-
-    <p><strong>Submitted At:</strong> {{ project.submitted_at|date:"d M Y, H:i" }}</p>
-
+            <!-- File Section -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                            <polyline points="13 2 13 9 20 9"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Project Files</h3>
+                </div>
+                <div class="card-content">
+                    {% if project.file %}
+                    <a href="{{ project.file.url }}" target="_blank" class="link-button download-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download File
+                    </a>
+                    {% else %}
+                    <div class="no-link">No file uploaded</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+:root {
+    --primary: #5932EA;
+    --primary-dark: #4a2bcb;
+    --primary-light: #f0eeff;
+    --secondary: #667eea;
+    --accent: #764ba2;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --text-tertiary: #a0aec0;
+    --bg-white: #ffffff;
+    --bg-gray: #f8fafc;
+    --border: #e2e8f0;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.12);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+}
+
+
+/* Project Header */
+.project-header {
+    background: linear-gradient(135deg, var(--primary));
+    color: white;
+    padding: 3rem 2rem;
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+.title-section {
+    flex: 1;
+}
+
+.project-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    word-wrap: break-word;
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.submission-date {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* Score Display */
+.score-display {
+    flex-shrink: 0;
+}
+
+.score-circle {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+}
+
+.score-pending {
+    text-align: center;
+}
+
+.pending-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.pending-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Project Details */
+.project-details-container {
+    max-width: 1200px;
+    margin: -1.5rem auto 0;
+    position: relative;
+    z-index: 2;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+}
+
+.detail-card {
+    background: var(--bg-white);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.detail-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 1.5rem 0;
+    margin-bottom: 1rem;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.card-content {
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Description Text */
+.description-text {
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.description-text p {
+    margin-bottom: 1rem;
+}
+
+.description-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Link Buttons */
+.link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: var(--primary-light);
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.link-button:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(89, 50, 234, 0.3);
+    text-decoration: none;
+}
+
+.no-link {
+    color: var(--text-tertiary);
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-gray);
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+}
+
+/* Status Colors */
+.status-pending { background: var(--warning); }
+.status-approved { background: var(--success); }
+.status-rejected { background: var(--error); }
+.status-review { background: var(--info); }
+.status-completed { background: var(--success); }
+.status-in-progress { background: var(--info); }
+
+/* Mobile Responsive Design */
+@media (max-width: 1024px) {
+    .project-details-container {
+        padding: 0 1.5rem;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .detail-card.full-width {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .project-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .project-title {
+        font-size: 2rem;
+    }
+    
+    .project-meta {
+        justify-content: center;
+    }
+    
+    .score-circle {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .score-value {
+        font-size: 1.5rem;
+    }
+    
+    .project-details-container {
+        margin-top: -1.5rem;
+        padding: 0 1rem;
+    }
+    
+    .details-grid {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .project-title {
+        font-size: 1.75rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+        padding: 1.25rem 1.25rem 0;
+    }
+    
+    .card-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .card-content {
+        padding: 0 1.25rem 1.25rem;
+    }
+    
+    .link-button {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .project-details-container {
+        margin-top: -1rem;
+        padding: 0 0.75rem;
+    }
+    
+    .details-grid {
+        gap: 0.75rem;
+    }
+    
+    .project-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 360px) {
+    .project-header {
+        padding: 1rem 0.75rem;
+    }
+    
+    .project-title {
+        font-size: 1.5rem;
+    }
+    
+    .project-details-container {
+        padding: 0 0.5rem;
+    }
+    
+    .detail-card {
+        border-radius: 12px;
+    }
+    
+    .card-header {
+        padding: 1rem 1rem 0;
+    }
+    
+    .card-content {
+        padding: 0 1rem 1rem;
+    }
+}
+
+/* Animation for status badge */
+.status-badge {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+.detail-card,
+.link-button,
+.score-circle {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure no horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+
+.main-content {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+</style>
 {% endblock %}

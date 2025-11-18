@@ -1,13 +1,218 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+{% load static %}
+<style>
+/* --- THEME COLOR VARIABLE --- */
+:root {
+    --primary-color: #5932EA;
+    --primary-hover-color: #4928b9; /* A slightly darker shade for hover effect */
+    --accent-bg-color: #f0f0ff; /* Very light tint of the primary color */
+}
+/* Centered and Styled H2 */
+.main-content h2 {
+    text-align: center !important;
+    font-size: 32px !important;
+    font-weight: 800 !important;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    color: var(--primary-color) !important;
+    position: relative;
+}
 
-<h2>Submit Project - {{ project.title }}</h2>
+/* Beautiful underline accent */
+.main-content h2::after {
+    content: "";
+    width: 80px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+/*
+ * 1. Base Container Setup (Same Height Layout)
+ * --------------------------------------------
+ */
+.project-submission-container {
+    display: flex;
+    gap: 0; /* Remove gap; the visual separation is now handled by colors/border */
+    margin-top: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #ffffff;
+    border-radius: 12px; /* Slightly larger radius for a softer look */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* More prominent, professional shadow */
+    overflow: hidden;
+}
 
-    <button class="btn btn-success">Submit</button>
-</form>
+/*
+ * 2. Form Wrapper (Left Side)
+ * ----------------------------
+ */
+.submission-form-wrapper {
+    flex: 1 1 55%;
+    padding: 40px;
+    background-color: #ffffff; /* White background for clean form space */
+}
 
+/* --- Form Alignment and Input Consistency --- */
+
+/* Ensures vertical rhythm and consistent spacing */
+.submission-form p {
+    margin-bottom: 20px;
+}
+
+/* Label Styling (Ensuring strong visual connection to inputs) */
+.submission-form label {
+    display: block;
+    font-weight: 600;
+    color:#5932EA;
+    margin-bottom: 5px;
+    font-size: 0.95em;
+}
+
+/* ALL INPUT FIELDS SAME HEIGHT and STYLING */
+.submission-form input[type="text"],
+.submission-form input[type="email"],
+.submission-form input[type="file"],
+.submission-form textarea {
+    /* Fixed height for all text/email inputs, excluding textarea */
+    height: 50px; 
+    padding: 10px 12px;
+    border: 1px solid #dee2e6; /* Light, neutral border */
+    border-radius: 6px;
+    box-sizing: border-box; /* Crucial for consistent sizing */
+    width: 100%;
+    font-size: 16px;
+    line-height: 24px; /* Matches padding for vertical alignment */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Handle textarea separately for multiple lines, but maintain width and border style */
+.submission-form textarea {
+    height: 44px; /* Specific height for multi-line text */
+    resize: vertical; /* Allow resizing only vertically */
+}
+
+.submission-form input:focus,
+.submission-form textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(89, 50, 234, 0.2); /* Soft glow using theme color */
+    outline: none;
+}
+
+/* Submit Button Styling (Theme Color) */
+.btn-submit-project {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 700;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s;
+    margin-top: 15px;
+}
+
+.btn-submit-project:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-1px);
+}
+
+/*
+ * 3. Image Card (Right Side)
+ * --------------------------
+ */
+.submission-image-card {
+    flex: 1 1 45%;
+    background-color: var(--primary-color); /* Theme color background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    color: white;
+}
+
+.image-content-box {
+    text-align: center;
+    max-width: 100%;
+}
+
+.card-visual-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px; /* Slightly more rounded edges */
+    margin-bottom: 20px;
+    border: 5px solid rgba(255, 255, 255, 0.2); /* White border for contrast */
+}
+
+.image-card-caption {
+    font-size: 1.2em;
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+
+/*
+ * 4. Responsiveness (Mobile View)
+ * -------------------------------
+ */
+@media (max-width: 992px) {
+    .project-submission-container {
+        flex-direction: column;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .submission-form-wrapper {
+        padding: 30px 20px;
+        flex: 1 1 100%;
+    }
+    
+    .submission-image-card {
+        flex: 1 1 100%;
+        padding: 40px 20px;
+        background-color: var(--accent-bg-color); /* Lighter accent color for mobile stacking */
+        color: var(--primary-color); /* Use theme color for text on light background */
+    }
+
+    .card-visual-image {
+        max-height: 250px;
+        border: none; /* Remove border on small screens */
+    }
+
+    .image-card-caption {
+        font-weight: 500;
+    }
+}
+</style>
+<div class="main-content">
+    <h2>Submit Project - {{ project.title }}</h2>
+
+    <div class="project-submission-container">
+        <div class="submission-form-wrapper">
+            <form method="POST" enctype="multipart/form-data" class="submission-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="btn btn-submit-project">Submit</button>
+            </form>
+        </div>
+        
+        <div class="submission-image-card">
+            <div class="image-content-box">
+                <img src="{% static 'images/project.jpg' %}" alt="Project Submission Visual" class="card-visual-image">
+                <p class="image-card-caption">Visualize your successful project submission.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,39 +1,585 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1 class="main-title">My Projects</h1>
+            </div>
 
-<h2 class="mb-3">My Projects</h2>
+        </div>
+        <a href="{% url 'create_intern_project' %}" class="cta-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Submit New Project
+        </a>
+    </div>
 
-<a href="{% url 'create_intern_project' %}" class="btn btn-success mb-3">
-    + Submit New Project
-</a>
+    <!-- Projects Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Project Submissions</h3>
+            <div class="table-controls">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <input type="text" placeholder="Search projects..." class="search-input">
+                </div>
+            </div>
+        </div>
 
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Project Title</th>
-            <th>Status</th>
-            <th>Score</th>
-            <th>Submitted At</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in projects %}
-        <tr>
-            <td>{{ p.project_title }}</td>
-            <td>{{ p.status }}</td>
-            <td>{% if p.score %}{{ p.score }}{% else %}-{% endif %}</td>
-            <td>{{ p.submitted_at|date:"d M Y H:i" }}</td>
-            <td>
-                <a href="{% url 'intern_project_detail' p.pk %}" class="btn btn-sm btn-primary">
-                    View
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="text-center">No projects submitted yet.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <div class="table-wrapper">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th class="col-title">Project Title</th>
+                        <th class="col-status">Status</th>
+                        <th class="col-score">Score</th>
+                        <th class="col-date">Submitted At</th>
+                        <th class="col-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in projects %}
+                    <tr class="table-row">
+                        <td class="project-title-cell">
+                            <div class="project-info">
+                                <div class="project-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="project-name">{{ p.project_title }}</div>
+                                    <div class="project-id">ID: {{ p.pk }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-container">
+                                <span class="status-indicator status-{{ p.status|lower }}"></span>
+                                <span class="status-text">{{ p.status }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="score-container">
+                                {% if p.score %}
+                                <div class="score-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ p.score }}%"></div>
+                                    </div>
+                                    <span class="score-value">{{ p.score }}/100</span>
+                                </div>
+                                {% else %}
+                                <span class="score-pending">Pending</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="date-cell">
+                            <div class="date-wrapper">
+                                <div class="date-main">{{ p.submitted_at|date:"d M Y" }}</div>
+                                <div class="date-time">{{ p.submitted_at|date:"H:i" }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'intern_project_detail' p.pk %}" class="action-btn view-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                    </svg>
+                                </div>
+                                <h3>No projects submitted yet</h3>
+                                <p>Start your journey by submitting your first project</p>
+                                <a href="{% url 'create_intern_project' %}" class="cta-button outline">
+                                    Create Your First Project
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modern Design System */
+:root {
+    --primary: #5932EA;
+    --primary-dark: #4a2bcb;
+    --secondary: #667eea;
+    --accent: #764ba2;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --text-tertiary: #a0aec0;
+    --bg-white: #ffffff;
+    --bg-gray: #f8fafc;
+    --border: #e2e8f0;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* Main Layout */
+.dashboard-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: end;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: end;
+    padding: 0 10px;
+}
+
+.title-section .main-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+.stats-overview {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* CTA Button */
+.cta-button {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.cta-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+    text-decoration: none;
+}
+
+.cta-button.outline {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.cta-button.outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Table Container */
+.table-container {
+    background: var(--bg-white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 2rem 2rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.table-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box svg {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-tertiary);
+}
+
+.search-input {
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: var(--bg-gray);
+    transition: all 0.3s ease;
+    width: 250px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(89, 50, 234, 0.1);
+}
+
+/* Modern Table */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modern-table th {
+    background: var(--bg-gray);
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modern-table td {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s ease;
+}
+
+.table-row:hover {
+    background: var(--bg-gray);
+}
+
+/* Project Info */
+.project-title-cell {
+    min-width: 280px;
+}
+
+.project-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.project-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.project-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.project-id {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+/* Status Styles */
+.status-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-pending { background: #f59e0b; }
+.status-approved { background: #10b981; }
+.status-rejected { background: #ef4444; }
+.status-review { background: #3b82f6; }
+
+.status-text {
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* Score Styles */
+.score-container {
+    min-width: 120px;
+}
+
+.score-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.score-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    min-width: 50px;
+}
+
+.score-pending {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* Date Styles */
+.date-wrapper {
+    text-align: left;
+}
+
+.date-main {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.date-time {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.view-btn {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.view-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(89, 50, 234, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-icon {
+    color: var(--text-tertiary);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin: 0 0 2rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .header-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stats-overview {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .modern-table {
+        min-width: 800px;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-overview {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .project-info {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector(".search-input");
+    const rows = document.querySelectorAll(".modern-table tbody tr.table-row");
+
+    searchInput.addEventListener("input", function () {
+        const query = this.value.toLowerCase().trim();
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? "" : "none";
+        });
+    });
+});
+</script>
 
 {% endblock %}

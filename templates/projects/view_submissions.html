@@ -1,38 +1,679 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
 
-<h2>Submissions - {{ project.title }}</h2>
+<!-- ================= HEADER SECTION ================= -->
+<div class="submissions-header">
+    <div class="header-content">
+        <h1>Project Submissions</h1>
+        <p>Review submissions for: <strong>{{ project.title }}</strong></p>
+    </div>
+    <div class="header-actions">
+        <a href="{% url 'view_projects' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Projects
+        </a>
+    </div>
+</div>
 
-<table class="table">
-    <tr>
-        <th>Intern</th>
-        <th>ID</th>
-        <th>Status</th>
-        <th>GitHub</th>
-        <th>File</th>
-    </tr>
+<!-- ================= SEARCH SECTION ================= -->
+<div class="search-section">
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="submissionSearch" placeholder="Search by intern name, ID, or status...">
+            <button class="clear-search" id="clearSearch">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
-{% for s in submissions %}
-    <tr>
-        <td>{{ s.intern.user.get_full_name }}</td>
-        <td>{{ s.intern.unique_id }}</td>
-        <td>{{ s.status }}</td>
-        <td>
-            {% if s.github_url %}
-                <a href="{{ s.github_url }}" target="_blank">Open</a>
-            {% else %}
-                N/A
-            {% endif %}
-        </td>
-        <td>
-            {% if s.file %}
-                <a href="{{ s.file.url }}" download>Download</a>
-            {% else %}
-                N/A
-            {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-</table>
+<!-- ================= SUBMISSIONS TABLE ================= -->
+<div class="table-container">
+    <div class="table-header">
+        <h3>Submission Details</h3>
+        <div class="table-stats">
+            <span class="stat-item">
+                <i class="fas fa-users"></i>
+                Total: <strong id="totalCount">{{ submissions|length }}</strong>
+            </span>
+            <span class="stat-item">
+                <i class="fas fa-check-circle"></i>
+                Submitted: <strong id="submittedCount">0</strong>
+            </span>
+        </div>
+    </div>
 
+    <div class="table-wrapper">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th class="intern-col">
+                        <div class="th-content">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Intern</span>
+                        </div>
+                    </th>
+                    <th class="id-col">
+                        <div class="th-content">
+                            <i class="fas fa-id-card"></i>
+                            <span>ID</span>
+                        </div>
+                    </th>
+                    <th class="status-col">
+                        <div class="th-content">
+                            <i class="fas fa-circle"></i>
+                            <span>Status</span>
+                        </div>
+                    </th>
+                    <th class="github-col">
+                        <div class="th-content">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </div>
+                    </th>
+                    <th class="file-col">
+                        <div class="th-content">
+                            <i class="fas fa-file"></i>
+                            <span>File</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+                {% for s in submissions %}
+                <tr class="submission-row">
+                    <td class="intern-cell">
+                        <div class="user-info">
+                            <div class="avatar">{{ s.intern.user.get_full_name|first }}</div>
+                            <div class="user-details">
+                                <div class="user-name">{{ s.intern.user.get_full_name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="id-cell">
+                        <span class="unique-id">{{ s.intern.unique_id }}</span>
+                    </td>
+                    <td class="status-cell">
+                        <span class="status-badge {{ s.status|lower }}">
+                            <span class="status-dot"></span>
+                            {{ s.status }}
+                        </span>
+                    </td>
+                    <td class="github-cell">
+                        {% if s.github_url %}
+                        <a href="{{ s.github_url }}" target="_blank" class="github-link">
+                            <i class="fab fa-github"></i>
+                            <span>Open</span>
+                        </a>
+                        {% else %}
+                        <span class="na-text">
+                            <i class="fas fa-minus"></i>
+                            N/A
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="file-cell">
+                        {% if s.file %}
+                        <a href="{{ s.file.url }}" download class="download-link">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </a>
+                        {% else %}
+                        <span class="na-text">
+                            <i class="fas fa-minus"></i>
+                            N/A
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="no-submissions-row">
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3>No Submissions Yet</h3>
+                            <p>No interns have submitted their work for this project</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div>
+
+<!-- ================= STYLING ================= -->
+<style>
+:root {
+    --primary: #5932EA;
+    --primary-light: #6d4aff;
+    --primary-lighter: #f0edff;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --radius: 12px;
+    --radius-lg: 16px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: var(--gray-800);
+    line-height: 1.6;
+}
+
+/* ================= HEADER SECTION ================= */
+.submissions-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: 30px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.header-content p {
+    opacity: 0.9;
+    font-size: 15px;
+}
+
+.header-content strong {
+    font-weight: 600;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* ================= SEARCH SECTION ================= */
+.search-section {
+    background: white;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.search-container {
+    max-width: 100%;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(89, 50, 234, 0.1);
+}
+
+.search-box i {
+    color: var(--gray-400);
+    margin-right: 12px;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--gray-800);
+    outline: none;
+}
+
+.search-box input::placeholder {
+    color: var(--gray-400);
+}
+
+.clear-search {
+    background: var(--gray-300);
+    border: none;
+    color: var(--gray-600);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.clear-search:hover {
+    background: var(--gray-400);
+    color: var(--gray-700);
+}
+
+/* ================= TABLE CONTAINER ================= */
+.table-container {
+    background: white;
+    margin: 20px 0;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.table-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.table-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--gray-100);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.stat-item i {
+    color: var(--primary);
+}
+
+/* ================= MODERN TABLE ================= */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modern-table th {
+    background: var(--gray-50);
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.th-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.th-content i {
+    font-size: 14px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+.modern-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+}
+
+.modern-table tr:last-child td {
+    border-bottom: none;
+}
+
+.modern-table tr:hover {
+    background: var(--gray-50);
+}
+
+/* ================= TABLE CELL STYLES ================= */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.unique-id {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 13px;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.submitted {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.pending {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.status-badge.reviewed {
+    background: var(--primary-lighter);
+    color: var(--primary);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* Action Links */
+.github-link, .download-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.github-link {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.github-link:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+}
+
+.download-link {
+    background: var(--primary);
+    color: white;
+}
+
+.download-link:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.na-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray-400);
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-500);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--gray-600);
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1024px) {
+    .submissions-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .table-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 768px) {
+    .submissions-header {
+        padding: 20px;
+    }
+    
+    .search-section {
+        padding: 16px 20px;
+    }
+    
+    .table-container {
+        margin: 16px 0;
+        border-radius: var(--radius);
+    }
+    
+    .table-header {
+        padding: 20px;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 12px 16px;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .table-wrapper {
+        margin: 0 -16px;
+    }
+    
+    .modern-table {
+        min-width: 600px;
+    }
+    
+    .stat-item {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.submission-row {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.submission-row:nth-child(1) { animation-delay: 0.1s; }
+.submission-row:nth-child(2) { animation-delay: 0.2s; }
+.submission-row:nth-child(3) { animation-delay: 0.3s; }
+.submission-row:nth-child(4) { animation-delay: 0.4s; }
+</style>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const submissionRows = document.querySelectorAll('.submission-row');
+    const searchInput = document.getElementById('submissionSearch');
+    const clearSearch = document.getElementById('clearSearch');
+    const totalCount = document.getElementById('totalCount');
+    const submittedCount = document.getElementById('submittedCount');
+
+    // Calculate submitted count
+    function calculateSubmittedCount() {
+        const submitted = Array.from(submissionRows).filter(row => 
+            row.querySelector('.status-badge').textContent.toLowerCase().includes('submitted')
+        ).length;
+        submittedCount.textContent = submitted;
+    }
+
+    // Filter submissions
+    function filterSubmissions() {
+        const searchTerm = searchInput.value.toLowerCase();
+        let visibleCount = 0;
+
+        submissionRows.forEach(row => {
+            const internName = row.querySelector('.user-name').textContent.toLowerCase();
+            const internId = row.querySelector('.unique-id').textContent.toLowerCase();
+            const status = row.querySelector('.status-badge').textContent.toLowerCase();
+            
+            const matchesSearch = internName.includes(searchTerm) || 
+                                internId.includes(searchTerm) ||
+                                status.includes(searchTerm);
+            
+            if (matchesSearch) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide clear button
+        clearSearch.style.display = searchTerm.length > 0 ? 'flex' : 'none';
+        
+        // Update counts
+        totalCount.textContent = visibleCount;
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterSubmissions);
+    
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        filterSubmissions();
+        searchInput.focus();
+    });
+
+    // Initialize counts
+    calculateSubmittedCount();
+});
+</script>
 {% endblock %}

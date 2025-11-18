@@ -1,44 +1,745 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
+    <div class="rev-container">
 
-<h2 class="mb-3">Review Project: {{ project.project_title }}</h2>
+    <div class="rev-card">
 
-<div class="card p-4">
+        <!-- Header inside card -->
+        <div class="rev-header">
+            <div class="rev-header-content">
+                <div class="rev-title-wrapper">
+                    <h2 class="rev-title">Review Project</h2>
+                    <p class="rev-subtitle">{{ project.project_title }}</p>
+                </div>
+                <div class="rev-header-graphic">
+                    <div class="graphic-circle"></div>
+                    <div class="graphic-dots"></div>
+                </div>
+            </div>
+        </div>
 
-    <h4>Intern Details</h4>
-    <p><strong>ID:</strong> {{ project.intern.unique_id }}</p>
-    <p><strong>Name:</strong> {{ project.intern.user.get_full_name }}</p>
-    <p><strong>Batch:</strong> {{ project.intern.batch.name }}</p>
+        <!-- Intern Section -->
+        <div class="rev-section">
+            <div class="rev-section-header">
+                <div class="section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h3 class="rev-section-title">Intern Details</h3>
+            </div>
 
-    <hr>
+            <div class="rev-detail-grid">
+                <div class="rev-detail-item">
+                    <div class="detail-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <span class="rev-label">ID</span>
+                        <span class="rev-value">{{ project.intern.unique_id }}</span>
+                    </div>
+                </div>
 
-    <h4>Project Details</h4>
-    <p><strong>Description:</strong><br>{{ project.description|linebreaks }}</p>
-    <p><strong>Github URL:</strong>
-        {% if project.github_url %}
-        <a href="{{ project.github_url }}" target="_blank">{{ project.github_url }}</a>
-        {% else %}
-        -
-        {% endif %}
-    </p>
+                <div class="rev-detail-item">
+                    <div class="detail-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <span class="rev-label">Name</span>
+                        <span class="rev-value">{{ project.intern.user.get_full_name }}</span>
+                    </div>
+                </div>
 
-    <p><strong>File:</strong>
-        {% if project.file %}
-        <a href="{{ project.file.url }}" target="_blank">Download</a>
-        {% else %}
-        -
-        {% endif %}
-    </p>
+                <div class="rev-detail-item">
+                    <div class="detail-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 3h18v18H3zM8 7v10m4-10v10m4-10v10"></path>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <span class="rev-label">Batch</span>
+                        <span class="rev-value">{{ project.intern.batch.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <hr>
+        <!-- Divider -->
+        <div class="rev-divider">
+            <div class="divider-ornament"></div>
+        </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        <!-- Project Section -->
+        <div class="rev-section">
+            <div class="rev-section-header">
+                <div class="section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                    </svg>
+                </div>
+                <h3 class="rev-section-title">Project Details</h3>
+            </div>
 
-        <button class="btn btn-success">Save Review</button>
-    </form>
+            <div class="rev-block">
+                <div class="rev-description-card">
+                    <div class="description-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"></path>
+                        </svg>
+                        <span>Project Description</span>
+                    </div>
+                    <div class="rev-description">
+                        {{ project.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
 
+            <div class="rev-links-grid">
+                <div class="rev-link-item">
+                    <div class="link-icon-wrapper github">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                        </svg>
+                    </div>
+                    <div class="link-content">
+                        <span class="rev-label">Github URL</span>
+                        {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" class="rev-link">
+                                View Repository
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        {% else %}
+                            <span class="rev-missing">Not Provided</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="rev-link-item">
+                    <div class="link-icon-wrapper file">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                        </svg>
+                    </div>
+                    <div class="link-content">
+                        <span class="rev-label">Project File</span>
+                        {% if project.file %}
+                            <a href="{{ project.file.url }}" target="_blank" class="rev-link">
+                                Download File
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </a>
+                        {% else %}
+                            <span class="rev-missing">No File Attached</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="rev-divider">
+            <div class="divider-ornament"></div>
+        </div>
+
+        <!-- Review Form -->
+        <form method="post" class="rev-form">
+            {% csrf_token %}
+            <div class="rev-form-header">
+                <div class="section-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                </div>
+                <h3 class="rev-section-title">Evaluation Form</h3>
+            </div>
+            
+            <div class="rev-form-fields">
+                {{ form.as_p }}
+            </div>
+
+            <button type="submit" class="rev-submit-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                    <polyline points="17,21 17,13 7,13 7,21"/>
+                    <polyline points="7,3 7,8 15,8"/>
+                </svg>
+                Save Review
+            </button>
+        </form>
+
+    </div>
+    </div>
 </div>
+
+
+<style>
+/* Root Colors */
+:root {
+    --rev-primary: #4f46e5;
+    --rev-primary-dark: #4338ca;
+    --rev-primary-light: #e0e7ff;
+    --rev-secondary: #7c3aed;
+    --rev-accent: #06b6d4;
+    --rev-bg: #ffffff;
+    --rev-light: #f8fafc;
+    --rev-lighter: #f1f5f9;
+    --rev-border: #e2e8f0;
+    --rev-text: #1e293b;
+    --rev-text-light: #64748b;
+    --rev-muted: #94a3b8;
+    --rev-radius: 16px;
+    --rev-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --rev-shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* Container */
+.rev-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Card */
+.rev-card {
+    background: var(--rev-bg);
+    border-radius: var(--rev-radius);
+    padding: 2.5rem;
+    box-shadow: var(--rev-shadow-lg);
+    border: 1px solid var(--rev-border);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* Header */
+.rev-header {
+    margin-bottom: 3rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid var(--rev-border);
+    position: relative;
+}
+
+.rev-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.rev-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, var(--rev-primary), var(--rev-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.rev-subtitle {
+    color: var(--rev-text-light);
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.rev-header-graphic {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.graphic-circle {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--rev-primary-light);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: float 3s ease-in-out infinite;
+}
+
+.graphic-dots {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, var(--rev-primary) 2px, transparent 2px);
+    background-size: 10px 10px;
+    opacity: 0.3;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Section Headers */
+.rev-section-header, .rev-form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--rev-primary-light), transparent);
+    border-radius: 12px;
+    border-left: 4px solid var(--rev-primary);
+}
+
+.section-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--rev-primary), var(--rev-secondary));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.rev-section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--rev-text);
+}
+
+.rev-section {
+    margin-bottom: 2.5rem;
+}
+
+/* Divider */
+.rev-divider {
+    position: relative;
+    margin: 2.5rem 0;
+    text-align: center;
+}
+
+.divider-ornament {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rev-primary), transparent);
+    position: relative;
+}
+
+.divider-ornament::before,
+.divider-ornament::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--rev-primary);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.divider-ornament::before { left: 30%; }
+.divider-ornament::after { right: 30%; }
+
+/* Details Grid */
+.rev-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.rev-detail-item {
+    padding: 1.5rem;
+    background: var(--rev-bg);
+    border-radius: 14px;
+    border: 1px solid var(--rev-border);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--rev-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.rev-detail-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rev-primary), var(--rev-secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.rev-detail-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--rev-shadow-lg);
+}
+
+.rev-detail-item:hover::before {
+    transform: scaleX(1);
+}
+
+.detail-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--rev-primary-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--rev-primary);
+    flex-shrink: 0;
+}
+
+.detail-content {
+    flex: 1;
+}
+
+.rev-label {
+    font-size: .75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--rev-text-light);
+    letter-spacing: 0.5px;
+    display: block;
+}
+
+.rev-value {
+    font-weight: 700;
+    color: var(--rev-text);
+    display: block;
+    margin-top: 4px;
+    font-size: 1.05rem;
+}
+
+/* Description Card */
+.rev-description-card {
+    background: var(--rev-bg);
+    border-radius: 14px;
+    border: 1px solid var(--rev-border);
+    overflow: hidden;
+    box-shadow: var(--rev-shadow);
+}
+
+.description-header {
+    background: #f5f5f5;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: var(--rev-primary);
+    border-bottom: 1px solid var(--rev-border);
+}
+
+.rev-description {
+    padding: 1.5rem;
+    line-height: 1.7;
+    max-height: 220px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+    color: var(--rev-text);
+}
+
+/* Links Grid */
+.rev-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+}
+
+.rev-link-item {
+    padding: 1.5rem;
+    background: var(--rev-bg);
+    border-radius: 14px;
+    border: 1px solid var(--rev-border);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: var(--rev-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.rev-link-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rev-primary), var(--rev-secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.rev-link-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--rev-shadow-lg);
+}
+
+.rev-link-item:hover::before {
+    transform: scaleX(1);
+}
+
+.link-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.link-icon-wrapper.github {
+    background: #1a1a1a;
+    color: white;
+}
+
+.link-icon-wrapper.file {
+    background: var(--rev-primary-light);
+    color: var(--rev-primary);
+}
+
+.link-content {
+    flex: 1;
+}
+
+.rev-link {
+    color: var(--rev-primary);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 6px;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0;
+}
+
+.rev-link:hover {
+    color: var(--rev-primary-dark);
+    text-decoration: none;
+    transform: translateX(4px);
+}
+
+.rev-missing {
+    color: var(--rev-muted);
+    font-style: italic;
+    margin-top: 6px;
+    display: block;
+    font-size: 0.9rem;
+}
+
+/* Form */
+.rev-form {
+    margin-top: 1rem;
+}
+
+.rev-form-fields p {
+    margin-bottom: 1.75rem;
+}
+
+.rev-form-fields label {
+    display: block;
+    font-weight: 600;
+    color: var(--rev-text);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.rev-form-fields input,
+.rev-form-fields textarea,
+.rev-form-fields select {
+    width: 100%;
+    padding: 1.125rem;
+    border-radius: 12px;
+    border: 2px solid var(--rev-border);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--rev-bg);
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.rev-form-fields input:focus,
+.rev-form-fields textarea:focus,
+.rev-form-fields select:focus {
+    border-color: var(--rev-primary);
+    box-shadow: 0 0 0 4px var(--rev-primary-light);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.rev-form-fields textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* Button */
+.rev-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--rev-primary), var(--rev-secondary));
+    color: white;
+    padding: 1.25rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    box-shadow: 0 8px 25px rgba(79,70,229,0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.rev-submit-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.rev-submit-btn:hover {
+    background: linear-gradient(135deg, var(--rev-primary-dark), #6d28d9);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(79,70,229,0.5);
+}
+
+.rev-submit-btn:hover::before {
+    left: 100%;
+}
+
+/* Responsive */
+@media(max-width: 768px){
+    .rev-card { 
+        padding: 2rem; 
+    }
+    
+    .rev-header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .rev-title { 
+        font-size: 1.8rem; 
+    }
+    
+    .rev-header-graphic {
+        display: none;
+    }
+    
+    .rev-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rev-links-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rev-container {
+        padding: 0.5rem;
+    }
+}
+
+@media(max-width: 480px){
+    .rev-card { 
+        padding: 1.5rem; 
+        border-radius: 12px;
+    }
+    
+    .rev-title { 
+        font-size: 1.5rem; 
+    }
+    
+    .rev-subtitle {
+        font-size: 1rem;
+    }
+    
+    .rev-detail-item,
+    .rev-link-item {
+        padding: 1.25rem;
+    }
+    
+    .rev-section-header,
+    .rev-form-header {
+        padding: 1rem;
+    }
+}
+
+/* Custom scrollbar */
+.rev-description::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rev-description::-webkit-scrollbar-track {
+    background: var(--rev-light);
+    border-radius: 3px;
+}
+
+.rev-description::-webkit-scrollbar-thumb {
+    background: var(--rev-primary);
+    border-radius: 3px;
+}
+
+.rev-description::-webkit-scrollbar-thumb:hover {
+    background: var(--rev-primary-dark);
+}
+
+/* Animation for elements */
+.rev-detail-item,
+.rev-link-item,
+.rev-description-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 
 {% endblock %}

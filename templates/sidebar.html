@@ -29,14 +29,14 @@ body {
   color: #333;
 }
 .main-content {
-    margin-left: 260px;
+    margin-left: 240px;
     padding: 10px 20px;
     transition: var(--transition);
 }
 
 /* Sidebar */
 .sidebar {
-  width: 260px;
+  width: 240px;
   height: 100vh;
   position: fixed;
   top: 0;
@@ -61,7 +61,7 @@ body {
   text-align: center;
 }
 .sidebar-header h1 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--primary);
   padding: 20px 5px;
@@ -71,6 +71,24 @@ body {
  border-bottom: 1px solid #E5E7EB;
   background: #eef5ff;
 
+}
+/* Compact Sidebar Items */
+.sidebar ul li a {
+    font-size: 15px !important;     /* smaller text */
+}
+
+/* Compact Icons */
+.sidebar ul li a i {
+    font-size: 15px !important;     /* smaller icons */
+}
+
+/* Compact badge */
+.badge {
+    top: 12px !important;
+    right: 8px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    font-size: 9px !important;
 }
 
 /* Sections */
@@ -95,7 +113,7 @@ body {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  color:#9197B3;
+  color:#666 !important;
   text-decoration: none;
   border-radius: 6px;
   font-weight: 500;
@@ -103,14 +121,25 @@ body {
    border-bottom: 1px solid #E5E7EB;
 
 }
-.sidebar ul li a i { margin-right: 12px; font-size: 16px; color: var(--primar); }
+.sidebar ul li a i { margin-right: 12px; font-size: 16px; color:#5932EA; }
 .sidebar ul li a:hover,
 .sidebar ul li a.active {
   background: var(--primary);
   color: #fff;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
-.sidebar ul li a i:hover { margin-right: 12px; font-size: 16px; color:#fff; }
+/* ACTIVE + HOVER: make text & icon white */
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background: var(--primary);
+    color: #fff !important;
+}
+
+/* Make icons white on hover and active */
+.sidebar ul li a:hover i,
+.sidebar ul li a.active i {
+    color: #fff !important;
+}
 
 /* User Section */
 .user-section {
@@ -235,7 +264,6 @@ body {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  color: #9197B3;
   text-decoration: none;
   border-radius: 6px;
   font-weight: 500;
@@ -292,10 +320,13 @@ body {
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
       <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern Profiles</a></li>
+      <li><a href="{% url 'admin_intern_projects_overview' %}"> <i class="fas fa-clipboard-list"></i> Intern Projects</a></li>
       <li><a href="{% url 'trainer_list' %}"><i class="fas fa-chalkboard-teacher"></i></i>Trainer Profiles</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
       <li><a href="{% url 'batch_assessment_scores' %}"><i class="fas fa-chart-bar"></i> Assessment Scores</a></li>
       <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
+      <li><a href="{% url 'view_projects' %}"><i class="fas fa-diagram-project"></i>Projects</a></li>
+
       <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i>Undertaking Letters</a></li>
       <li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i>Completion Certificates</a></li>
       <li><a href="{% url 'manage_lor' %}"><i class="fas fa-certificate"></i>LOR's</a></li>
@@ -320,10 +351,13 @@ body {
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
       <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern Profiles</a></li>
+      <li><a href="{% url 'admin_intern_projects_overview' %}"> <i class="fas fa-clipboard-list"></i> Intern Projects</a></li>
       <li><a href="{% url 'trainer_list' %}"><i class="fas fa-chalkboard-teacher"></i></i>Trainer Profiles</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
       <li><a href="{% url 'batch_assessment_scores' %}"><i class="fas fa-chart-bar"></i> Assessment Scores</a></li>
       <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
+      <li><a href="{% url 'view_projects' %}"><i class="fas fa-diagram-project"></i>Projects</a></li>
+
       <li><a href="{% url 'undertaking_home' %}"><i class="fas fa-file-alt"></i>Undertaking Letters</a></li>
       <li><a href="{% url 'manage_certificates' %}"><i class="fas fa-certificate"></i>Completion Certificates</a></li>
       <li><a href="{% url 'manage_lor' %}"><i class="fas fa-certificate"></i>LOR's</a></li>
@@ -350,6 +384,8 @@ body {
       <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i>Profile</a></li>
       <li><a href="{% url 'attendance_report' %}"><i class="fas fa-calendar-check"></i> Attendance Report</a></li>
       <li><a href="{% url 'intern_list' %}"><i class="fas fa-user-friends"></i> Intern List</a></li>
+      <li><a href="{% url 'trainer_project_list' %}"> <i class="fas fa-clipboard-list"></i> Intern Projects</a></li>
+
       <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-check-circle"></i>Mark Attendance</a></li>
       <li><a href="{% url 'upload_lesson' %}"><i class="fas fa-upload"></i>Upload Lesson</a></li>
       <li><a href="{% url 'view_lessons' %}"><i class="fas fa-book"></i>Lessons</a></li>
@@ -357,6 +393,8 @@ body {
       <li><a href="{% url 'batch_assessment_scores' %}"><i class="fas fa-chart-bar"></i> Assessment Scores</a></li>
       <li><a href="{% url 'view_assignments' %}"><i class="fas fa-clipboard-list"></i> Assignments</a></li>
       <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
+            <li><a href="{% url 'view_projects' %}"><i class="fas fa-diagram-project"></i>Projects</a></li>
+
       <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
       <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>
@@ -393,6 +431,9 @@ body {
     {% endif %}
   </a>
 </li>      <li><a href="{% url 'batch_scores' %}"><i class="fas fa-star"></i> Assignment Scores</a></li>
+            <li><a href="{% url 'view_projects' %}"><i class="fas fa-diagram-project"></i>My Projects</a></li>
+      <li><a href="{% url 'intern_project_list' %}"> <i class="fas fa-clipboard-list"></i>Own Projects</a></li>
+
       <li><a href="{% url 'daily_update_list' %}"><i class="fas fa-calendar-alt"></i> Sessions List</a></li>
       <li><a href="{% url 'curriculum_list' %}"><i class="fas fa-book-open"></i> Curriculum</a></li>
       <li><a href="{% url 'recorded_session_list' %}"><i class="fas fa-video"></i>Recorded Classes</a></li>

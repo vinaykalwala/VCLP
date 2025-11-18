@@ -1,15 +1,146 @@
-{% extends "base.html" %}
+{% extends "login_base.html" %}
 {% block content %}
+<div class="main-content">
+    <div class="project-submission-container">
+        <div class="submission-card">
+            <div class="card-header">
+                <h2 class="card-title">Submit Your Project</h2>
+            </div>
 
-<h2 class="mb-3">Submit Your Project</h2>
+            <form method="post" enctype="multipart/form-data" class="project-form">
+                {% csrf_token %}
+                
+                <div class="form-fields">
+                    {{ form.as_p }}
+                </div>
 
-<div class="card p-4">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button class="btn btn-primary">Submit Project</button>
-    </form>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">
+                        Submit Project
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
+<style>
+.project-submission-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.submission-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(89, 50, 234, 0.08);
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+
+.card-header {
+    background: #5932EA;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-title {
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.project-form {
+    padding: 2.5rem;
+}
+
+.form-fields p {
+    margin-bottom: 1.5rem;
+}
+
+.form-fields label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-fields input,
+.form-fields textarea,
+.form-fields select {
+    width: 100%;
+    padding: 0.875rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+.form-fields input:focus,
+.form-fields textarea:focus,
+.form-fields select:focus {
+    outline: none;
+    border-color: #5932EA;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(89, 50, 234, 0.1);
+}
+
+.form-fields textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.submit-btn {
+    background: #5932EA;
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    background: #4a2bcb;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .project-submission-container {
+        padding: 1rem;
+    }
+    
+    .project-form {
+        padding: 2rem;
+    }
+    
+    .card-header {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-form {
+        padding: 1.5rem;
+    }
+    
+    .submit-btn {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}
